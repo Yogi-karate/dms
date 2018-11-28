@@ -9,8 +9,14 @@ class ProductionLot(models.Model):
     _name = 'vehicle'
     _inherit = 'stock.production.lot'
     _description = 'Vehicle'
-
+    name = fields.Char(
+        'Vehicle Number', default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
+        required=True, help="Unique Machine Number")
     chassis_no = fields.Char('Chasis Number',help = "Unique Chasis number of the vehicle")
+    order_id = fields.Many2one(
+        'sale.order', 'SaleOrder',
+        domain=[('state', 'in', ['sale', 'draft'])], required=True)
+    battery_no = fields.Char('Battery Number',help = "Unique Battery number of the vehicle")
 
     @api.model_create_multi
     def create(self, vals_list):

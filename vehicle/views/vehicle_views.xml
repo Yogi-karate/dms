@@ -25,6 +25,9 @@
                         <field name="ref"/>
                         <field name="chassis_no"/>
                     </group>
+                    <group>
+                        <field name="order_id" help="Sale Order this vehicle is allocated to. You cannot change it anymore if it has already been moved."/>
+                    </group>
                 </group>
                 </sheet>
                 <div class="oe_chatter">
