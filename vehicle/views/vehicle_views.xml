@@ -24,9 +24,11 @@
                             </div>
                         <field name="ref"/>
                         <field name="chassis_no"/>
+                         <field name="battery_no"/>
                     </group>
                     <group>
                         <field name="order_id" help="Sale Order this vehicle is allocated to. You cannot change it anymore if it has already been moved."/>
+                         <field name="customer_id"/>
                     </group>
                 </group>
                 </sheet>
@@ -49,6 +51,7 @@
                 <field name="product_id"/>
                 <field name="create_date"/>
                 <field name="chassis_no"/>
+                <field name="battery_no"/>
             </tree>
         </field>
     </record>
