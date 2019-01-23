@@ -3,6 +3,8 @@
 
 
 
+#from . import models
+# import
 
 def post_init(cr, registry):
     print("BASE DMS MODULE INIT!!!")

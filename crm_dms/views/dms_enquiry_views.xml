@@ -1,0 +1,297 @@
+<?xml version="1.0"?>
+<odoo>
+<!-- Opportunity Types -->
+
+        <record id="view_opportunity_type_tree" model="ir.ui.view">
+            <field name="name">opportunity.type.tree</field>
+            <field name="model">dms.opportunity.type</field>
+            <field name="arch" type="xml">
+                <tree string="Opportunity Type" decoration-muted="not active">
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="company_id" options="{'no_create': True}" groups="base.group_multi_company"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+
+
+        <record id="view_opportunity_type_kanban" model="ir.ui.view">
+            <field name="name">opportunity.type.kanban</field>
+            <field name="model">dms.opportunity.type</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile">
+                    <field name="name"/>
+                    <field name="description"/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                                <div class="row mb4">
+                                    <div class="col-6">
+                                        <strong><span><t t-esc="record.name.value"/></span></strong>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <span class="badge badge-pill"><t t-esc="record.description.value"/></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+        <record id="view_opportunity_type_search" model="ir.ui.view">
+            <field name="name">opportunity.type.search</field>
+            <field name="model">dms.opportunity.type</field>
+            <field name="arch" type="xml">
+                <search string="Search Opportunity Types">
+                    <field name="name" filter_domain="['|', ('name','ilike',self), ('description','ilike',self)]" string="Type"/>
+                    <separator/>
+                    <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active types"/>
+                    <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive types"/>
+                    <group string="Group By">
+                        <filter string="Company" name="company" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="opportunity_type_view_search" model="ir.ui.view">
+            <field name="name">opportunity.type.search.filters</field>
+            <field name="model">dms.opportunity.type</field>
+            <field name="arch" type="xml">
+                <search string="Search Opportunity Types">
+                    <field name="name" filter_domain="['|', ('name','ilike',self), ('description','ilike',self)]" string="Type"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_opportunity_type_form" model="ir.ui.view">
+            <field name="name">opportunity.type.form</field>
+            <field name="model">dms.opportunity.type</field>
+            <field name="arch" type="xml">
+                <form string="Opportunity Type">
+                    <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="team_id"/>
+                        </group>
+                    </group>
+                </sheet>
+                </form>
+              </field>
+        </record>
+        <record id="action_opportunity_type_form" model="ir.actions.act_window">
+            <field name="name">Opportunity Types</field>
+            <field name="res_model">dms.opportunity.type</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new Opportunity Type
+              </p>
+            </field>
+        </record>
+
+
+    <!-- Enquiry -->
+
+        <record id="dms_enquiry_form_view" model="ir.ui.view">
+            <field name="name">dms.enquiry.form</field>
+            <field name="model">dms.enquiry</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <form string="Enquiries" class="o_opportunity_form">
+                    <header>
+                        <button name="action_create_opportunities" string="Create Opportunities"
+                                type="object" class="oe_highlight"
+                                attrs="{'invisible': [('active','=',False)]}"/>
+
+                        <field name="state" widget="statusbar"
+                            attrs="{'invisible': [('active', '=', False)]}"/>
+                    </header>
+                    <sheet>
+                        <field name="active" invisible="1"/>
+                        <div class="oe_button_box" name="button_box">
+                            <button class="oe_stat_button" type="object"
+                                context="{'partner_id': partner_id}"
+                                name="action_schedule_meeting" icon="fa-calendar">
+                                <div class="o_stat_info">
+                                    <field name="meeting_count" class="o_stat_value"/>
+                                    <span class="o_stat_text" attrs="{'invisible': [('meeting_count', '&lt;', 2)]}"> Meetings</span>
+                                    <span class="o_stat_text" attrs="{'invisible': [('meeting_count', '&gt;', 1)]}"> Meeting</span>
+                                </div>
+                            </button>
+                        </div>
+                        <div class="oe_title">
+                            <label for="name" class="oe_edit_only"/>
+                            <h1><field name="name" placeholder="e.g. Product Pricing"/></h1>
+                        </div>
+                        <group>
+                            <group>
+                                <field name="partner_id" widget="res_partner_many2one" domain="[('customer', '=', True)]" context="{'search_default_customer': 1, 'show_vat': True}"/>
+                                <field name="product_id" />
+                                <field name="type_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
+                                <field name="date_follow_up"/>
+                            </group>
+                             <group string="Customer">
+                                 <field name="partner_name" />
+                                <field name="partner_mobile" />
+                                <field name="partner_email" />
+                             </group>
+                             <group string="Marketing">
+                                    <field name="campaign_id" invisible="1"/>
+                                    <field name="medium_id" invisible="1"/>
+                                    <field name="source_id" />
+                             </group>
+                        </group>
+                        <notebook colspan="4">
+                        <page string="Remarks">
+                            <field name="description"/>
+                        </page>
+                        </notebook>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="activity_ids" widget="mail_activity"/>
+                        <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipients'}"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="dms_enquiry_view_tree" model="ir.ui.view">
+            <field name="name">dms.enquiry.tree</field>
+           <field name="model">dms.enquiry</field>
+            <field name="arch" type="xml">
+                <tree string="Enquiries">
+                    <field name="create_date"/>
+                    <field name="name" string="Enquiry"/>
+                    <field name="partner_id" string="Customer"/>
+                    <field name="product_id" string="Product"/>
+                    <field name="medium_id" invisible="1"/>
+                    <field name="campaign_id" invisible="1"/>
+                    <field name="source_id"/>
+                    <field name="team_id"/>
+                    <field name="user_id"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="dms_enquiry_view_graph" model="ir.ui.view">
+            <field name="name">dms.enquiry.view.graph</field>
+            <field name="model">dms.enquiry</field>
+            <field name="arch" type="xml">
+                <graph string="Enquiries">
+                    <field name="state" type="col"/>
+                    <field name="user_id" type="row"/>
+                </graph>
+            </field>
+        </record>
+
+        <record id="dms_enquiry_view_pivot" model="ir.ui.view">
+            <field name="name">dms.enquiry.view.pivot</field>
+            <field name="model">dms.enquiry</field>
+            <field name="arch" type="xml">
+                <pivot string="Enquiry Analysis" disable_linking="True">
+                    <field name="create_date" interval="month" type="row"/>
+                    <field name="state" type="col"/>
+                </pivot>
+            </field>
+        </record>
+
+
+
+        <record id="view_dms_enquiry_filter" model="ir.ui.view">
+            <field name="name">dms.enquiry.search</field>
+            <field name="model">dms.enquiry</field>
+            <field name="arch" type="xml">
+                <search string="Search Enquiries">
+                    <field name="name" string="Enquiry" filter_domain="['|','|','|',('partner_id','ilike',self),('partner_name','ilike',self),('email_from','ilike',self),('name', 'ilike', self)]"/>
+                    <field name="state" domain="[]"/>
+                    <field name="user_id"/>
+                    <field name="team_id"/>
+                    <field name="partner_id" operator="child_of" string="Customer"/>
+                    <separator/>
+                    <filter string="My Enquiries" name="assigned_to_me"
+                        domain="[('user_id', '=', uid)]"
+                        help="Enquiries that are assigned to me"/>
+                    <filter string="Unassigned" name="unassigned"
+                        domain="[('user_id','=', False)]" help="No salesperson"/>
+                    <separator/>
+                    <group expand="0" string="Group By" colspan="16">
+                        <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
+                        <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>
+                        <filter name="stage" string="Stage" context="{'group_by':'state'}"/>
+                        <filter string="Source" name="source" domain="[]" context="{'group_by':'source_id'}"/>
+                        <separator orientation="vertical" />
+                        <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+
+        <!-- 'My Pipeline' menu : Server action, act_window_views and act_windows -->
+
+        <record model="ir.actions.act_window" id="dms_enquiry_tree_view">
+            <field name="name">Enquiry Pipeline</field>
+            <field name="res_model">dms.enquiry</field>
+            <field name="view_mode">tree,graph,pivot,form</field>
+            <field name="context">{
+                    'default_user_id': uid,
+                    'search_default_assigned_to_me': 1
+            }</field>
+            <field name="search_view_id" ref="view_dms_enquiry_filter"/>
+        </record>
+
+        <record id="dms_enquiry_tree_view_tree" model="ir.actions.act_window.view">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="dms_enquiry_view_tree"/>
+            <field name="act_window_id" ref="dms_enquiry_tree_view"/>
+        </record>
+
+        <record id="dms_enquiry_tree_view_view_pivot" model="ir.actions.act_window.view">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">pivot</field>
+            <field name="view_id" ref="dms_enquiry_view_pivot"/>
+            <field name="act_window_id" ref="dms_enquiry_tree_view"/>
+        </record>
+
+        <record id="dms_enquiry_tree_view_form" model="ir.actions.act_window.view">
+            <field name="sequence" eval="4"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="dms_enquiry_form_view"/>
+            <field name="act_window_id" ref="dms_enquiry_tree_view"/>
+        </record>
+
+        <record id="dms_enquiry_tree_view_graph" model="ir.actions.act_window.view">
+            <field name="sequence" eval="5"/>
+            <field name="view_mode">graph</field>
+            <field name="view_id" ref="dms_enquiry_view_graph"/>
+            <field name="act_window_id" ref="dms_enquiry_tree_view"/>
+        </record>
+
+        <menuitem
+            id="menu_dms_enquiries"
+            action="dms_enquiry_tree_view"
+            name="Enquiries"
+            parent="crm.crm_menu_sales"
+            sequence="1"/>
+         <menuitem
+             action="action_opportunity_type_form"
+             id="menu_opportunity_type_form"
+             parent="crm.crm_menu_config"
+             sequence="2"/>
+</odoo>

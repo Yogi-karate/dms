@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+        <!-- Top menu item -->
+        <menuitem id="menu_dms_root"
+            name="Dms"
+            web_icon="dms,static/description/icon.png"
+            sequence="1"/>
+        <menuitem name="Master Data" id="menu_dms_master_data_root" sequence="40"
+        parent="dms.menu_dms_root"
+        web_icon="vehicle,static/description/icon.png"/>
+
+</odoo>

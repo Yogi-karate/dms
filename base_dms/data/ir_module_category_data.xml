@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <!-- add applications to base groups -->
+
+        <record model="res.groups" id="group_dms_user">
+            <field name="category_id" ref="base.module_category_user_type"/>
+        </record>
+    </data>
+</odoo>

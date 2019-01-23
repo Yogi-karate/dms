@@ -2,5 +2,9 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
-from . import vehicle
-from . import stoc_move_line
+
+from . import models
+# import
+
+def post_init(cr, registry):
+    print("CRM DMS MODULE INIT!!!")

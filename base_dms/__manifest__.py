@@ -6,11 +6,15 @@
     'version': '1.0',
     'category': 'Base',
     'sequence': 60,
-    'summary': 'DMS User Interface Changes',
-    'description': "Vehicle Business Domain",
-    'depends': ['base'],
+    'summary': 'DMS Base Changes',
+    'description': "Auto Dealership Business Domain",
+    'depends': ['base','dms'],
     'data': [
+        'security/dms_groups.xml',
+        'data/ir_module_category_data.xml',
         'views/res_partner_views.xml',
+
+
     ],
     'installable': True,
     'auto_install': True,

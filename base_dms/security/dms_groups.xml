@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+
+        <!--
+            Users Groups
+            Note that the field 'category_id' is set later in
+            base/data/ir_module_category_data.xml
+        -->
+
+
+        <record model="res.groups" id="group_dms_user">
+            <field name="name">DMS User</field>
+        </record>
+        <record model="res.groups" id="group_dms_power_user">
+            <field name="name">DMS Power User</field>
+        </record>
+
+        <record model="res.groups" id="group_dms_user">
+            <field name="implied_ids" eval="[(4, ref('base.group_no_one'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+         <record model="res.groups" id="group_dms_power_user">
+            <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
+        </record>
+
+        <record id="mail.menu_root_discuss" model="ir.ui.menu">
+            <field name="groups_id" eval="[(3,ref('base.group_user')),(4, ref('group_dms_power_user'))]"/>
+        </record>
+
+        <record id="calendar.mail_menu_calendar" model="ir.ui.menu">
+            <field name="groups_id" eval="[(3,ref('base.group_user')),(4, ref('group_dms_power_user'))]"/>
+        </record>
+
+        <record id="contacts.menu_contacts" model="ir.ui.menu">
+            <field name="groups_id" eval="[(3,ref('base.group_user')),(4, ref('group_dms_power_user'))]"/>
+        </record>
+
+        <record id="stock.group_stock_user" model="res.groups">
+        <field name="implied_ids" eval="[(4, ref('group_dms_user'))]"/>
+        </record>
+    </data>
+</odoo>

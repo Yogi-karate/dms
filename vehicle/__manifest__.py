@@ -8,14 +8,14 @@
     'sequence': 60,
     'summary': 'Handle Vehicles for DMS',
     'description': "Vehicle Business Domain",
-    'depends': ['purchase','sale','stock'],
+    'depends': ['dms'],
     'data': [
         'security/vehicle_security.xml',
         'security/ir.model.access.csv',
         'views/vehicle_views.xml',
+        'views/stock_picking_views.xml',
     ],
     'installable': True,
-    'auto_install': False,
-    'application': True,
+    'auto_install': True,
 
 }
