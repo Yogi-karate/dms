@@ -24,24 +24,11 @@ class StockMoveLine(models.Model):
             # If the move line is directly create on the picking view.
             # Created vehicles lot id is associated to this move line
             if 'vehicle_id' in vals :
-                vals['lot_id'] = self._create_vehicle_lot(vals)
+                vehicle = self.env['vehicle'].browse(vals['vehicle_id'])
+                vals['lot_id'] = vehicle.lot_id.id
         return super(StockMoveLine, self).create(vals_list)
 
-    def _create_vehicle_lot(self,vals):
-        vehicle = self.env['vehicle'].browse(vals['vehicle_id'])
-        lot = vehicle.lot_id
-        if lot:
-            return lot.id
-        if 'product_id' in vals and vals['product_id']:
-            product = self.env['product.product'].browse(vals['product_id'])
-        else:
-            product = self.product_id
-        new_lot = self.env['stock.production.lot'].create({
-            'name': vehicle.name,
-            'product_id': product.id,
-        })
-        print("The new Lot created is " + new_lot.name)
-        return new_lot.id
+
 
     def _update_vehicle_lot(self,vals):
         vehicle = self.env['vehicle'].browse(vals['vehicle_id'])
@@ -61,5 +48,6 @@ class StockMoveLine(models.Model):
         print(vals)
         print(self)
         if 'vehicle_id' in vals:
-            self._update_vehicle_lot(vals)
+            vehicle = self.env['vehicle'].browse(vals['vehicle_id'])
+            vals['lot_id'] = vehicle.lot_id.id
         return super(StockMoveLine, self).write(vals)

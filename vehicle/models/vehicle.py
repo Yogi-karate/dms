@@ -49,7 +49,16 @@ class Vehicle(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             print(vals)
+            self._create_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
+
+    def _create_vehicle_lot(self,vals):
+        new_lot = self.env['stock.production.lot'].create({
+            'name': vals['name'],
+            'product_id': vals['product_id'],
+        })
+        vals['lot_id'] = new_lot.id
+        print("The new Lot created is " + new_lot.name)
 
     @api.multi
     def write(self, vals):

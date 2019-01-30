@@ -2,5 +2,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
-from . import dms_sale
+#from . import dms_sale
 
