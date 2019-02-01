@@ -78,6 +78,9 @@
                                         'show_vat': True,
                                     }"
                                 />
+                                <field name="campaign_id" invisible="1"/>
+                                <field name="source_id"  invisible="1"/>
+                                <field name="medium_id"  invisible="1"/>
                                 <field name="is_blacklisted" invisible="1"/>
                                 <field name="partner_is_blacklisted" invisible="1"/>
                                 <label for="email_from" class="oe_inline"/>

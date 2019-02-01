@@ -120,13 +120,7 @@
             }</field>
             <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
         </record>
-        <record id="enquiry_action_opportunities" model="ir.actions.act_window">
-            <field name="name">Enquiry_Opportunities</field>
-            <field name="res_model">crm.lead</field>
-            <field name="search_view_id" ref="crm.view_crm_case_opportunities_filter"/>
-            <field name="domain">[('enquiry_id', '=', active_id)]</field>
-            <field name="context">{'search_default_enquiry_id': [active_id], 'default_enquiry_id': active_id}</field>
-        </record>
+
         <record id="dms_enquiry_form_view" model="ir.ui.view">
             <field name="name">dms.enquiry.form</field>
             <field name="model">dms.enquiry</field>

@@ -40,8 +40,7 @@ class Enquiry(models.Model):
     categ_ids = fields.Many2many('product.category', 'enquiry_category_rel', 'enquiry_id',
                                 'id', string='Opportunity Categories', compute='_compute_categories',
                                 track_visibility='onchange')
-    product_updatable = fields.Boolean(string='Can provide product details', readonly=True,
-                                       default=False)
+    product_updatable = fields.Boolean(compute='_compute_tabs', string='Can provide product details', readonly=True)
     opportunity_count = fields.Integer('# Meetings', compute='_compute_opportunity_count')
     date_follow_up = fields.Date('Follow-Up Date', help="Estimate of the date on which the opportunity will be won.", required=True)
     partner_name = fields.Char('Customer Name', required=True)
@@ -85,10 +84,12 @@ class Enquiry(models.Model):
 
     @api.multi
     def _compute_tabs(self):
-        self.product_updatable = False
+        is_vehicle = False
         for type_id in self.type_ids:
-            if 'vehicle' in type_id.name.lower() or 'new' in type_id.name.lower() and not self.product_updatable:
-                self.product_updatable = True
+            if 'vehicle' in type_id.name.lower() or 'new' in type_id.name.lower():
+                is_vehicle = True
+                print("returning TRUE")
+        return is_vehicle
 
 
     @api.multi
@@ -103,7 +104,7 @@ class Enquiry(models.Model):
     def _on_change_type(self):
         print(self.type_ids)
         self._compute_categories()
-        self._compute_tabs()
+        self.product_updatable = self._compute_tabs()
         return
 
     #@api.onchange('product_id')
