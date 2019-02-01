@@ -11,18 +11,18 @@ class PurchaseOrder(models.Model):
     def create(self, vals):
         print(vals)
         result = super(PurchaseOrder, self).create(vals)
-        self.create_import(result,vals)
+        result.create_import(vals)
         return result
 
     @api.multi
-    def create_import(self,result,vals):
-        print(result)
+    def create_import(self,vals):
+        print(self)
         if 'confirm' in vals and 'vehicle' in vals:
             print("confirming the order as well !!!! ")
-            result.button_confirm()
+            self.button_confirm()
             template = self._prepare_stock_move_line(result.picking_ids, vals['vehicle'])
             res = self.env['stock.move.line'].create(template)
-            result.picking_ids.button_validate()
+            self.picking_ids.button_validate()
             print(res)
 
 

@@ -26,21 +26,7 @@
                         <field name="registration_no"/>
                         <field name="color"/>
                     </group>
-                     <group string="Finance Information" name="vehicle_finance" groups="vehicle.group_vehicle_manager">
-                            <field name="financier_name" groups="vehicle.group_vehicle_manager"/>
-                            <field name="finance_amount" groups="vehicle.group_vehicle_manager"/>
-                            <field name="finance_type" groups="vehicle.group_vehicle_manager"/>
-                        </group>
-                            <group string="Loan Details" name="vehicle_loan">
-                               <field name="loan_tenure"/>
-                                <field name="loan_amount"/>
-                                <field name="loan_approved_amount"/>
-                                <field name="loan_rate"/>
-                                <field name="loan_emi"/>
-                                <field name="loan_commission"/>
-                            </group>
-
-                         </group>
+                </group>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>

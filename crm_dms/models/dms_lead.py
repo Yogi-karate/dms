@@ -34,3 +34,4 @@ class OpportunityType(models.Model):
     color = fields.Integer('Color')
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
     team_id = fields.Many2one('crm.team', string='Default Sales Team', required=True)
+    categ_id = fields.Many2one('product.category',string="Default category", required=True)

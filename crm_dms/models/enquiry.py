@@ -1,5 +1,7 @@
 from odoo import api, fields, models, tools, SUPERUSER_ID,_
 
+from odoo.addons import decimal_precision as dp
+
 
 class Enquiry(models.Model):
     _name = "dms.enquiry"
@@ -7,7 +9,7 @@ class Enquiry(models.Model):
 
     name = fields.Char('Enquiry', index=True)
     partner_id = fields.Many2one('res.partner', string='Customer', track_visibility='onchange', track_sequence=1,
-                                 index=True,
+                                index=True,
                                  help="Linked partner (optional). Usually created when converting the lead. You can find a partner by its Name, TIN, Email or Internal Reference.")
     active = fields.Boolean('Active', default=True, track_visibility=True)
     team_id = fields.Many2one('crm.team', string='Sales Team', oldname='section_id',
@@ -28,32 +30,99 @@ class Enquiry(models.Model):
     ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='open')
     product_id = fields.Many2one('product.template', string='Product', required=True)
+    model_name = fields.Char('Model', compute='_compute_model_name')
+    product_color = fields.Many2one('product.template.attribute.value', string='Color')
+    product_variant = fields.Many2one('product.template.attribute.value', string='Variant')
     opportunity_ids = fields.One2many('crm.lead', 'enquiry_id', string='Opportunities')
-    type_ids = fields.Many2many('dms.opportunity.type', 'enquiry_opportunity_type_rel', 'enquiry_id', 'opportunity_type_id', string='Opportunity Types', required=True, track_visibility='onchange')
-    meeting_count = fields.Integer('# Meetings', compute='_compute_meeting_count')
+    type_ids = fields.Many2many('dms.opportunity.type', 'enquiry_opportunity_type_rel', 'enquiry_id',
+                                'opportunity_type_id', string='Types', required=True,
+                                track_visibility='onchange')
+    categ_ids = fields.Many2many('product.category', 'enquiry_category_rel', 'enquiry_id',
+                                'id', string='Opportunity Categories', compute='_compute_categories',
+                                track_visibility='onchange')
+    product_updatable = fields.Boolean(string='Can provide product details', readonly=True,
+                                       default=False)
+    opportunity_count = fields.Integer('# Meetings', compute='_compute_opportunity_count')
     date_follow_up = fields.Date('Follow-Up Date', help="Estimate of the date on which the opportunity will be won.", required=True)
     partner_name = fields.Char('Customer Name', required=True)
     partner_mobile = fields.Char('Customer Mobile', required=True)
     partner_email = fields.Char('Customer Email')
     description = fields.Text('Notes', track_visibility='onchange', track_sequence=6)
 
+    #finance fields added by Yoganand on 31-01-2019
+    financier_name = fields.Many2one('res.bank', string='Financier', help="Bank for finance")
+    finance_amount = fields.Float('Amount', digits=dp.get_precision('Product Price'), default=0.0)
+    finance_agreement_date = date_order = fields.Datetime(string='Finance Agreement Date', default=fields.Datetime.now)
+    loan_tenure = fields.Char('Tenure', help="Loan Tenure")
+    loan_amount = fields.Float('Loan Amount', digits=dp.get_precision('Product Price'), default=0.0)
+    loan_approved_amount = fields.Float('Approved Amount', digits=dp.get_precision('Product Price'), default=0.0)
+    loan_rate = fields.Float("Rate of Interest", digits=(2, 2), help='The rate of interest for loan')
+    loan_emi = fields.Float('EMI', digits=dp.get_precision('Product Price'), default=0.0)
+    loan_commission = fields.Float('Commission ', digits=dp.get_precision('Product Price'), default=0.0)
+    finance_type = fields.Selection([
+        ('in', 'in-house'),
+        ('out', 'out-house'),
+    ], string='Finance Type', store=True, default='out')
+
+    # insurance fields added by Yoganand on 31/01/2019
+    insurance_company = fields.Char('Insurance Company',String = "Insurance Company")
+    policy_no = fields.Char('Policy No.')
+    insurance_valid_from = fields.Datetime(string='Insurance Valid From')
+    insurance_valid_to = fields.Datetime(string='Insurance Valid To')
+    insurance_type = fields.Selection([
+        ('in', 'in-house'),
+        ('out', 'out-house'),
+    ], string='Insurance Type', store=True, default='out')
+    policy_punch_via = fields.Selection([
+        ('covernote', 'Covernote'),
+        ('hap', 'HAP'),
+        ('nonhap','Non-HAP')
+    ], string='Policy Punch Via', store=True, default='covernote')
+    currency_id = fields.Many2one(
+        'res.currency', string='Currency')
+    idv = fields.Monetary('IDV',currency_field='currency_id')
+    premium_amount = fields.Monetary('Premium Amount',currency_field='currency_id')
+
+    @api.multi
+    def _compute_tabs(self):
+        self.product_updatable = False
+        for type_id in self.type_ids:
+            if 'vehicle' in type_id.name.lower() or 'new' in type_id.name.lower() and not self.product_updatable:
+                self.product_updatable = True
+
+
+    @api.multi
+    def _compute_categories(self):
+        ids = []
+        for type_id in self.type_ids:
+            ids.append(type_id.categ_id.id)
+        self.categ_ids = ids
+
+
     @api.onchange('type_ids')
     def _on_change_type(self):
         print(self.type_ids)
+        self._compute_categories()
+        self._compute_tabs()
+        return
+
+    #@api.onchange('product_id')
+    #def _compute_model_name(self):
+        #return self.product_id.name
 
     @api.multi
-    def _compute_meeting_count(self):
-       # meeting_data = self.env['calendar.event'].read_group([('enquiry_id', 'in', self.ids)], ['enquiry_id'],
-                                                             #['enquiry_id'])
-        #mapped_data = {m['enquiry_id'][0]: m['enquiry_id_count'] for m in meeting_data}
+    def _compute_opportunity_count(self):
+        # meeting_data = self.env['calendar.event'].read_group([('enquiry_id', 'in', self.ids)], ['enquiry_id'],
+        # ['enquiry_id'])
+        # mapped_data = {m['enquiry_id'][0]: m['enquiry_id_count'] for m in meeting_data}
         for enquiry in self:
-            enquiry.meeting_count = 0
+            enquiry.opportunity_count = len(enquiry.opportunity_ids)
 
     @api.model
     def create(self, vals):
         # context: no_log, because subtype already handle this
         print(vals)
-        if not vals['name']:
+        if 'name' not in vals:
             print("hello")
             product_name = self.env['product.template'].browse(vals['product_id']).name
             vals['name'] = product_name
@@ -61,7 +130,7 @@ class Enquiry(models.Model):
             if 'partner_name' in vals:
                 vals['name'] += '/' + vals['partner_name']
         res = super(Enquiry, self).create(vals)
-        self._create_opportunities(res)
+        res._create_opportunities()
         return res
 
     @api.model
@@ -75,6 +144,7 @@ class Enquiry(models.Model):
             'opportunity_type': type.id,
             'user_id': self.user_id.id,
             'team_id': type.team_id.id,
+            'date_deadline' : self.date_follow_up,
             'type': 'opportunity'
         }
 
@@ -90,8 +160,8 @@ class Enquiry(models.Model):
 
 
     @api.multi
-    def _create_opportunities(self, vals):
-        print(vals)
+    def _create_opportunities(self):
+        #print(vals)
         lead = self.env['crm.lead']
         for enquiry in self:
             print(enquiry)
@@ -158,7 +228,7 @@ class Enquiry(models.Model):
         #if partner_company:
         #    return partner_company
         if self.partner_name:
-            return Partner.create(self._create_lead_partner_data(self.name, False))
+            return Partner.create(self._create_lead_partner_data(self.partner_name, False))
 
 
 

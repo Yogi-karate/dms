@@ -12,6 +12,9 @@ class Vehicle(models.Model):
     name = fields.Char(
         'Vehicle Number', default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
         required=True, help="Unique Machine Number")
+    _sql_constraints = [
+        ('name_ref_uniq', 'unique (name, product_id)', 'The combination of serial number and product must be unique !'),
+    ]
     ref = fields.Char('Internal Reference',
                       help="Internal reference number in case it differs from the manufacturer's lot/serial number")
     state = fields.Selection([
@@ -24,22 +27,8 @@ class Vehicle(models.Model):
     chassis_no = fields.Char('Chasis Number',help = "Unique Chasis number of the vehicle")
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
-                                 change_default=True, ondelete='restrict')
+                                 change_default=True, ondelete='cascade')
     battery_no = fields.Char('Battery Number',help = "Unique Battery number of the vehicle")
-    #customer_id = fields.Many2one('res.partner', string='Customer', readonly=True, compute='_get_customer')
-    financier_name = fields.Many2one('res.bank', string = 'Financier', help="Bank for finance")
-    finance_amount = fields.Float('Amount',digits=dp.get_precision('Product Price'), default=0.0)
-    finance_agreement_date = date_order = fields.Datetime(string='Finance Agreement Date', default=fields.Datetime.now)
-    loan_tenure = fields.Char('Tenure', help="Loan Tenure")
-    loan_amount = fields.Float('Loan Amount',digits=dp.get_precision('Product Price'), default=0.0)
-    loan_approved_amount = fields.Float('Approved Amount',digits=dp.get_precision('Product Price'), default=0.0)
-    loan_rate = fields.Float("Rate of Interest", digits=(2, 2), help='The rate of interest for loan')
-    loan_emi = fields.Float('EMI',digits=dp.get_precision('Product Price'), default=0.0)
-    loan_commission = fields.Float('Commission ', digits=dp.get_precision('Product Price'), default=0.0)
-    finance_type = fields.Selection([
-        ('in', 'in-house'),
-        ('out', 'out-house'),
-    ], string='Finance Type', store=True, default='out')
     product_id = fields.Many2one(
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], required=True)
