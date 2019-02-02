@@ -2,5 +2,5 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
-from . import dms_import_purchase
-from . import dms_import_sale
+from . import order_confirm
+
