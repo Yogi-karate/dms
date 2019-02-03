@@ -35,9 +35,13 @@ class MassConfirm(models.TransientModel):
         po_ids = self.env['purchase.order'].search([('name', 'in', ids)])
         po_ids.button_approve()
         d = val_list
-        for l in range(len(po_ids)):
-            d[l]['ids'] = po_ids[l]
-        self.confirm_inventory(d)
+        if po_ids:
+            for l in range(len(po_ids)):
+                d[l]['ids'] = po_ids[l]
+            self.confirm_inventory(d)
+        else:
+            print("No Purchase Inventory to Process")
+            return False
 
     @api.model
     def confirm_sale_orders(self, val_list):
@@ -46,16 +50,25 @@ class MassConfirm(models.TransientModel):
         for so_id in so_ids:
             so_id.action_confirm()
         d = val_list
-        for l in range(len(so_ids)):
-            d[l]['ids'] = so_ids[l]
-        self.confirm_inventory(d)
+        if so_ids:
+            for l in range(len(so_ids)):
+                d[l]['ids'] = so_ids[l]
+            self.confirm_inventory(d)
+        else:
+            print("No Sales Inventory to Process")
+            return False
+
 
     @api.multi
     def _create_move_lines(self, picking_ids, vehicle_id):
-        template = self._prepare_stock_move_line(picking_ids, vehicle_id)
-        res = self.env['stock.move.line'].create(template)
-        print(res)
-        picking_ids.button_validate()
+        if not picking_ids.move_line_ids:
+            template = self._prepare_stock_move_line(picking_ids, vehicle_id)
+            res = self.env['stock.move.line'].create(template)
+            print(res)
+        else:
+            print("Move Line Exists")
+            picking_ids.move_line_ids.write({'vehicle_id':vehicle_id, 'qty_done':1})
+        picking_ids.action_done()
 
     @api.multi
     def _prepare_stock_move_line(self, picking,vehicle_id):
