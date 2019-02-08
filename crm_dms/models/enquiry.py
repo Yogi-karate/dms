@@ -41,6 +41,10 @@ class Enquiry(models.Model):
                                 'id', string='Opportunity Categories', compute='_compute_categories',
                                 track_visibility='onchange')
     product_updatable = fields.Boolean(compute='_compute_product_updatable', string='Can provide product details', readonly=True)
+    finance_updatable = fields.Boolean(compute='_compute_finance_updatable', string='Can provide finance details',
+                                       readonly=True)
+    insurance_updatable = fields.Boolean(compute='_compute_insurance_updatable', string='Can provide insurance details',
+                                       readonly=True)
     opportunity_count = fields.Integer('# Meetings', compute='_compute_opportunity_count')
     date_follow_up = fields.Date('Follow-Up Date', help="Estimate of the date on which the opportunity will be won.", required=True)
     partner_name = fields.Char('Customer Name', required=True)
@@ -92,6 +96,25 @@ class Enquiry(models.Model):
                 print("returning TRUE")
         self.product_updatable = is_vehicle
 
+    @api.depends('type_ids')
+    @api.multi
+    def _compute_finance_updatable(self):
+        is_finance = False
+        for type_id in self.type_ids:
+            if 'finance' in type_id.name.lower():
+                is_finance = True
+                print("returning TRUE")
+        self.finance_updatable = is_finance
+
+    @api.depends('type_ids')
+    @api.multi
+    def _compute_insurance_updatable(self):
+        is_insurance = False
+        for type_id in self.type_ids:
+            if 'insurance' in type_id.name.lower():
+                is_insurance = True
+                print("returning TRUE")
+        self.insurance_updatable = is_insurance
 
     @api.multi
     def _compute_categories(self):
@@ -139,7 +162,7 @@ class Enquiry(models.Model):
         print(self)
         customer = self._create_lead_partner()
         return {
-            'name': type.name + '/' + self.name,
+            'name': type.name + '/' + self.product_id.name,
             'partner_id': customer.id,
             'enquiry_id': self.id,
             'opportunity_type': type.id,

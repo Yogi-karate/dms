@@ -177,6 +177,8 @@
                                     <field name="campaign_id" invisible="1"/>
                                     <field name="medium_id" invisible="1"/>
                                     <field name="product_updatable" invisible="1"/>
+                                    <field name="finance_updatable" invisible="1"/>
+                                    <field name="insurance_updatable" invisible="1"/>
                                     <field name="source_id" />
                              </group>
 
@@ -191,24 +193,32 @@
                             </group>
                             </group>
                         </page>
-                            <page string="Finance Details">
-                               <group string="Finance Information" name="vehicle_finance" groups="vehicle.group_vehicle_manager">
-                                    <field name="financier_name" groups="vehicle.group_vehicle_manager"/>
-                                    <field name="finance_amount" groups="vehicle.group_vehicle_manager"/>
-                                   <field name ="finance_agreement_date" groups="vehicle.group_vehicle_manager"/>
-                                    <field name="finance_type" groups="vehicle.group_vehicle_manager"/>
+                            <page string="Finance Details" attrs="{'invisible': [('finance_updatable', '=', False)]}">
+                               <group string="Finance Information" name="vehicle_finance">
+                                   <group>
+                                   <field name="finance_type"/>
+                                   <field name="financier_name" />
+                                   </group>
+                                   <group>
+                                   <field name="finance_amount" />
+                                   <field name ="finance_agreement_date" />
+                                   </group>
                                </group>
                         </page>
-                            <page string="Insurance Details">
+                            <page string="Insurance Details" attrs="{'invisible': [('insurance_updatable', '=', False)]}">
                                 <group string="Insurance Details" name="insur">
-                                    <field name="insurance_company"/>
+                                    <group>
                                     <field name="insurance_type"/>
+                                    <field name="insurance_company"/>
                                     <field name="policy_no"/>
+                                    <field name="idv"/>
+                                    </group>
+                                    <group>
                                     <field name="insurance_valid_from"/>
                                     <field name="insurance_valid_to"/>
                                     <field name="policy_punch_via"/>
-                                    <field name="idv"/>
                                     <field name ="premium_amount"/>
+                                    </group>
                                 </group>
 
                         </page>
