@@ -4,6 +4,7 @@
 
 
 from . import models
+from . import wizard
 # import
 
 def post_init(cr, registry):

@@ -1,6 +1,8 @@
 from odoo import api, fields, models, tools, SUPERUSER_ID,_
 
 from odoo.addons import decimal_precision as dp
+from odoo.exceptions import ValidationError
+import re
 
 
 class Enquiry(models.Model):
@@ -116,6 +118,14 @@ class Enquiry(models.Model):
                 print("returning TRUE")
         self.insurance_updatable = is_insurance
 
+    @api.constrains('partner_mobile')
+    @api.multi
+    def _valid_mobile(self):
+        pattern = re.compile(r'^[0-9]{10}')
+        for enquiry in self:
+            if not pattern.match(enquiry.partner_mobile):
+                raise ValidationError(_("Please Enter a Valid Mobile Number"))
+
     @api.multi
     def _compute_categories(self):
         ids = []
@@ -166,7 +176,7 @@ class Enquiry(models.Model):
             'partner_id': customer.id,
             'enquiry_id': self.id,
             'opportunity_type': type.id,
-            'user_id': self.user_id.id,
+            'user_id': type.team_id.user_id.id,
             'team_id': type.team_id.id,
             'date_deadline' : self.date_follow_up,
             'type': 'opportunity'

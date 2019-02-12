@@ -1,0 +1,16 @@
+<odoo>
+    <data noupdate="1">
+    <record id="product_category_vehicle" model="product.category">
+            <field name="parent_id" ref="product.product_category_all"/>
+            <field name="name">Vehicles</field>
+     </record>
+         <record id="product_category_finance" model="product.category">
+            <field name="parent_id" ref="product.product_category_all"/>
+            <field name="name">Finance</field>
+     </record>
+        <record id="product_category_insurance" model="product.category">
+            <field name="parent_id" ref="product.product_category_all"/>
+            <field name="name">Insurance</field>
+     </record>
+    </data>
+</odoo>
