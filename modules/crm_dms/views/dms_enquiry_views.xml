@@ -241,14 +241,17 @@
                     <field name="create_date"/>
                     <field name="name" string="Enquiry"/>
                     <field name="partner_name" string="Customer"/>
+                    <field name="partner_mobile" string="Mobile No."/>
+                    <field name="type_ids" widget="many2many_tags" string="Type"/>
                     <field name="product_id" string="Product"/>
+                    <field name="product_color" string="Color"/>
+                    <field name="product_variant" string="Variant"/>
                     <field name="medium_id" invisible="1"/>
                     <field name="campaign_id" invisible="1"/>
                     <field name="date_follow_up"/>
                     <field name="source_id"/>
                     <field name="team_id"/>
                     <field name="user_id"/>
-                    <field name="state"/>
                 </tree>
             </field>
         </record>
