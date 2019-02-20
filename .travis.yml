@@ -9,7 +9,7 @@ script:
 
 after_success:
   provider: script
-  script: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push $DOCKER_USERNAME/$TRAVIS_BRANCH:$TRAVIS_BUILD_NUMBER
+  script: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push tramm/dms
   on:
     branch: master
  
