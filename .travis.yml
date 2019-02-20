@@ -7,7 +7,7 @@ script:
   - docker run -d -p 127.0.0.1:80:4567 tramm/dms
   - docker ps -a
 
-deploy:
+after_success:
   provider: script
   script: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push $DOCKER_USERNAME/$TRAVIS_BRANCH:$TRAVIS_BUILD_NUMBER
   on:
