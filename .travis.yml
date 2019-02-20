@@ -8,7 +8,7 @@ script:
   - docker ps -a
 
 after_success:
-  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push tramm/dms
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push $DOCKER_USERNAME/dms:$TRAVIS_BUILD_NUMBER
  
 notifications:
   slack: saboogroupworkspace:tco87KFtlVfRyVKhQoaEfKQn
