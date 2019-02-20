@@ -8,10 +8,7 @@ script:
   - docker ps -a
 
 after_success:
-  provider: script
-  script: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push tramm/dms
-  on:
-    branch: master
+  - docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push tramm/dms
  
 notifications:
   slack: saboogroupworkspace:tco87KFtlVfRyVKhQoaEfKQn
