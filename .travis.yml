@@ -9,7 +9,7 @@ script:
 
 deploy:
   provider: script
-  script: bash docker_push
+  script: docker login -u $DOCKER_USERNAME -p $DOCKER_PASSWORD && docker push $DOCKER_USERNAME/$TRAVIS_BRANCH:$TRAVIS_BUILD_NUMBER
   on:
     branch: master
  
