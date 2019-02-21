@@ -153,6 +153,10 @@ class Lead2OpportunityPartner(models.TransientModel):
             # on 15/02/2019
             if x.attribute_value_ids.ids[0] == color.id and x.attribute_value_ids.ids[1] == variant.id:
                                         product = x
+        print("HELLO")
+        print(product.color_value)
+        print(product.variant_value)
+
         values = {
             'team_id': self.team_id.id,
             'product_id': self.product_id.id,
