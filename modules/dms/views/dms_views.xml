@@ -10,4 +10,5 @@
         parent="dms.menu_dms_root"
         web_icon="vehicle,static/description/icon.png"/>
 
+
 </odoo>

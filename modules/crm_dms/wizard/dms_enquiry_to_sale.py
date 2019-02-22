@@ -27,8 +27,6 @@ class Lead2OpportunityPartner(models.TransientModel):
             type = 'Vehicle'
             dms = self.env['dms.enquiry'].search([('type_ids.name','in',[type])])
             email = lead.partner_id.email if lead.partner_id else lead.email_from
-
-
             print(lead)
             tomerge.update(self._get_duplicated_leads(partner_id, email, include_lost=True).ids)
 
@@ -38,16 +36,10 @@ class Lead2OpportunityPartner(models.TransientModel):
                 result['partner_id'] = lead.partner_id.id
             if 'name' in fields:
                 result['name'] = 'merge' if len(tomerge) >= 2 else 'convert'
-            if 'opportunity_ids' in fields and len(tomerge) >= 2:
-                result['opportunity_ids'] = list(tomerge)
             if lead.user_id:
                 result['user_id'] = lead.user_id.id
             if lead.team_id:
                 result['team_id'] = lead.team_id.id
-            if enquiry.partner_id:
-                result['partner_id'] = enquiry.partner_id.id
-            if enquiry.source_id:
-                result['source_id'] = enquiry.source_id.id
             if enquiry.product_color:
                 result['product_color'] = enquiry.product_color.id
             if enquiry.product_variant:
@@ -62,15 +54,14 @@ class Lead2OpportunityPartner(models.TransientModel):
         ('convert', 'Convert to opportunity'),
         ('merge', 'Merge with existing opportunities')
     ], 'Conversion Action', required=True)
-    opportunity_ids = fields.Many2many('crm.lead', string='Opportunities')
-    user_id = fields.Many2one('res.users', 'Salesperson', index=True)
-    team_id = fields.Many2one('crm.team', 'Sales Team', oldname='section_id', index=True)
-    source_id = fields.Many2one('utm.source', string='Source', required=True)
+
     action = fields.Selection([
         ('exist', 'Link to an existing customer'),
         ('create', 'Create a new customer'),
         ('nothing', 'Do not link to a customer')
     ], 'Related Customer', required=True)
+    user_id = fields.Many2one('res.users', 'User')
+    team_id = fields.Many2one('crm.team', 'Team')
     partner_id = fields.Many2one('res.partner', 'Customer')
     product_id = fields.Many2one('product.template', string='Product', required=True)
     product_color = fields.Many2one('product.template.attribute.value', string='Color')
@@ -140,39 +131,28 @@ class Lead2OpportunityPartner(models.TransientModel):
             the freshly created opportunity view.
         """
         self.ensure_one()
-
+        print(self.product_id)
+        print(self.product_color.name)
+        print(self.product_variant.name)
         sale = self.env['sale.order']
-        type = 'Vehicle'
-        dms = self.env['dms.enquiry'].search([('type_ids.name', 'in', [type])])
-        color = self.product_color.product_attribute_value_id
-        variant = self.product_variant.product_attribute_value_id
-        product = None
-        print(self.product_id.product_variant_ids)
-        for x in self.product_id.product_variant_ids:
-            #hard coded for now by yoganand, needs to be changed in product.product
-            # on 15/02/2019
-            if x.attribute_value_ids.ids[0] == color.id and x.attribute_value_ids.ids[1] == variant.id:
-                                        product = x
-        print("HELLO")
+        product = self.env['product.product'].search([('product_tmpl_id','=',self.product_id.id),('color_value','=',self.product_color.name),('variant_value','=',self.product_variant.name)])
+        if not product:
+            return
+        print(product)
         print(product.color_value)
         print(product.variant_value)
 
         values = {
             'team_id': self.team_id.id,
-            'product_id': self.product_id.id,
-            'product_color': self.product_color.id,
-            'product_variant': self.product_variant.id,
             'partner_id': self.partner_id.id,
             'user_id':self.user_id.id,
-            'opportunity_id': int(self._context['active_id'])
-
+            'opportunity_id': self._context['active_id']
         }
-
-#
         if self.partner_id:
             values['partner_id'] = self.partner_id.id
         order = sale.create(values)
         self._create_sale_order_line(product,order)
+
     def _create_sale_order_line(self,product,order):
           order_line = self.env['sale.order.line']
           vals = {
@@ -182,7 +162,6 @@ class Lead2OpportunityPartner(models.TransientModel):
           }
           order_line.create(vals)
           print(order_line)
-
 
     def _create_partner(self, lead_id, action, partner_id):
         """ Create partner based on action.

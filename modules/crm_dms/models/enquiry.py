@@ -21,6 +21,8 @@ class Enquiry(models.Model):
                               help='When sending mails, the default email address is taken from the Sales Team.')
     user_id = fields.Many2one('res.users', string='Salesperson', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
+    company_id = fields.Many2one('res.company', string='Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
     # kanban_state = fields.Selection(
     #    [('grey', 'No next activity planned'), ('red', 'Next activity late'), ('green', 'Next activity is planned')],
     #   string='Kanban State', compute='_compute_kanban_state')
@@ -171,12 +173,13 @@ class Enquiry(models.Model):
     def _prepare_opportunities(self, type):
         print(self)
         customer = self._create_lead_partner()
+        user_id = self._assign_enquiry_user()
         return {
             'name': type.name + '/' + self.product_id.name,
             'partner_id': customer.id,
             'enquiry_id': self.id,
             'opportunity_type': type.id,
-            'user_id': type.team_id.user_id.id,
+            'user_id': user_id,
             'team_id': type.team_id.id,
             'date_deadline' : self.date_follow_up,
             'type': 'opportunity'
@@ -237,6 +240,10 @@ class Enquiry(models.Model):
             'email': email_split[0] if email_split else False,
             'type': 'contact'
         }
+
+    @api.multi
+    def _assign_enquiry_user(self):
+        return self.user_id.id
 
     @api.multi
     def _create_lead_partner(self):

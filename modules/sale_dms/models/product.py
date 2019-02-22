@@ -5,8 +5,8 @@ class DmsProduct(models.Model):
     _name = 'product.product'
     _inherit = 'product.product'
 
-    color_value = fields.Char('color', compute='_compute_color', help='test color')
-    variant_value = fields.Char('variant', compute='_compute_variant', help='test something')
+    color_value = fields.Char('color', compute='_compute_color', help='test color', store=True)
+    variant_value = fields.Char('variant', compute='_compute_variant', help='test something', store=True)
 
     @api.one
     @api.depends('attribute_value_ids')
