@@ -1,22 +1,4 @@
-Skip to content
- 
-Search or jump to…
 
-Pull requests
-Issues
-Marketplace
-Explore
- @tramm Sign out
-1
-0 9,649 tramm/odoo
-forked from odoo/odoo
- Code  Issues 0  Pull requests 1  Projects 0  Wiki  Insights  Settings
-odoo/.gitignore
-6a66adf  on 3 Oct 2017
-@d-fence d-fence [IMP] setup: ignore external files needed for win32 build
-@KangOl @beledouxdenis @xmo-odoo @tde-banana-odoo @d-fence @antonylesuisse
-     
-41 lines (36 sloc)  579 Bytes
 # sphinx build directories
 _build/
 
@@ -34,39 +16,4 @@ __pycache__/
 # hg stuff
 *.orig
 status
-# odoo filestore
-odoo/filestore
-# maintenance migration scripts
-odoo/addons/base/maintenance
 
-# generated for windows installer?
-install/win32/*.bat
-install/win32/meta.py
-
-# needed only when building for win32
-setup/win32/static/less/
-setup/win32/static/wkhtmltopdf/
-setup/win32/static/postgresql*.exe
-
-# various virtualenv
-/bin/
-/build/
-/dist/
-/include/
-/lib/
-/man/
-/share/
-/src/
-© 2019 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Help
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
-Press h to open a hovercard with more details.
