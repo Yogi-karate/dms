@@ -5,8 +5,8 @@
         <field name="name">All Orders</field>
         <field ref="sale.model_sale_order" name="model_id"/>
         <field name="domain_force">[(1,'=',1)]</field>
-        <field name="groups" eval="[(6, ref('base.group_system'))]"/>
-    </record> 
+        <field name="groups" eval="[(0, ref('base.group_system'))]"/>
+    </record>
      <record id="sale_order_team_rule" model="ir.rule">
         <field name="name">Team Orders</field>
         <field ref="sale.model_sale_order" name="model_id"/>
