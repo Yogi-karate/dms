@@ -21,3 +21,6 @@ class CrmTeam(models.Model):
         'res.users', 'team_manager_user_rel', 'team_id', 'user_id',domain=lambda self:[('groups_id','in',self.env.ref('sales_team.group_sale_manager').id)],
         string='Managers')
     location_id = fields.Many2one('stock.location', domain=[('usage', '=', 'Sales')], string='Sales Team Location')
+    team_type = fields.Selection([('sales', 'Sales'),('insurance', 'Insurance'),('finance', 'Finance'), ('website', 'Website')], string='Team Type', default='sales',
+                                 required=True,
+                                 help="The type of this channel, it will define the resources this channel uses.")
