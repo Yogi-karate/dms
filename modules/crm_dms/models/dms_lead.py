@@ -55,3 +55,10 @@ class OpportunityType(models.Model):
     company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
     team_id = fields.Many2one('crm.team', string='Default Sales Team', required=True)
     categ_id = fields.Many2one('product.category',string="Default category", required=True)
+    team_type = fields.Char('Team Type', compute='_get_team_type')
+
+    @api.depends('team_id')
+    @api.multi
+    def _get_team_type(self):
+        for type in self:
+            type.team_type = type.team_id.team_type or False

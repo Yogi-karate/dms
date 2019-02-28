@@ -8,13 +8,12 @@
     'sequence': 60,
     'summary': 'Handle Sales customization for DMS',
     'description': "Vehicle Dealership Business Domain",
-    'depends': ['dms','sale'],
+    'depends': ['sale','dms'],
     'data': [
         'security/ir.model.access.csv',
         'views/booking_views.xml',
     ],
     'installable': True,
     'auto_install': False,
-    'application': True,
 
 }

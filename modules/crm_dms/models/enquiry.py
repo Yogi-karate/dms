@@ -1,13 +1,13 @@
 from odoo import api, fields, models, tools, SUPERUSER_ID,_
 
 from odoo.addons import decimal_precision as dp
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError,UserError
 import re
 
 
 class Enquiry(models.Model):
     _name = "dms.enquiry"
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'utm.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
 
     name = fields.Char('Enquiry', index=True)
     partner_id = fields.Many2one('res.partner', string='Customer', track_visibility='onchange', track_sequence=1,
@@ -21,10 +21,11 @@ class Enquiry(models.Model):
                               help='When sending mails, the default email address is taken from the Sales Team.')
     user_id = fields.Many2one('res.users', string='Salesperson', index=True, track_visibility='onchange',
                               default=lambda self: self.env.user)
+    company_id = fields.Many2one('res.company', string='Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
     # kanban_state = fields.Selection(
     #    [('grey', 'No next activity planned'), ('red', 'Next activity late'), ('green', 'Next activity is planned')],
     #   string='Kanban State', compute='_compute_kanban_state')
-
     state = fields.Selection([
         ('open', 'Open'),
         ('done', 'Closed'),
@@ -87,6 +88,8 @@ class Enquiry(models.Model):
         'res.currency', string='Currency')
     idv = fields.Monetary('IDV',currency_field='currency_id')
     premium_amount = fields.Monetary('Premium Amount',currency_field='currency_id')
+    source_id = fields.Many2one('utm.source', string='Source', required=True)
+    medium_id = fields.Many2one('utm.medium', string='Medium')
 
     @api.depends('type_ids')
     @api.multi
@@ -95,7 +98,6 @@ class Enquiry(models.Model):
         for type_id in self.type_ids:
             if 'vehicle' in type_id.name.lower() or 'new' in type_id.name.lower():
                 is_vehicle = True
-                print("returning TRUE")
         self.product_updatable = is_vehicle
 
     @api.depends('type_ids')
@@ -105,7 +107,6 @@ class Enquiry(models.Model):
         for type_id in self.type_ids:
             if 'finance' in type_id.name.lower():
                 is_finance = True
-                print("returning TRUE")
         self.finance_updatable = is_finance
 
     @api.depends('type_ids')
@@ -115,7 +116,6 @@ class Enquiry(models.Model):
         for type_id in self.type_ids:
             if 'insurance' in type_id.name.lower():
                 is_insurance = True
-                print("returning TRUE")
         self.insurance_updatable = is_insurance
 
     @api.constrains('partner_mobile')
@@ -140,9 +140,14 @@ class Enquiry(models.Model):
         self._compute_categories()
         return
 
-    #@api.onchange('product_id')
-    #def _compute_model_name(self):
-        #return self.product_id.name
+    @api.depends('type_ids')
+    @api.multi
+    def _compute_type_changes(self):
+        print(self.type_ids)
+        leads = self.env['crm.lead'].search([('enquiry_id','=',self.id)])
+        print(leads)
+        if leads:
+            raise UserError(_('Cannot Change Types after Sub Enquiry creation - Please Create a new enquiry'))
 
     @api.multi
     def _compute_opportunity_count(self):
@@ -157,12 +162,10 @@ class Enquiry(models.Model):
         # context: no_log, because subtype already handle this
         print(vals)
         if 'name' not in vals:
-            print("hello")
             product_name = self.env['product.template'].browse(vals['product_id']).name
             vals['name'] = product_name
-            print(product_name)
             if 'partner_name' in vals:
-                vals['name'] += '/' + vals['partner_name']
+                vals['name'] += '-' + vals['partner_name']
         res = super(Enquiry, self).create(vals)
         res._create_opportunities()
         return res
@@ -172,12 +175,10 @@ class Enquiry(models.Model):
         print(self)
         customer = self._create_lead_partner()
         return {
-            'name': type.name + '/' + self.product_id.name,
+            'name': type.name + '-' + self.product_id.name,
             'partner_id': customer.id,
             'enquiry_id': self.id,
             'opportunity_type': type.id,
-            'user_id': type.team_id.user_id.id,
-            'team_id': type.team_id.id,
             'date_deadline' : self.date_follow_up,
             'type': 'opportunity'
         }
@@ -195,28 +196,23 @@ class Enquiry(models.Model):
 
     @api.multi
     def _create_opportunities(self):
-        #print(vals)
         lead = self.env['crm.lead']
         for enquiry in self:
-            print(enquiry)
             if not enquiry.opportunity_ids:
-                leads = []
                 for type in enquiry.type_ids:
                     res = self._prepare_opportunities(type)
                     id = lead.create(res)
-                    print(id)
+                    res.update(self._assign_enquiry_user(type))
+                    print(res)
                     self._schedule_follow_up(id)
             else:
                 print("Not creating Opportunities as they already exist")
 
     @api.multi
     def write(self, vals):
-        print("write enquiry !!!!!! ---------------------|||||||||||||||||||||||||||||||")
-        print(self)
         return super(Enquiry, self).write(vals)
 
     def action_create_opportunities(self):
-        print("Creating Opportunities")
         self._create_opportunities(None)
 
     @api.multi
@@ -237,6 +233,25 @@ class Enquiry(models.Model):
             'email': email_split[0] if email_split else False,
             'type': 'contact'
         }
+
+    @api.model
+    def _assign_enquiry_user(self, type):
+        user = self.env.user
+        user_team = self.sudo().env['crm.team'].search([('member_ids', '=', user.id)])
+        user_team_type = user_team.team_type
+        print(user_team_type)
+        print(type.team_type)
+        if type.team_type and user_team_type and user_team_type == type.team_type:
+            print(type.team_type)
+            user_id = user.id
+        else:
+            if user_team:
+                location_team = self.sudo().env['crm.team'].search([('location_id', 'in', [user_team.location_id.id]),
+                                ('team_type','=', type.team_type)])
+                print(location_team)
+                print("Location !!!")
+            user_id = user.id
+        return {'user_id': user_id}
 
     @api.multi
     def _create_lead_partner(self):

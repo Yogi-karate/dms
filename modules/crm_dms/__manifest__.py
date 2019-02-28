@@ -11,7 +11,9 @@
     'depends': ['crm','dms'],
     'data': [
         'security/ir.model.access.csv',
+        'security/dms_enquiry_security.xml',
         'views/dms_enquiry_views.xml',
+        'data/crm_stage_data.xml',
         'data/mail_activity.xml',
         'data/product_category_data.xml',
         'data/sale_team_data.xml',
@@ -22,6 +24,5 @@
         'views/crm_lead_views.xml',
     ],
     'installable': True,
-    'auto_install': False,
-    'application': True,
+    'auto_install': True,
 }

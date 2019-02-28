@@ -174,8 +174,6 @@
                                 <field name="partner_email" />
                              </group>
                              <group string="Marketing">
-                                    <field name="campaign_id" invisible="1"/>
-                                    <field name="medium_id" invisible="1"/>
                                     <field name="product_updatable" invisible="1"/>
                                     <field name="finance_updatable" invisible="1"/>
                                     <field name="insurance_updatable" invisible="1"/>
@@ -246,8 +244,6 @@
                     <field name="product_id" string="Product"/>
                     <field name="product_color" string="Color"/>
                     <field name="product_variant" string="Variant"/>
-                    <field name="medium_id" invisible="1"/>
-                    <field name="campaign_id" invisible="1"/>
                     <field name="date_follow_up"/>
                     <field name="source_id"/>
                     <field name="team_id"/>
