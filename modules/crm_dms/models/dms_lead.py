@@ -13,7 +13,9 @@ class DmsLead(models.Model):
     days_open = fields.Float(compute='_compute_days_open', string='Days Open', store=True)
     enquiry_id = fields.Many2one('dms.enquiry',string='Enquiry')
     opportunity_type = fields.Many2one('dms.opportunity.type', string='Opportunity Type')
-
+    color_value = fields.Char(compute='_compute_color',string='Color',help ='true')
+    variant_value = fields.Char(compute='_compute_variant',string='Variant',help ='true')
+    vehicle_name = fields.Char(compute='_compute_vehicle',string='Vehicle',help ='true')
     @api.depends('date_open')
     def _compute_days_open(self):
         """ Compute difference between create date and open date """
@@ -21,6 +23,24 @@ class DmsLead(models.Model):
             date_create = fields.Datetime.from_string(lead.create_date)
             # date_open = fields.Datetime.from_string(lead.date_open)
             lead.days_open = abs((fields.Datetime.now() - date_create).days)
+
+    @api.depends('enquiry_id')
+    def _compute_color(self):
+        """ Compute color """
+        for lead in self.filtered(lambda l: l.enquiry_id):
+            lead.color_value = lead.enquiry_id.product_color.name
+
+    @api.depends('enquiry_id')
+    def _compute_variant(self):
+        """ Compute Variant """
+        for lead in self.filtered(lambda l: l.enquiry_id):
+            lead.variant_value = lead.enquiry_id.product_variant.name
+
+    @api.depends('enquiry_id')
+    def _compute_vehicle(self):
+        """ Compute Vehicle/Product ID """
+        for lead in self.filtered(lambda l: l.enquiry_id):
+            lead.vehicle_name = lead.enquiry_id.product_id.name
 
 
 class OpportunityType(models.Model):

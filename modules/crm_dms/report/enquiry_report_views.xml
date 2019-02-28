@@ -2,83 +2,80 @@
 <odoo>
 
 
-        <record id="dms_enquiry_view2_tree" model="ir.ui.view">
-            <field name="name">dms.enquiry.tree</field>
-           <field name="model">dms.enquiry</field>
+  <record id="enquiry_report_view_tree" model="ir.ui.view">
+            <field name="name">crm.lead.tree</field>
+           <field name="model">crm.lead</field>
             <field name="arch" type="xml">
-                <tree string="Enquiries">
+                <tree string="Enquiry Report">
+                    <field name="create_date"/>
+                    <field name="name" string="Lead"/>
+                    <field name="contact_name"/>
+                    <field name="contact_name"/>
+                    <field name="city"/>
+                    <field name="country_id"/>
+                    <field name="email_from"/>
+                    <field name="phone"/>
                     <field name="user_id"/>
-                    <field name="partner_mobile" string="Mobile No."/>
-                    <field name="product_id" string="Product"/>
-                    <field name="product_color" string="Color"/>
-                    <field name="product_variant" string="Variant"/>
-                    <field name="medium_id" invisible="1"/>
-                    <field name="campaign_id" invisible="1"/>
-                    <field name="financier_name" />
-                    <field name="finance_type"/>
-                    <field name="insurance_type"/>
-                    <field name="insurance_company"/>
-                    <field name="source_id"/>
-
-
+                    <field name="color_value"/>
+                    <field name="variant_value"/>
+                    <field name="vehicle_name"/>
                 </tree>
             </field>
         </record>
-
-        <record id="view_dms_enquiry_filter2" model="ir.ui.view">
-            <field name="name">dms.enquiry.search</field>
-            <field name="model">dms.enquiry</field>
+   <!-- <record id="enquiry_report_view_form" model="ir.ui.view">
+            <field name="name">crm.lead..form</field>
+            <field name="model">crm.lead</field>
+            <field name="priority">20</field>
             <field name="arch" type="xml">
-                <search string="Search Enquiries">
-                    <field name="name" string="Enquiry" filter_domain="['|','|','|',('partner_id','ilike',self),('partner_name','ilike',self),('email_from','ilike',self),('name', 'ilike', self)]"/>
-                    <field name="state" domain="[]"/>
-                    <field name="user_id"/>
-                    <field name="team_id"/>
-                    <field name="partner_id" operator="child_of" string="Customer"/>
-                    <separator/>
-                    <filter string="My Enquiries" name="assigned_to_me"
-                        domain="[('user_id', '=', uid)]"
-                        help="Enquiries that are assigned to me"/>
-                    <filter string="Unassigned" name="unassigned"
-                        domain="[('user_id','=', False)]" help="No salesperson"/>
-                    <separator/>
-                    <group expand="0" string="Group By" colspan="16">
-                        <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
-                        <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>
-                        <filter name="stage" string="Stage" context="{'group_by':'state'}"/>
-                        <filter string="Source" name="source" domain="[]" context="{'group_by':'source_id'}"/>
-                        <separator orientation="vertical" />
-                        <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
-                    </group>
-                </search>
+                <form string="Enquiry Analysis" class="o_opportunity_form">
+                    <sheet>
+                        <group>
+
+                            <group string="Opportunity">
+                                <field name="product_id"/>
+                                <field name="product_color"/>
+                                <field name="create_date"/>
+                                <field name="date_follow_up"/>
+                                <field name="user_id"/>
+
+                            </group>
+
+                             <group string="Customer">
+                                 <field name="partner_name" />
+                                <field name="partner_mobile" />
+                                 <field name="source_id"/>
+
+                             </group>
+
+                        </group>
+                    </sheet>
+                </form>
             </field>
-        </record>
+        </record> -->
 
-        <!-- 'My Pipeline' menu : Server action, act_window_views and act_windows -->
+       <record id="enquiry_report_action" model="ir.actions.act_window">
+           <field name="name">Followup Report</field>
+           <field name="res_model">crm.lead</field>
+           <field name="view_type">form</field>
+           <field name="view_mode">tree</field>
+           <field name="context">{'search_default_activities_my': True}</field>
+           <field name="domain">[]</field>
+       </record>
 
-        <record model="ir.actions.act_window" id="dms_enquiry_tree_view2">
-            <field name="name">Reports 2</field>
-            <field name="res_model">dms.enquiry</field>
-            <field name="view_mode">tree,graph,pivot,form</field>
-            <field name="context">{
-                    'default_user_id': uid,
-                    'search_default_assigned_to_me': 1
-            }</field>
-            <field name="search_view_id" ref="view_dms_enquiry_filter2"/>
-        </record>
-
-        <record id="dms_enquiry_tree_view2_tree" model="ir.actions.act_window.view">
-            <field name="sequence" eval="1"/>
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="dms_enquiry_view2_tree"/>
-            <field name="act_window_id" ref="dms_enquiry_tree_view2"/>
-        </record>
-
-        <menuitem
-            id="menu_dms_enquiries2"
-            action="dms_enquiry_tree_view2"
-            name="Demo report"
+       <menuitem
+            id="enquiry_report_menu"
+            name="Enquiry Report"
             parent="crm.crm_menu_report"
+            action="enquiry_report_action"
             sequence="1"/>
+
+       <record id="enquiry_report_action_team" model="ir.actions.act_window">
+           <field name="name">Followup Report</field>
+           <field name="res_model">crm.lead</field>
+           <field name="view_type">form</field>
+           <field name="view_mode">tree,form</field>
+           <field name="context">{'search_default_team_id': active_id}</field>
+           <field name="domain">[]</field>
+       </record>
 
 </odoo>

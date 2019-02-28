@@ -368,5 +368,188 @@
                 </form>
             </field>
         </record>
+    <!-- code added by yoganand -->
+     <record id="product.product_pricelist_item_form_view" model="ir.ui.view">
+            <field name="name">product.pricelist.item.form</field>
+            <field name="model">product.pricelist.item</field>
+            <field name="arch" type="xml">
+                <form string="Pricelist Items">
+                    <h1><field name="name"/></h1>
+                    <group>
+                        <group>
+                            <field name="applied_on" widget="radio"/>
+                            <field name="categ_id" attrs="{'invisible':[('applied_on', '!=', '2_product_category')], 'required':[('applied_on', '=', '2_product_category')]}"/>
+                            <field name="product_tmpl_id" attrs="{'invisible':[('applied_on', '!=', '1_product')],'required':[('applied_on', '=', '1_product')]}" string="Product"/>
+                            <field name="product_id" attrs="{'invisible':[('applied_on', '!=', '0_product_variant')],'required':[('applied_on', '=', '0_product_variant')]}" string="Product Variant"/>
+                        </group>
+                        <group>
+                            <field name="min_quantity"/>
+                            <field name="date_start"/>
+                            <field name="date_end"/>
+                        </group>
+
+                    </group>
+                    <separator string="Price Computation"/>
+                    <group>
+                        <group>
+                            <label for="compute_price" string="Compute Price"/>
+                            <div>
+                                <field name="compute_price" widget="radio"/>
+                                <field name="currency_id" invisible="1"/>
+                                <div attrs="{'invisible':[('compute_price', '!=', 'fixed')]}">
+                                    <field name="fixed_price" nolabel= "1" widget='monetary' options="{'currency_field': 'currency_id'}"/></div>
+                                <div attrs="{'invisible':[('compute_price', '!=', 'percentage')]}">
+                                    <field name="percent_price" nolabel="1" class="oe_inline"/>%%
+                                </div>
+                            </div>
+                        </group>
+                              <div>
+                           <separator string="Pricelist Components"/>
+                                           <field name="component">
+                                               <tree create="true" >
+                                                   <field name="type_id"/>
+                                                   <field name="price"/>
+                                               </tree>
+
+                                           </field>
+
+
+                       </div>
+                    </group>
+                    <div class="oe_grey" groups="uom.group_uom">
+                        <p>The computed price is expressed in the default Unit of Measure of the product.</p>
+                    </div>
+                    <group col="6" attrs="{'invisible':[('compute_price', '!=', 'formula')]}">
+                        <field name="base" colspan="6"/>
+
+                        <label for="" string="New Price ="/>
+                        <div>
+                            <span attrs="{'invisible':[('base', '!=', 'list_price')]}">Public Price  -  </span>
+                            <span attrs="{'invisible':[('base', '!=', 'standard_price')]}">Cost  -  </span>
+                            <span attrs="{'invisible':[('base', '!=', 'pricelist')]}">Other Pricelist  -  </span>
+                        </div>
+                        <label for="price_discount"/>
+                        <div class="o_row">
+                            <field name="price_discount"/>
+                            <span>%%</span>
+                        </div>
+                        <label string=" + " for="price_surcharge"/>
+                        <field name="price_surcharge" nolabel="1"/>
+
+                        <field name="price_round" string="Rounding Method"/>
+                        <field name="price_min_margin" string="Min. Margin"/>
+                        <field name="price_max_margin" string="Max. Margin"/>
+
+                        <field name="base_pricelist_id" attrs="{'invisible':[('base', '!=', 'pricelist')],'required': [('base','=', 'pricelist')], 'readonly': [('base','!=', 'pricelist')]}"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+    <!--  creating pricelist component object-->
+
+<record id="pricelist_component_view_form" model="ir.ui.view">
+            <field name="name">pricelist.component.form</field>
+            <field name="model">pricelist.component</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <form string="Pricelist component">
+                    <sheet>
+                        <group>
+
+                            <group string="Pricelist Component">
+                                <field name="type_id" />
+                                <field name="price"/>
+
+                            </group>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    <!-- Price Components -->
+
+ <record id="view_price_component_tree" model="ir.ui.view">
+            <field name="name">price.component.tree</field>
+            <field name="model">dms.price.component</field>
+            <field name="arch" type="xml">
+                <tree string="Price Component" decoration-muted="not active">
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="company_id"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+
+
+        <record id="view_price_component_search" model="ir.ui.view">
+            <field name="name">price.component.search</field>
+            <field name="model">dms.price.component</field>
+            <field name="arch" type="xml">
+                <search string="Search Price components">
+                    <field name="name" filter_domain="['|', ('name','ilike',self), ('description','ilike',self)]" string="Type"/>
+                    <separator/>
+                    <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active types"/>
+                    <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive types"/>
+                    <group string="Group By">
+                        <filter string="Company" name="company" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="price_component_view_search" model="ir.ui.view">
+            <field name="name">price.component.search.filters</field>
+            <field name="model">dms.price.component</field>
+            <field name="arch" type="xml">
+                <search string="Search Price Components">
+                    <field name="name" filter_domain="['|', ('name','ilike',self), ('description','ilike',self)]" string="Type"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_price_component_form" model="ir.ui.view">
+            <field name="name">price.component.form</field>
+            <field name="model">dms.price.component</field>
+            <field name="arch" type="xml">
+                <form string="Price Component">
+                    <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="company_id" />
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+                </form>
+              </field>
+        </record>
+        <record id="action_price_component_form" model="ir.actions.act_window">
+            <field name="name">Price Components</field>
+            <field name="res_model">dms.price.component</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p>
+                Create a new Price component
+              </p>
+            </field>
+        </record>
+       <menuitem
+               name="Components"
+             action="action_price_component_form"
+             id="menu_price_component_form"
+             parent="sale.menu_sale_config"
+             sequence="2"/>
 
 </odoo>

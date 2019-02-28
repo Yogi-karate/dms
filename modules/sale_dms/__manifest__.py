@@ -10,6 +10,7 @@
     'description': "Vehicle Dealership Business Domain",
     'depends': ['dms','sale'],
     'data': [
+        'security/ir.model.access.csv',
         'views/sale_views.xml',
     ],
     'installable': True,
