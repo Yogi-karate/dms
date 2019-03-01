@@ -8,7 +8,7 @@
     'sequence': 60,
     'summary': 'Handle Sales customization for DMS',
     'description': "Vehicle Dealership Business Domain",
-    'depends': ['base','stock'],
+    'depends': ['base_dms','purchase','sale_dms','crm_dms','vehicle'],
     'data': [
         'views/dms_views.xml',
     ],

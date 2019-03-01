@@ -84,7 +84,5 @@
           </p>
         </field>
     </record>
-      <menuitem action="action_vehicle_form" id="menu_action_vehicle_form"
-        parent="dms.menu_dms_master_data_root" groups="stock.group_stock_user"
-        sequence="1"/>
+
 </odoo>

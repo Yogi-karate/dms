@@ -8,13 +8,9 @@
     'sequence': 60,
     'summary': 'DMS Base Changes',
     'description': "Auto Dealership Business Domain",
-    'depends': ['base','dms'],
+    'depends': ['base'],
     'data': [
-        'security/dms_groups.xml',
-        'data/ir_module_category_data.xml',
         'views/res_partner_views.xml',
-
-
     ],
     'installable': True,
     'auto_install': True,
