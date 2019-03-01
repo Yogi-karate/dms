@@ -14,7 +14,6 @@
                     <field name="mobile"/>
                     <field name="activity_date_deadline" string="Followup Date"/>
                     <field name="stage_id"/>
-                    <field name="source_id" />
                     <field name="vehicle_name"/>
                     <field name="variant_value"/>
                     <field name="color_value"/>

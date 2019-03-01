@@ -178,7 +178,6 @@ class Enquiry(models.Model):
             'name': type.name + '-' + self.product_id.name,
             'partner_id': customer.id,
             'mobile': self.partner_mobile,
-            'source_id': self.source_id,
             'enquiry_id': self.id,
             'opportunity_type': type.id,
             'date_deadline' : self.date_follow_up,
