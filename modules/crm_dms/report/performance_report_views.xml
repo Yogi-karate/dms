@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+
+
         <record id="dms_enquiry_view2_tree" model="ir.ui.view">
             <field name="name">dms.enquiry.tree</field>
            <field name="model">dms.enquiry</field>
@@ -10,6 +12,8 @@
                     <field name="product_id" string="Product"/>
                     <field name="product_color" string="Color"/>
                     <field name="product_variant" string="Variant"/>
+                    <field name="medium_id" invisible="1"/>
+                    <field name="campaign_id" invisible="1"/>
                     <field name="financier_name" />
                     <field name="finance_type"/>
                     <field name="insurance_type"/>
@@ -17,25 +21,6 @@
                     <field name="source_id"/>
 
 
-
-  <record id="enquiry_report_view_tree1" model="ir.ui.view">
-            <field name="name">crm.lead.tree</field>
-           <field name="model">crm.lead</field>
-            <field name="arch" type="xml">
-                <tree string="Followup Report">
-                    <field name="create_date"/>
-                    <field name="name"/>
-                    <field name="partner_id" string="Customer"/>
-                    <field name="mobile"/>
-                    <field name="activity_date_deadline" string="Followup Date"/>
-                    <field name="stage_id"/>
-                    <field name="source_id" />
-                    <field name="vehicle_name"/>
-                    <field name="variant_value"/>
-                    <field name="color_value"/>
-                    <field name="user_id"/>
-                    <field name="team_id"/>
-                    <field name="team_lead"/>
                 </tree>
             </field>
         </record>
@@ -72,7 +57,7 @@
         <!-- 'My Pipeline' menu : Server action, act_window_views and act_windows -->
 
         <record model="ir.actions.act_window" id="dms_enquiry_tree_view2">
-            <field name="name">Reports 2</field>
+            <field name="name">MTD Report</field>
             <field name="res_model">dms.enquiry</field>
             <field name="view_mode">tree,graph,pivot,form</field>
             <field name="context">{
@@ -81,6 +66,7 @@
             }</field>
             <field name="search_view_id" ref="view_dms_enquiry_filter2"/>
         </record>
+
         <record id="dms_enquiry_tree_view2_tree" model="ir.actions.act_window.view">
             <field name="sequence" eval="1"/>
             <field name="view_mode">tree</field>
@@ -91,32 +77,8 @@
         <menuitem
             id="menu_dms_enquiries2"
             action="dms_enquiry_tree_view2"
-            name="Demo report"
+            name="MTD Performance"
             parent="crm.crm_menu_report"
             sequence="1"/>
 
-       <record id="enquiry_report_action1" model="ir.actions.act_window">
-           <field name="name">Followup Report</field>
-           <field name="res_model">crm.lead</field>
-           <field name="view_type">form</field>
-           <field name="view_mode">tree,form,graph</field>
-           <field name="context">{'search_default_activities_my': True}</field>
-           <field name="domain">[]</field>
-       </record>
-
-       <menuitem
-            id="enquiry_report_menu1"
-            name="Followup"
-            parent="crm.crm_menu_report"
-            action="enquiry_report_action1"
-            sequence="1"/>
-
-       <record id="enquiry_report_action_team1" model="ir.actions.act_window">
-           <field name="name">Followup Report</field>
-           <field name="res_model">crm.lead</field>
-           <field name="view_type">form</field>
-           <field name="view_mode">tree,form</field>
-           <field name="context">{'search_default_team_id': active_id}</field>
-           <field name="domain">[]</field>
-       </record>
 </odoo>
