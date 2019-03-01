@@ -77,7 +77,7 @@
         <menuitem
             id="menu_dms_enquiries2"
             action="dms_enquiry_tree_view2"
-            name="Performance"
+            name="MTD Performance"
             parent="crm.crm_menu_report"
             sequence="1"/>
 

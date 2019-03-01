@@ -2,14 +2,13 @@
 <odoo>
 
 
-  <record id="enquiry_report_view_tree" model="ir.ui.view">
+  <record id="enquiry_report_view_tree1" model="ir.ui.view">
             <field name="name">crm.lead.tree</field>
            <field name="model">crm.lead</field>
             <field name="arch" type="xml">
-                <tree string="Enquiry Report">
+                <tree string="Followup Report">
                     <field name="create_date"/>
                     <field name="name" string="Lead"/>
-                    <field name="contact_name"/>
                     <field name="contact_name"/>
                     <field name="city"/>
                     <field name="country_id"/>
@@ -53,7 +52,7 @@
             </field>
         </record> -->
 
-       <record id="enquiry_report_action" model="ir.actions.act_window">
+       <record id="enquiry_report_action1" model="ir.actions.act_window">
            <field name="name">Followup Report</field>
            <field name="res_model">crm.lead</field>
            <field name="view_type">form</field>
@@ -63,13 +62,13 @@
        </record>
 
        <menuitem
-            id="enquiry_report_menu"
-            name="Enquiry Report"
+            id="enquiry_report_menu1"
+            name="Followup"
             parent="crm.crm_menu_report"
-            action="enquiry_report_action"
+            action="enquiry_report_action1"
             sequence="1"/>
 
-       <record id="enquiry_report_action_team" model="ir.actions.act_window">
+       <record id="enquiry_report_action_team1" model="ir.actions.act_window">
            <field name="name">Followup Report</field>
            <field name="res_model">crm.lead</field>
            <field name="view_type">form</field>
