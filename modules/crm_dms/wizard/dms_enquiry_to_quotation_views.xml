@@ -4,15 +4,12 @@
             <field name="name">dms.enquiry2sale.order.form</field>
             <field name="model">dms.enquiry2sale.order</field>
             <field name="arch" type="xml">
-                <form string="Convert to Quotation">
-                    <group>
-                    <group name ="left" string="Confirm Vehicle Details">
+                <form string="Convert to Opportunity">
+                    <group string="Assign this opportunity to">
                         <field name="product_id" />
                         <field name="product_color" />
                         <field name="product_variant" />
                     </group>
-                     <group name="right"/>
-                     </group>
                     <footer>
                         <button name="action_apply" string="Create Quotation" type="object" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
