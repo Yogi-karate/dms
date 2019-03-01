@@ -8,16 +8,18 @@
             <field name="arch" type="xml">
                 <tree string="Followup Report">
                     <field name="create_date"/>
-                    <field name="name" string="Lead"/>
-                    <field name="contact_name"/>
-                    <field name="city"/>
-                    <field name="country_id"/>
-                    <field name="email_from"/>
-                    <field name="phone"/>
-                    <field name="user_id"/>
-                    <field name="color_value"/>
-                    <field name="variant_value"/>
+                    <field name="name"/>
+                    <field name="partner_id" string="Customer"/>
+                    <field name="mobile"/>
+                    <field name="activity_date_deadline" string="Followup Date"/>
+                    <field name="stage_id"/>
+                    <field name="source_id" />
                     <field name="vehicle_name"/>
+                    <field name="variant_value"/>
+                    <field name="color_value"/>
+                    <field name="user_id"/>
+                    <field name="team_id"/>
+                    <field name="team_lead"/>
                 </tree>
             </field>
         </record>

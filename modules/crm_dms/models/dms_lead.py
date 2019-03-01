@@ -16,6 +16,7 @@ class DmsLead(models.Model):
     color_value = fields.Char(compute='_compute_color',string='Color',help ='true')
     variant_value = fields.Char(compute='_compute_variant',string='Variant',help ='true')
     vehicle_name = fields.Char(compute='_compute_vehicle',string='Vehicle',help ='true')
+    team_lead = fields.Char(compute='_compute_lead',string = 'Team Lead')
     @api.depends('date_open')
     def _compute_days_open(self):
         """ Compute difference between create date and open date """
@@ -23,6 +24,7 @@ class DmsLead(models.Model):
             date_create = fields.Datetime.from_string(lead.create_date)
             # date_open = fields.Datetime.from_string(lead.date_open)
             lead.days_open = abs((fields.Datetime.now() - date_create).days)
+
 
     @api.depends('enquiry_id')
     def _compute_color(self):
@@ -41,7 +43,10 @@ class DmsLead(models.Model):
         """ Compute Vehicle/Product ID """
         for lead in self.filtered(lambda l: l.enquiry_id):
             lead.vehicle_name = lead.enquiry_id.product_id.name
-
+    @api.depends('team_id')
+    def _compute_lead(self):
+        for lead in self.filtered(lambda l: l.team_id):
+            lead.team_lead = lead.team_id.user_id.name
 
 class OpportunityType(models.Model):
 
