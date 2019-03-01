@@ -23,9 +23,9 @@ class PricelistItemComponent(models.Model):
     price = fields.Float(
         'Price', digits=dp.get_precision('Product Price'))
 
-# class PricelistItem(models.Model):
-#     _name = 'product.pricelist.item'
-#     _inherit = 'product.pricelist.item'
-#
-#     component = fields.One2many('pricelist.component', 'item_id', string='Pricelist component')
-#     component_based_price = fields.Float('Component Based Price', digits=dp.get_precision('Product Price'))
+class PricelistItem(models.Model):
+     _name = 'product.pricelist.item'
+     _inherit = 'product.pricelist.item'
+
+     component = fields.One2many('pricelist.component', 'item_id', string='Pricelist component')
+     component_based_price = fields.Float('Component Based Price', digits=dp.get_precision('Product Price'))

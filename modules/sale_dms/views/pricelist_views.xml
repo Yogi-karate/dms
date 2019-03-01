@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+   <!--  creating pricelist component object-->
+
+<record id="pricelist_component_view_form" model="ir.ui.view">
+            <field name="name">pricelist.component.form</field>
+            <field name="model">pricelist.component</field>
+            <field name="priority">20</field>
+            <field name="arch" type="xml">
+                <form string="Pricelist component">
+                    <sheet>
+                        <group>
+
+                            <group string="Pricelist Component">
+                                <field name="type_id" />
+                                <field name="price"/>
+
+                            </group>
+
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    <!-- Price Components -->
+
+ <record id="view_price_component_tree" model="ir.ui.view">
+            <field name="name">price.component.tree</field>
+            <field name="model">dms.price.component</field>
+            <field name="arch" type="xml">
+                <tree string="Price Component" decoration-muted="not active">
+                    <field name="name"/>
+                    <field name="description"/>
+                    <field name="company_id"/>
+                    <field name="active" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+
+
+        <record id="view_price_component_search" model="ir.ui.view">
+            <field name="name">price.component.search</field>
+            <field name="model">dms.price.component</field>
+            <field name="arch" type="xml">
+                <search string="Search Price components">
+                    <field name="name" filter_domain="['|', ('name','ilike',self), ('description','ilike',self)]" string="Type"/>
+                    <separator/>
+                    <filter name="active" string="Active" domain="[('active','=',True)]" help="Show active types"/>
+                    <filter name="inactive" string="Inactive" domain="[('active','=',False)]" help="Show inactive types"/>
+                    <group string="Group By">
+                        <filter string="Company" name="company" domain="[]" context="{'group_by':'company_id'}" groups="base.group_multi_company"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+        <record id="price_component_view_search" model="ir.ui.view">
+            <field name="name">price.component.search.filters</field>
+            <field name="model">dms.price.component</field>
+            <field name="arch" type="xml">
+                <search string="Search Price Components">
+                    <field name="name" filter_domain="['|', ('name','ilike',self), ('description','ilike',self)]" string="Type"/>
+                </search>
+            </field>
+        </record>
+
+        <record id="view_price_component_form" model="ir.ui.view">
+            <field name="name">price.component.form</field>
+            <field name="model">dms.price.component</field>
+            <field name="arch" type="xml">
+                <form string="Price Component">
+                    <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="toggle_active" type="object" class="oe_stat_button" icon="fa-archive">
+                            <field name="active" widget="boolean_button" options='{"terminology": "archive"}'/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name"/>
+                            <field name="description"/>
+                        </group>
+                        <group>
+                            <field name="company_id" />
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </sheet>
+                </form>
+              </field>
+        </record>
+        <record id="action_price_component_form" model="ir.actions.act_window">
+            <field name="name">Price Components</field>
+            <field name="res_model">dms.price.component</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p>
+                Create a new Price component
+              </p>
+            </field>
+        </record>
+       <menuitem
+               name="Components"
+             action="action_price_component_form"
+             id="menu_price_component_form"
+             parent="sale.menu_sale_config"
+             sequence="2"/>
+</odoo>

@@ -12,7 +12,9 @@
     'data': [
         'views/sale_views.xml',
         'views/crm_team_views.xml',
+        'views/pricelist_views.xml',
         'security/sale_security.xml',
+        'security/ir.model.access.csv'
     ],
     'installable': True,
     'auto_install': True,

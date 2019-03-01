@@ -1,20 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-        <record id="dms_enquiry_view2_tree" model="ir.ui.view">
-            <field name="name">dms.enquiry.tree</field>
-           <field name="model">dms.enquiry</field>
-            <field name="arch" type="xml">
-                <tree string="Enquiries">
-                    <field name="user_id"/>
-                    <field name="partner_mobile" string="Mobile No."/>
-                    <field name="product_id" string="Product"/>
-                    <field name="product_color" string="Color"/>
-                    <field name="product_variant" string="Variant"/>
-                    <field name="financier_name" />
-                    <field name="finance_type"/>
-                    <field name="insurance_type"/>
-                    <field name="insurance_company"/>
-                    <field name="source_id"/>
 
 
 
@@ -40,60 +25,8 @@
             </field>
         </record>
 
-        <record id="view_dms_enquiry_filter2" model="ir.ui.view">
-            <field name="name">dms.enquiry.search</field>
-            <field name="model">dms.enquiry</field>
-            <field name="arch" type="xml">
-                <search string="Search Enquiries">
-                    <field name="name" string="Enquiry" filter_domain="['|','|','|',('partner_id','ilike',self),('partner_name','ilike',self),('email_from','ilike',self),('name', 'ilike', self)]"/>
-                    <field name="state" domain="[]"/>
-                    <field name="user_id"/>
-                    <field name="team_id"/>
-                    <field name="partner_id" operator="child_of" string="Customer"/>
-                    <separator/>
-                    <filter string="My Enquiries" name="assigned_to_me"
-                        domain="[('user_id', '=', uid)]"
-                        help="Enquiries that are assigned to me"/>
-                    <filter string="Unassigned" name="unassigned"
-                        domain="[('user_id','=', False)]" help="No salesperson"/>
-                    <separator/>
-                    <group expand="0" string="Group By" colspan="16">
-                        <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
-                        <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>
-                        <filter name="stage" string="Stage" context="{'group_by':'state'}"/>
-                        <filter string="Source" name="source" domain="[]" context="{'group_by':'source_id'}"/>
-                        <separator orientation="vertical" />
-                        <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
-                    </group>
-                </search>
-            </field>
-        </record>
 
         <!-- 'My Pipeline' menu : Server action, act_window_views and act_windows -->
-
-        <record model="ir.actions.act_window" id="dms_enquiry_tree_view2">
-            <field name="name">Reports 2</field>
-            <field name="res_model">dms.enquiry</field>
-            <field name="view_mode">tree,graph,pivot,form</field>
-            <field name="context">{
-                    'default_user_id': uid,
-                    'search_default_assigned_to_me': 1
-            }</field>
-            <field name="search_view_id" ref="view_dms_enquiry_filter2"/>
-        </record>
-        <record id="dms_enquiry_tree_view2_tree" model="ir.actions.act_window.view">
-            <field name="sequence" eval="1"/>
-            <field name="view_mode">tree</field>
-            <field name="view_id" ref="dms_enquiry_view2_tree"/>
-            <field name="act_window_id" ref="dms_enquiry_tree_view2"/>
-        </record>
-
-        <menuitem
-            id="menu_dms_enquiries2"
-            action="dms_enquiry_tree_view2"
-            name="Demo report"
-            parent="crm.crm_menu_report"
-            sequence="1"/>
 
        <record id="enquiry_report_action1" model="ir.actions.act_window">
            <field name="name">Followup Report</field>
@@ -105,7 +38,7 @@
        </record>
 
        <menuitem
-            id="enquiry_report_menu1"
+               id="enquiry_report_menu1"
             name="Followup"
             parent="crm.crm_menu_report"
             action="enquiry_report_action1"

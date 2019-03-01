@@ -20,6 +20,7 @@
         'data/opportunity_type_data.xml',
         'wizard/dms_enquiry_to_quotation_views.xml',
         'report/enquiry_report_views.xml',
+        'report/performance_report_views.xml',
         'views/crm_lead_views.xml',
     ],
     'installable': True,
