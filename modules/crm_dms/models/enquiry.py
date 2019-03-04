@@ -172,7 +172,6 @@ class Enquiry(models.Model):
 
     @api.model
     def _prepare_opportunities(self, type):
-        print(self)
         customer = self._create_lead_partner()
         return {
             'name': type.name + '-' + self.product_id.name,
@@ -202,9 +201,9 @@ class Enquiry(models.Model):
             if not enquiry.opportunity_ids:
                 for type in enquiry.type_ids:
                     res = self._prepare_opportunities(type)
-                    id = lead.create(res)
                     res.update(self._assign_enquiry_user(type))
                     print(res)
+                    id = lead.create(res)
                     self._schedule_follow_up(id)
             else:
                 print("Not creating Opportunities as they already exist")
@@ -237,21 +236,22 @@ class Enquiry(models.Model):
 
     @api.model
     def _assign_enquiry_user(self, type):
+        print("starting for "+type.name)
         user = self.env.user
+        user_id = user.id
         user_team = self.sudo().env['crm.team'].search([('member_ids', '=', user.id)])
         user_team_type = user_team.team_type
-        print(user_team_type)
-        print(type.team_type)
-        if type.team_type and user_team_type and user_team_type == type.team_type:
-            print(type.team_type)
-            user_id = user.id
-        else:
-            if user_team:
-                location_team = self.sudo().env['crm.team'].search([('location_id', 'in', [user_team.location_id.id]),
-                                ('team_type','=', type.team_type)])
-                print(location_team)
-                print("Location !!!")
-            user_id = user.id
+        user_team_location = user_team.location_id
+        if not user_team_type == type.team_type:
+            if user_team_location:
+                team = self.sudo().env['crm.team'].search([('location_id', 'child_of',user_team_location.id),
+                                                           ('team_type', '=', type.team_type)])
+                print(team)
+                if team:
+                    return {'user_id': team.user_id.id,
+                            'team_id': team.id
+                            }
+        print(user_id)
         return {'user_id': user_id}
 
     @api.multi

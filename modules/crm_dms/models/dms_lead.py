@@ -17,7 +17,21 @@ class DmsLead(models.Model):
     variant_value = fields.Char(compute='_compute_variant',string='Variant',help ='true')
     vehicle_name = fields.Char(compute='_compute_vehicle',string='Vehicle',help ='true')
     team_lead = fields.Char(compute='_compute_lead',string = 'Team Lead')
-    
+
+    @api.model
+    def _onchange_user_values(self, user_id):
+        """ returns new values when user_id has changed """
+        if not user_id:
+            return {}
+        if user_id and self._context.get('team_id'):
+            team = self.env['crm.team'].browse(self._context['team_id'])
+            if user_id in team.member_ids.ids:
+                return {}
+            if user_id == team.user_id.id:
+                return {'team_id': team.id}
+        team_id = self.env['crm.team']._get_default_team_id(user_id=user_id)
+        return {'team_id': team_id}
+
     @api.depends('date_open')
     def _compute_days_open(self):
         """ Compute difference between create date and open date """
