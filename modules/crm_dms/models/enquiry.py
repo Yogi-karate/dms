@@ -196,7 +196,7 @@ class Enquiry(models.Model):
 
     @api.multi
     def _create_opportunities(self):
-        lead = self.env['crm.lead']
+        lead = self.sudo().env['crm.lead']
         for enquiry in self:
             if not enquiry.opportunity_ids:
                 for type in enquiry.type_ids:
