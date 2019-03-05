@@ -32,10 +32,10 @@ class MassConfirm(models.TransientModel):
         ids = [val['order_no'] for val in val_list]
         print("The ids multi in purchase confirm")
         print(ids)
-        po_ids = self.env['purchase.order'].search([('name', 'in', ids)])
-        po_ids.button_approve()
-        d = val_list
+        po_ids = self.env['purchase.order'].search([('name', 'in', ids),('state','=','draft')])
         if po_ids:
+            po_ids.button_approve()
+            d = val_list
             for l in range(len(po_ids)):
                 d[l]['ids'] = po_ids[l]
             self.confirm_inventory(d)
@@ -46,11 +46,11 @@ class MassConfirm(models.TransientModel):
     @api.model
     def confirm_sale_orders(self, val_list):
         ids = [val['order_no'] for val in val_list]
-        so_ids = self.env['sale.order'].search([('name', 'in', ids)])
-        for so_id in so_ids:
-            so_id.action_confirm()
-        d = val_list
+        so_ids = self.env['sale.order'].search([('name', 'in', ids),('state','=','draft')])
         if so_ids:
+            for so_id in so_ids:
+                so_id.action_confirm()
+            d = val_list
             for l in range(len(so_ids)):
                 d[l]['ids'] = so_ids[l]
             self.confirm_inventory(d)
