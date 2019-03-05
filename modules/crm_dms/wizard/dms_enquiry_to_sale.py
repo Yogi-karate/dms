@@ -5,7 +5,7 @@ from odoo import api, fields, models
 from odoo.exceptions import UserError
 from odoo.tools.translate import _
 
-""" Create quotations and sale orders code completed by Yoganand on 15/02/2019"""
+
 class Lead2OpportunityPartner(models.TransientModel):
 
     _name = 'dms.enquiry2sale.order'
@@ -24,10 +24,7 @@ class Lead2OpportunityPartner(models.TransientModel):
             partner_id = result.get('partner_id')
             lead = self.env['crm.lead'].browse(self._context['active_id'])
             enquiry = lead.enquiry_id
-            type = 'Vehicle'
-            dms = self.env['dms.enquiry'].search([('type_ids.name','in',[type])])
             email = lead.partner_id.email if lead.partner_id else lead.email_from
-            print(lead)
             tomerge.update(self._get_duplicated_leads(partner_id, email, include_lost=True).ids)
 
             if 'action' in fields and not result.get('action'):
@@ -66,6 +63,7 @@ class Lead2OpportunityPartner(models.TransientModel):
     product_id = fields.Many2one('product.template', string='Product', required=True)
     product_color = fields.Many2one('product.template.attribute.value', string='Color')
     product_variant = fields.Many2one('product.template.attribute.value', string='Variant')
+
     @api.onchange('action')
     def onchange_action(self):
         if self.action == 'exist':
@@ -131,16 +129,12 @@ class Lead2OpportunityPartner(models.TransientModel):
             the freshly created opportunity view.
         """
         self.ensure_one()
-        print(self.product_id)
-        print(self.product_color.name)
-        print(self.product_variant.name)
         sale = self.env['sale.order']
-        product = self.env['product.product'].search([('product_tmpl_id','=',self.product_id.id),('color_value','=',self.product_color.name),('variant_value','=',self.product_variant.name)])
+        product = self.env['product.product'].search([('product_tmpl_id','=',self.product_id.id),
+                                                      ('color_value','=',self.product_color.name),
+                                                      ('variant_value','=',self.product_variant.name)], limit=1)
         if not product:
-            return
-        print(product)
-        print(product.color_value)
-        print(product.variant_value)
+            raise UserError(_("Unable to create Quote as product not found"))
 
         values = {
             'team_id': self.team_id.id,
@@ -161,7 +155,6 @@ class Lead2OpportunityPartner(models.TransientModel):
               'order_id':order.id
           }
           order_line.create(vals)
-          print(order_line)
 
     def _create_partner(self, lead_id, action, partner_id):
         """ Create partner based on action.
