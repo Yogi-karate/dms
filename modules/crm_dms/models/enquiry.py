@@ -245,12 +245,15 @@ class Enquiry(models.Model):
         if not user_team_type == type.team_type:
             if user_team_location:
                 team = self.sudo().env['crm.team'].search([('location_id', 'child_of',user_team_location.id),
-                                                           ('team_type', '=', type.team_type)])
+                                                           ('team_type', '=', type.team_type)], limit=1)
                 print(team)
-                if team:
+                if team and team.user_id:
                     return {'user_id': team.user_id.id,
                             'team_id': team.id
                             }
+                else:
+                    raise UserError(_("Error Assigning Sub Enquiry - Please check your team setup"))
+
         print(user_id)
         return {'user_id': user_id}
 
