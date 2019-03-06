@@ -150,39 +150,44 @@ class Lead2OpportunityPartner(models.TransientModel):
             values['partner_id'] = self.partner_id.id
         order = sale.create(values)
 
-        self._create_sale_order_line(product, self.pricelist, order)
+        self._create_product_order_line(product, order)
+        self._create_component_order_line(product, self.pricelist, order)
 
-    def _create_sale_order_line(self, product, component, order):
+
+    def _create_product_order_line(self, product, order):
         order_line = self.env['sale.order.line']
         vals = {
             'product_id': product.id,
             'name': product.name,
             'order_id': order.id
         }
-        for itemlist in component.item_ids:
-            print("#####################", itemlist)
-            for item in itemlist:
-                for compos in item.component:
-                    product = self.env['product.product'].search([('name', '=', compos.type_id.name)])
-                    if not product:
-                        product = self._prepare_component_product(compos.type_id.name)
-                    vals = {
-                        'product_id': product.id,
-                        'name': compos.type_id.name,
-                        'price_unit': compos.price,
-                        'order_id': order.id
-                    }
-            print(vals)
-            order_line.create(vals)
-
-            print(item)
         order_line.create(vals)
+
+    def _create_component_order_line(self, product, pricelist, order):
+        items = pricelist.item_ids.search(
+            ['|', ('product_id', '=', product.id), ('product_tmpl_id', '=', product.product_tmpl_id.id)])
+        for item in items:
+            print("#####################", item)
+            for compos in item.component:
+                product = self.env['product.product'].search([('name', '=', compos.type_id.name)])
+                if not product:
+                    product = self.env['product.product'].create(self._prepare_component_product(compos.type_id.name))
+                vals = {
+                    'product_id': product.id,
+                    'name': compos.type_id.name,
+                    'price_unit': compos.price,
+                    'order_id': order.id
+                }
+                print(vals)
+                order_line = self.env['sale.order.line']
+                order_line.create(vals)
 
     def _prepare_component_product(self, component_name):
         return {
             'name': component_name,
             'type': 'service',
             'company_id': False,
+            'taxes_id': []
         }
 
     def _create_partner(self, lead_id, action, partner_id):
