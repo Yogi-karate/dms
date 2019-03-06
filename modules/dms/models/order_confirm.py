@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
-
+import logging
 from odoo import api,fields, models
+
+_logger = logging.getLogger(__name__)
 
 class MassConfirm(models.TransientModel):
 
@@ -11,27 +13,27 @@ class MassConfirm(models.TransientModel):
 
     @api.multi
     def confirm_inventory(self, val_list):
-        print("Confirm Multi Inventory")
+        _logger.info("Confirm Multi Inventory")
         for vals in val_list:
-            print(vals)
+            _logger.info(vals)
             order_id = vals['ids']
-            print("ORDER ID Before Processing"+str(order_id))
+            _logger.info("ORDER ID Before Processing"+str(order_id))
             vehicle_id = self.env['vehicle'].search([('ref', '=', order_id.name)])
             if not vehicle_id or not order_id:
-                print("ERROR processing" + str(order_id))
+                _logger.error("ERROR processing" + str(order_id))
                 continue
             try:
                 self._create_move_lines(order_id.picking_ids, vehicle_id.id)
             except Exception as ex:
-                print("ERROR processing" + str(order_id))
+                _logger.error("ERROR processing" + str(order_id))
         return True
 
 
     @api.model
     def confirm_purchase_orders(self, val_list):
         ids = [val['order_no'] for val in val_list]
-        print("The ids multi in purchase confirm")
-        print(ids)
+        _logger.info("The ids multi in purchase confirm")
+        _logger.info(ids)
         po_ids = self.env['purchase.order'].search([('name', 'in', ids),('state','=','draft')])
         if po_ids:
             po_ids.button_approve()
@@ -40,7 +42,7 @@ class MassConfirm(models.TransientModel):
                 d[l]['ids'] = po_ids[l]
             self.confirm_inventory(d)
         else:
-            print("No Purchase Inventory to Process")
+            _logger.info("No Purchase Inventory to Process")
             return False
 
     @api.model
@@ -55,7 +57,7 @@ class MassConfirm(models.TransientModel):
                 d[l]['ids'] = so_ids[l]
             self.confirm_inventory(d)
         else:
-            print("No Sales Inventory to Process")
+            _logger.info("No Sales Inventory to Process")
             return False
 
 
@@ -64,9 +66,9 @@ class MassConfirm(models.TransientModel):
         if not picking_ids.move_line_ids:
             template = self._prepare_stock_move_line(picking_ids, vehicle_id)
             res = self.env['stock.move.line'].create(template)
-            print(res)
+            _logger.info(res)
         else:
-            print("Move Line Exists")
+            _logger.info("Move Line Exists")
             picking_ids.move_line_ids.write({'vehicle_id':vehicle_id, 'qty_done':1})
         picking_ids.action_done()
 

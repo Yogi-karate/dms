@@ -13,9 +13,9 @@ class DmsLead(models.Model):
     days_open = fields.Float(compute='_compute_days_open', string='Days Open', store=True)
     enquiry_id = fields.Many2one('dms.enquiry',string='Enquiry')
     opportunity_type = fields.Many2one('dms.opportunity.type', string='Opportunity Type')
-    color_value = fields.Char(compute='_compute_color',string='Color',help ='true')
-    variant_value = fields.Char(compute='_compute_variant',string='Variant',help ='true')
-    vehicle_name = fields.Char(compute='_compute_vehicle',string='Vehicle',help ='true')
+    color_value = fields.Char(compute='_compute_enquiry_values',string='Color',help ='true')
+    variant_value = fields.Char(compute='_compute_enquiry_values',string='Variant',help ='true')
+    vehicle_name = fields.Char(compute='_compute_enquiry_values',string='Vehicle',help ='true')
     team_lead = fields.Char(compute='_compute_lead',string = 'Team Lead')
 
     @api.model
@@ -41,26 +41,19 @@ class DmsLead(models.Model):
             lead.days_open = abs((fields.Datetime.now() - date_create).days)
 
     @api.depends('enquiry_id')
-    def _compute_color(self):
+    def _compute_enquiry_values(self):
         """ Compute color """
-        for lead in self.filtered(lambda l: l.enquiry_id):
-            lead.color_value = lead.enquiry_id.product_color.name
+        for lead in self:
+            enq = self.sudo().env['dms.enquiry'].search([('id', '=', lead.enquiry_id.id)])
+            lead.color_value = enq.product_color.name
+            lead.variant_value = enq.product_variant.name
+            lead.vehicle_name = enq.product_id.name
 
-    @api.depends('enquiry_id')
-    def _compute_variant(self):
-        """ Compute Variant """
-        for lead in self.filtered(lambda l: l.enquiry_id):
-            lead.variant_value = lead.enquiry_id.product_variant.name
-
-    @api.depends('enquiry_id')
-    def _compute_vehicle(self):
-        """ Compute Vehicle/Product ID """
-        for lead in self.filtered(lambda l: l.enquiry_id):
-            lead.vehicle_name = lead.enquiry_id.product_id.name
     @api.depends('team_id')
     def _compute_lead(self):
         for lead in self.filtered(lambda l: l.team_id):
             lead.team_lead = lead.team_id.user_id.name
+
 
 class OpportunityType(models.Model):
 
