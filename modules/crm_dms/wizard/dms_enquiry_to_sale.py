@@ -159,7 +159,7 @@ class Lead2OpportunityPartner(models.TransientModel):
         vals = {
             'product_id': product.id,
             'name': product.name,
-            'order_id': order.id
+            'order_id': order.id,
             'pricelist_id':self.pricelist_id.id
         }
         order_line.create(vals)
