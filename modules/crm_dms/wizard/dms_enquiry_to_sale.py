@@ -136,7 +136,7 @@ class Lead2OpportunityPartner(models.TransientModel):
                                                       ('color_value', '=', self.product_color.name),
                                                       ('variant_value', '=', self.product_variant.name)], limit=1)
         print("************************************************************************")
-        print(self.pricelist)
+        print(product)
         if not product:
             raise UserError(_("Unable to create Quote as product not found"))
         values = {
@@ -151,7 +151,7 @@ class Lead2OpportunityPartner(models.TransientModel):
         order = sale.create(values)
 
         self._create_product_order_line(product, order)
-        self._create_component_order_line(product, self.pricelist, order)
+      #  self._create_component_order_line(product, self.pricelist, order)
 
 
     def _create_product_order_line(self, product, order):
@@ -167,20 +167,21 @@ class Lead2OpportunityPartner(models.TransientModel):
         items = pricelist.item_ids.search(
             ['|', ('product_id', '=', product.id), ('product_tmpl_id', '=', product.product_tmpl_id.id)])
         for item in items:
-            print("#####################", item)
-            for compos in item.component:
-                product = self.env['product.product'].search([('name', '=', compos.type_id.name)])
-                if not product:
-                    product = self.env['product.product'].create(self._prepare_component_product(compos.type_id.name))
-                vals = {
-                    'product_id': product.id,
-                    'name': compos.type_id.name,
-                    'price_unit': compos.price,
-                    'order_id': order.id
-                }
-                print(vals)
-                order_line = self.env['sale.order.line']
-                order_line.create(vals)
+            if item.pricelist_id.id == self.pricelist.id:
+                print("#####################", item)
+                for compos in item.component:
+                    product = self.env['product.product'].search([('name', '=', compos.type_id.name)])
+                    if not product:
+                        product = self.env['product.product'].create(self._prepare_component_product(compos.type_id.name))
+                    vals = {
+                        'product_id': product.id,
+                        'name': compos.type_id.name,
+                        'price_unit': compos.price,
+                        'order_id': order.id
+                    }
+                    print(vals)
+                    order_line = self.env['sale.order.line']
+                    order_line.create(vals)
 
     def _prepare_component_product(self, component_name):
         return {

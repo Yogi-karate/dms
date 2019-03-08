@@ -11,7 +11,6 @@
     'depends': ['base'],
     'data': [
         'views/res_partner_views.xml',
-        'security/dms_groups.xml',
     ],
     'installable': True,
     'auto_install': True,

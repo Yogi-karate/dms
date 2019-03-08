@@ -11,6 +11,7 @@
     'depends': ['base_dms','purchase','sale_dms','crm_dms','vehicle','l10n_in'],
     'data': [
         'views/dms_views.xml',
+        'security/dms_groups.xml',
     ],
     'installable': True,
     'auto_install': False,
