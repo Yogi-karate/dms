@@ -11,22 +11,6 @@ class MassConfirm(models.TransientModel):
     order_no = fields.Char("Order No")
     vehicle_no = fields.Char("Vehicle No")
 
-    @api.multi
-    def confirm_inventory(self, val_list):
-        _logger.info("Confirm Multi Inventory")
-        for vals in val_list:
-            _logger.info(vals)
-            order_id = vals['ids']
-            _logger.info("ORDER ID Before Processing"+str(order_id))
-            vehicle_id = self.env['vehicle'].search([('ref', '=', order_id.name)])
-            if not vehicle_id or not order_id:
-                _logger.error("ERROR processing" + str(order_id))
-                continue
-            try:
-                self._create_move_lines(order_id.picking_ids, vehicle_id.id)
-            except Exception as ex:
-                _logger.error("ERROR processing" + str(order_id))
-        return True
 
 
     @api.model
@@ -40,7 +24,7 @@ class MassConfirm(models.TransientModel):
             d = val_list
             for l in range(len(po_ids)):
                 d[l]['ids'] = po_ids[l]
-            self.confirm_inventory(d)
+            #self.confirm_inventory(d)
         else:
             _logger.info("No Purchase Inventory to Process")
             return False
@@ -55,11 +39,27 @@ class MassConfirm(models.TransientModel):
             d = val_list
             for l in range(len(so_ids)):
                 d[l]['ids'] = so_ids[l]
-            self.confirm_inventory(d)
+            #self.confirm_inventory(d)
         else:
             _logger.info("No Sales Inventory to Process")
             return False
 
+    @api.multi
+    def confirm_inventory(self, val_list):
+        _logger.info("Confirm Multi Inventory")
+        for vals in val_list:
+            _logger.info(vals)
+            order_id = vals['ids']
+            _logger.info("ORDER ID Before Processing" + str(order_id))
+            vehicle_id = self.env['vehicle'].search([('ref', '=', order_id.name)])
+            if not vehicle_id or not order_id:
+                _logger.error("ERROR processing" + str(order_id))
+                continue
+            try:
+                self._create_move_lines(order_id.picking_ids, vehicle_id.id)
+            except Exception as ex:
+                _logger.error("ERROR processing" + str(order_id))
+        return True
 
     @api.multi
     def _create_move_lines(self, picking_ids, vehicle_id):
