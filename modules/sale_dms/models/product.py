@@ -12,12 +12,12 @@ class DmsProduct(models.Model):
     @api.depends('attribute_value_ids')
     def _compute_color(self):
         for attribute_value in self.attribute_value_ids:
-            if attribute_value.attribute_id.name == 'color':
+            if attribute_value.attribute_id.name.lower() == 'color':
                 self.color_value = attribute_value.name
 
     @api.one
     @api.depends('attribute_value_ids')
     def _compute_variant(self):
         for attribute_value in self.attribute_value_ids:
-            if attribute_value.attribute_id.name == 'variant':
+            if attribute_value.attribute_id.name.lower() == 'variant':
                 self.variant_value = attribute_value.name
