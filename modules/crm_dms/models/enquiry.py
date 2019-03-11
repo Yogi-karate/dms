@@ -68,7 +68,7 @@ class Enquiry(models.Model):
     finance_type = fields.Selection([
         ('in', 'in-house'),
         ('out', 'out-house'),
-    ], string='Finance Type', store=True, default='out')
+    ], string='Finance Type', store=True, default='in')
 
     # insurance fields added by Yoganand on 31/01/2019
     insurance_company = fields.Char('Insurance Company',String = "Insurance Company")
@@ -78,12 +78,12 @@ class Enquiry(models.Model):
     insurance_type = fields.Selection([
         ('in', 'in-house'),
         ('out', 'out-house'),
-    ], string='Insurance Type', store=True, default='out')
+    ], string='Insurance Type', store=True, default='in')
     policy_punch_via = fields.Selection([
         ('covernote', 'Covernote'),
         ('hap', 'HAP'),
         ('nonhap','Non-HAP')
-    ], string='Policy Punch Via', store=True, default='covernote')
+    ], string='Policy Punch Via', store=True, default='hap')
     currency_id = fields.Many2one(
         'res.currency', string='Currency')
     idv = fields.Monetary('IDV',currency_field='currency_id')

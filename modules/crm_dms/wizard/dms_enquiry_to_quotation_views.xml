@@ -8,8 +8,8 @@
                     <group>
                     <group name ="left" string="Confirm Vehicle Details">
                         <field name="product_id" />
-                        <field name="product_color" />
-                        <field name="product_variant" />
+                        <field name="product_color" domain="[('attribute_id.name','=ilike','color'),('product_tmpl_id','=',product_id)]"/>
+                        <field name="product_variant" domain="[('attribute_id.name','=ilike','variant'),('product_tmpl_id','=',product_id)]"/>
                         <field name="pricelist"/>
                     </group>
                      <group name="right"/>
