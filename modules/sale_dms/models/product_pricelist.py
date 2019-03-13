@@ -22,6 +22,8 @@ class PricelistItemComponent(models.Model):
     item_id = fields.Many2one('product.pricelist.item',string='Pricelist Item')
     price = fields.Float(
         'Price', digits=dp.get_precision('Product Price'))
+    mandatory = fields.Boolean('Mandatory', default=True)
+
 
 class PricelistItem(models.Model):
      _name = 'product.pricelist.item'

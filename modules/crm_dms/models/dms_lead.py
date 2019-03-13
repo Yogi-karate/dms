@@ -17,6 +17,7 @@ class DmsLead(models.Model):
     variant_value = fields.Char(compute='_compute_enquiry_values',string='Variant',help ='true')
     vehicle_name = fields.Char(compute='_compute_enquiry_values',string='Vehicle',help ='true')
     team_lead = fields.Char(compute='_compute_lead',string = 'Team Lead')
+    customer_before_confirm = fields.Char(compute='_compute_enquiry_values',string='Customer')
 
     @api.model
     def _onchange_user_values(self, user_id):
@@ -48,6 +49,8 @@ class DmsLead(models.Model):
             lead.color_value = enq.product_color.name
             lead.variant_value = enq.product_variant.name
             lead.vehicle_name = enq.product_id.name
+            print("#####################",enq.partner_name)
+            lead.customer_before_confirm = enq.partner_name
 
     @api.depends('team_id')
     def _compute_lead(self):

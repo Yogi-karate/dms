@@ -172,10 +172,10 @@ class Enquiry(models.Model):
 
     @api.model
     def _prepare_opportunities(self, type):
-        customer = self._create_lead_partner()
+        #customer = self._create_lead_partner()
         return {
             'name': type.name + '-' + self.product_id.name,
-            'partner_id': customer.id,
+            'partner_name': self.partner_name,
             'mobile': self.partner_mobile,
             'enquiry_id': self.id,
             'opportunity_type': type.id,

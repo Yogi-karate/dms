@@ -8,7 +8,7 @@
     'sequence': 60,
     'summary': 'DMS CRM Changes',
     'description': "Auto Dealership Business Domain",
-    'depends': ['crm'],
+    'depends': ['crm','sale_dms'],
     'data': [
         'security/ir.model.access.csv',
         'security/dms_enquiry_security.xml',

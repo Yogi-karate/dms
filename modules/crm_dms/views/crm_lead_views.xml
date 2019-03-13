@@ -8,7 +8,7 @@
                     <field name="date_deadline" invisible="1"/>
                     <field name="create_date" invisible="1"/>
                     <field name="name" string="Opportunity"/>
-                    <field name="partner_id" string="Customer"/>
+                    <field name="customer_before_confirm"/>
                     <field name="days_open"/>
                     <field name="activity_date_deadline"/>
                     <field name="activity_summary"/>
@@ -102,13 +102,14 @@
                         </div>
                         <group>
                             <group>
-                                <field name="partner_id"
+                                <field name="partner_id" invisible="1"
                                     widget="res_partner_many2one"
                                     string="Customer" domain="[('customer', '=', True)]"
                                     context="{'search_default_customer': 1,
                                         'show_vat': True,
                                     }"
                                 />
+                                <field name="customer_before_confirm"/>
                                 <field name="enquiry_id" />
                                 <field name="campaign_id" invisible="1"/>
                                 <field name="source_id"  invisible="1"/>
@@ -183,6 +184,7 @@
                     <field name="partner_address_email"/>
                     <field name="message_needaction_counter"/>
                     <field name="partner_id"/>
+                    <field name="customer_before_confirm"/>
                     <field name="activity_summary"/>
                     <field name="active"/>
                     <field name="company_currency"/>
@@ -211,7 +213,11 @@
                                         <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                     </div>
                                     <div class="text-muted o_kanban_record_subtitle">
-                                        <t t-if="record.planned_revenue.raw_value"><field name="planned_revenue" widget="monetary" options="{'currency_field': 'company_currency'}"/><span t-if="record.partner_id.value">,</span></t> <span t-if="record.partner_id.value"> <t t-esc="record.partner_id.value"/></span>
+                                        <t t-if="record.planned_revenue.raw_value"><field name="planned_revenue" widget="monetary" options="{'currency_field': 'company_currency'}"/>
+                                            <span t-if="record.partner_id.value">,</span></t>
+                                        <span>
+                                        <!-- <t t-esc="record.partner_id.value"/> -->
+                                        <field name="customer_before_confirm"/> </span>
                                     </div>
 
                                     <div class="o_kanban_record_bottom">
@@ -236,5 +242,20 @@
             </field>
         </record>
 
-
+     <record id="crm.crm_lead_view_tree_activity" model="ir.ui.view">
+            <field name="name">crm.lead.tree.opportunity.next.activity</field>
+            <field name="model">crm.lead</field>
+            <field name="arch" type="xml">
+                <tree string="Next Activities" decoration-danger="activity_date_deadline and (activity_date_deadline &lt; current_date)" default_order="activity_date_deadline">
+                    <field name="name"/>
+                    <field name="partner_name"/>
+                    <field name="activity_date_deadline"/>
+                    <field name="activity_type_id"/>
+                    <field name="activity_summary"/>
+                    <field name="stage_id"/>
+                    <field name="planned_revenue"/>
+                    <field name="date_deadline"/>
+                </tree>
+            </field>
+        </record>
 </odoo>

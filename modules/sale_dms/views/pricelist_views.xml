@@ -41,6 +41,7 @@
                                                <tree create="true" >
                                                    <field name="type_id"/>
                                                    <field name="price"/>
+                                                   <field name="mandatory"/>
                                                </tree>
 
                                            </field>
@@ -89,6 +90,7 @@
                             <group string="Pricelist Component">
                                 <field name="type_id" />
                                 <field name="price"/>
+                                <field name="mandatory"/>
 
                             </group>
 
