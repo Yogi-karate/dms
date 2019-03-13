@@ -282,7 +282,7 @@
             <field name="model">dms.enquiry</field>
             <field name="arch" type="xml">
                 <search string="Search Enquiries">
-                    <field name="name" string="Enquiry" filter_domain="['|','|','|',('partner_id','ilike',self),('partner_name','ilike',self),('email_from','ilike',self),('name', 'ilike', self)]"/>
+                    <field name="name" string="Enquiry" filter_domain="['|',('partner_name','ilike',self),('name', 'ilike', self)]"/>
                     <field name="state" domain="[]"/>
                     <field name="user_id"/>
                     <field name="team_id"/>
