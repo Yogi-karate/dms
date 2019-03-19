@@ -1,50 +1,62 @@
 <?xml version="1.0"?>
 <odoo>
-        <record id="view_dms_enquiry2sale_order" model="ir.ui.view">
-            <field name="name">dms.enquiry2sale.order.form</field>
-            <field name="model">dms.enquiry2sale.order</field>
-            <field name="arch" type="xml">
-                <form string="Convert to Quotation">
-                    <group>
-                    <group name ="left" string="Confirm Vehicle Details">
-                        <field name="product_id" />
-                        <field name="product_color" domain="[('attribute_id.name','=ilike','color'),('product_tmpl_id','=',product_id)]"/>
-                        <field name="product_variant" domain="[('attribute_id.name','=ilike','variant'),('product_tmpl_id','=',product_id)]"/>
+    <record id="view_dms_enquiry2sale_order" model="ir.ui.view">
+        <field name="name">dms.enquiry2sale.order.form</field>
+        <field name="model">dms.enquiry2sale.order</field>
+        <field name="arch" type="xml">
+            <form string="Convert to Quotation">
 
-                    </group>
-                        <group name="right">
-                          <group name="action" string="Customers" col="1">
-                        <field name="action" nolabel="1" widget="radio"/>
-                        <group col="2">
-                            <field name="partner_id" widget="res_partner_many2one" domain="[('customer', '=', True)]" context="{'search_default_customer': 1, 'show_vat': True}" attrs="{'required': [('action', '=', 'exist')], 'invisible':[('action','!=','exist')]}"/>
+                <group name="left" string="Confirm Vehicle Details">
+                    <field name="show_color" invisible="1"/>
+                    <field name="variant_attribute_values" invisible="1"/>
+                    <field name="color_attribute_values" invisible="1"/>
+                    <field name="product_id"/>
+                    <field name="product_variant" no_label="1"
+                           domain="[('attribute_id.name','=ilike','variant'),('id','in',variant_attribute_values)]"/>
+                    <field name="product_color"
+                           domain="[('attribute_id.name','=ilike','color'),('id','in',color_attribute_values)]"
+                           attrs="{'invisible': [('show_color', '=', False)]}"/>
+                </group>
+                <group string="Additional Charges">
+                    <field name="pricelist"/>
+                    <field name="pricelist_components">
+                        <tree create="true">
+                            <field name="type_id"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
+                </group>
+
+                <footer>
+                    <button name="action_apply" string="Create Quotation" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="pricelist_component_view_form" model="ir.ui.view">
+        <field name="name">enquiry.component.form</field>
+        <field name="model">enquiry.pricelist.component</field>
+        <field name="priority">20</field>
+        <field name="arch" type="xml">
+            <form string="Pricelist component">
+                <sheet>
+                    <group>
+                        <group string="Pricelist Component">
+                            <field name="type_id"/>
+                            <field name="price"/>
                         </group>
                     </group>
-                     </group>
-                    </group>
-                    <group>
-                        <group name="left">
-                        <field name="pricelist"/>
-                        <field name="pricelist_item" domain="[('item_id.pricelist_id','=',pricelist),('mandatory','=',False)]">
-                            <tree>
-                                <field name="type_id"/>
-                                <field name="price"/>
-                            </tree>
-                        </field>
-                     </group>
-                    </group>
-                    <footer>
-                        <button name="action_apply" string="Create Quotation" type="object" class="btn-primary"/>
-                        <button string="Cancel" class="btn-secondary" special="cancel"/>
-                    </footer>
-                </form>
-            </field>
-        </record>
-        <record id="action_create_quotation" model="ir.actions.act_window">
-            <field name="name">Create Quotation from Sub Enquiry</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">dms.enquiry2sale.order</field>
-            <field name="view_mode">form</field>
-            <field name="view_id" ref="view_dms_enquiry2sale_order"/>
-            <field name="target">new</field>
-        </record>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_create_quotation" model="ir.actions.act_window">
+        <field name="name">Create Quotation from Sub Enquiry</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.enquiry2sale.order</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_dms_enquiry2sale_order"/>
+        <field name="target">new</field>
+    </record>
 </odoo>

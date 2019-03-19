@@ -1,16 +1,26 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, tools,models
+from odoo import api, fields, tools, models
 from odoo.exceptions import UserError
 from odoo.tools.translate import _
+from odoo.addons import decimal_precision as dp
+
+
+class PricelistComponent(models.TransientModel):
+    _name = 'enquiry.pricelist.component'
+
+    type_id = fields.Many2one('dms.price.component', string='Component Type')
+    item_id = fields.Many2one('dms.enquiry2sale.order', string='Enquiry')
+    price = fields.Float(
+        'Price', digits=dp.get_precision('Product Price'))
+    mandatory = fields.Boolean('Mandatory', default=False)
 
 
 class Lead2OpportunityPartner(models.TransientModel):
     _name = 'dms.enquiry2sale.order'
-    _description = 'Create Quote for Opportunity (not in mass)'
+    _description = 'Create Quote for Opportunity'
     _inherit = 'crm.partner.binding'
-
 
     @api.model
     def default_get(self, fields):
@@ -26,8 +36,7 @@ class Lead2OpportunityPartner(models.TransientModel):
             lead = self.env['crm.lead'].browse(self._context['active_id'])
             enquiry = lead.enquiry_id
             email = lead.partner_id.email if lead.partner_id else lead.email_from
-            tomerge.update(self._get_duplicated_leads(partner_id, email, include_lost=True).ids)
-
+            print(fields)
             if 'action' in fields and not result.get('action'):
                 result['action'] = 'exist' if partner_id else 'create'
             if 'partner_id' in fields:
@@ -50,9 +59,6 @@ class Lead2OpportunityPartner(models.TransientModel):
                 result['partner_mobile'] = enquiry.partner_mobile
             if enquiry.partner_email:
                 result['partner_email'] = enquiry.partner_email
-
-            if not partner_id and not lead.contact_name:
-                result['action'] = 'nothing'
         return result
 
     name = fields.Selection([
@@ -62,22 +68,25 @@ class Lead2OpportunityPartner(models.TransientModel):
 
     action = fields.Selection([
         ('exist', 'Link to an existing customer'),
-        ('create', 'Create a new customer'),
-        ('nothing', 'Do not link to a customer')
+        ('create', 'Create a new customer')
     ], 'Related Customer', required=True)
     user_id = fields.Many2one('res.users', 'User')
     team_id = fields.Many2one('crm.team', 'Team')
     partner_id = fields.Many2one('res.partner', 'Customer')
-    partner_name = fields.Char('Customer Name', required=True)
-    partner_mobile = fields.Char('Customer Mobile', required=True)
+    partner_name = fields.Char('Customer Name')
+    partner_mobile = fields.Char('Customer Mobile')
     partner_email = fields.Char('Customer Email')
-    product_id = fields.Many2one('product.template', string='Product', required=True)
-    product_color = fields.Many2one('product.template.attribute.value', string='Color')
-    product_variant = fields.Many2one('product.template.attribute.value', string='Variant')
-    pricelist = fields.Many2one('product.pricelist', string='Pricelist')
-    pricelist_item = fields.Many2many('pricelist.component', string='Pricelist Item')
-
-
+    product_id = fields.Many2one('product.template', string='Product', required=True, ondelete="cascade")
+    product_color = fields.Many2one('product.attribute.value', string='Color')
+    product_variant = fields.Many2one('product.attribute.value', string='Variant')
+    pricelist = fields.Many2one('product.pricelist', string='Pricelist', ondelete="cascade")
+    pricelist_components = fields.One2many('enquiry.pricelist.component', 'item_id',
+                                           string='Price Components', ondelete="cascade")
+    show_color = fields.Boolean('Color Visible', default=False)
+    variant_attribute_values = fields.One2many('product.attribute.value', string='attributes',
+                                               compute='compute_variant_attribute_values')
+    color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
+                                             compute='compute_color_attribute_values')
 
     @api.onchange('action')
     def onchange_action(self):
@@ -86,59 +95,24 @@ class Lead2OpportunityPartner(models.TransientModel):
         else:
             self.partner_id = False
 
-    @api.onchange('user_id')
-    def _onchange_user(self):
-        """ When changing the user, also set a team_id or restrict team id
-            to the ones user_id is member of.
-        """
-        if self.user_id:
-            if self.team_id:
-                user_in_team = self.env['crm.team'].search_count(
-                    [('id', '=', self.team_id.id), '|', ('user_id', '=', self.user_id.id),
-                     ('member_ids', '=', self.user_id.id)])
-            else:
-                user_in_team = False
-            if not user_in_team:
-                values = self.env['crm.lead']._onchange_user_values(self.user_id.id if self.user_id else False)
-                self.team_id = values.get('team_id', False)
+    @api.onchange('product_id')
+    def compute_variant_attribute_values(self):
+        print("HELOOOOOOOO")
+        products = self.sudo().env['product.product'].search([('product_tmpl_id', '=', self.product_id.id)])
+        self.variant_attribute_values = products.mapped('attribute_value_ids').filtered(
+            lambda attrib: attrib.attribute_id.name.lower() == 'variant')
+        print(self.variant_attribute_values)
 
-    @api.model
-    def _get_duplicated_leads(self, partner_id, email, include_lost=False):
-        """ Search for opportunities that have the same partner and that arent done or cancelled """
-        return self.env['crm.lead']._get_duplicated_leads_by_emails(partner_id, email, include_lost=include_lost)
+    @api.onchange('product_variant')
+    def compute_color_attribute_values(self):
+        print("HELOOOOOOOO COLOR")
+        products = self.sudo().env['product.product'].search(
+            [('product_tmpl_id', '=', self.product_id.id), ('variant_value', '=', self.product_variant.name)])
+        self.color_attribute_values = products.mapped('attribute_value_ids')
+        self.show_color = True
+        print(self.color_attribute_values)
 
-    # NOTE JEM : is it the good place to test this ?
-    @api.model
-    def view_init(self, fields):
-        """ Check some preconditions before the wizard executes. """
-        for lead in self.env['crm.lead'].browse(self._context.get('active_ids', [])):
-            if lead.probability == 100:
-                raise UserError(_("Closed/Dead leads cannot be converted into opportunities."))
-        return False
 
-    @api.multi
-    def _convert_opportunity(self, vals):
-        self.ensure_one()
-
-        res = False
-
-        leads = self.env['crm.lead'].browse(vals.get('lead_ids'))
-        for lead in leads:
-            self_def_user = self.with_context(default_user_id=self.user_id.id)
-            partner_id = \
-                self_def_user._create_partner(
-                    lead.id, self.action, vals.get('partner_id') or lead.partner_id.id)
-            res = lead.convert_opportunity(partner_id, [], False)
-        user_ids = vals.get('user_ids')
-
-        leads_to_allocate = leads
-        if self._context.get('no_force_assignation'):
-            leads_to_allocate = leads_to_allocate.filtered(lambda lead: not lead.user_id)
-
-        if user_ids:
-            leads_to_allocate.allocate_salesman(user_ids, team_id=(vals.get('team_id')))
-
-        return res
 
     @api.multi
     def action_apply(self):
@@ -155,8 +129,8 @@ class Lead2OpportunityPartner(models.TransientModel):
                                                       ('color_value', '=', self.product_color.name),
                                                       ('variant_value', '=', self.product_variant.name)], limit=1)
         print("************************************************************************")
-        for x in self.pricelist_item:
-         print(x.type_id)
+        for x in self.pricelist_components:
+            print(x.type_id)
         if not product:
             raise UserError(_("Unable to create Quote as product not found"))
         values = {
@@ -174,9 +148,8 @@ class Lead2OpportunityPartner(models.TransientModel):
         self._create_product_order_line(product, order)
         self._create_component_order_line(product, self.pricelist, order)
 
-        if self.pricelist_item:
-            self._create_additional_order_line(product,self.pricelist_item,order)
-
+        if self.pricelist_components:
+            self._create_additional_order_line(self.pricelist_components, order)
 
     def _create_product_order_line(self, product, order):
         order_line = self.env['sale.order.line']
@@ -197,7 +170,8 @@ class Lead2OpportunityPartner(models.TransientModel):
                         print("#####################", compos)
                         product = self.env['product.product'].search([('name', '=', compos.type_id.name)])
                         if not product:
-                            product = self.env['product.product'].create(self._prepare_component_product(compos.type_id.name))
+                            product = self.env['product.product'].create(
+                                self._prepare_component_product(compos.type_id.name))
                         vals = {
                             'product_id': product.id,
                             'name': compos.type_id.name,
@@ -208,22 +182,21 @@ class Lead2OpportunityPartner(models.TransientModel):
                         order_line = self.env['sale.order.line']
                         order_line.create(vals)
 
-    def _create_additional_order_line(self,product,items,order):
-        print(items)
-        for item in items:
-                        product = self.env['product.product'].search([('name', '=', item.type_id.name)])
-                        if not product:
-                            product = self.env['product.product'].create(self._prepare_component_product(item.type_id.name))
-                        vals = {
-                            'product_id': product.id,
-                            'name': item.type_id.name,
-                            'price_unit': item.price,
-                            'order_id': order.id
-                        }
-                        print(vals)
-                        order_line = self.env['sale.order.line']
-                        order_line.create(vals)
-
+    def _create_additional_order_line(self, pricelist_components, order):
+        print(pricelist_components)
+        for item in pricelist_components:
+            product = self.env['product.product'].search([('name', '=', item.type_id.name)])
+            if not product:
+                product = self.env['product.product'].create(self._prepare_component_product(item.type_id.name))
+            vals = {
+                'product_id': product.id,
+                'name': item.type_id.name,
+                'price_unit': item.price,
+                'order_id': order.id
+            }
+            print(vals)
+            order_line = self.env['sale.order.line']
+            order_line.create(vals)
 
     def _prepare_component_product(self, component_name):
         return {
@@ -259,33 +232,45 @@ class Lead2OpportunityPartner(models.TransientModel):
             'name': name,
             'mobile': self.partner_mobile,
             'email': email_split[0] if email_split else False,
-            'type': 'contact'
+            'customer': True
         }
+
+    @api.model
+    def _find_matching_partner(self):
+        """ Try to find a matching partner regarding the active model data, like
+            the customer's name, email, phone number, etc.
+            :return int partner_id if any, False otherwise
+        """
+        # active model has to be a lead
+        if self._context.get('active_model') != 'crm.lead' or not self._context.get('active_id'):
+            return False
+
+        lead = self.env['crm.lead'].browse(self._context.get('active_id'))
+
+        # find the best matching partner for the active model
+        Partner = self.env['res.partner']
+        if lead.partner_id:  # a partner is set already
+            return lead.partner_id.id
+
+        if lead.email_from:  # search through the existing partners based on the lead's email
+            partner = Partner.search([('email', '=', lead.email_from)], limit=1)
+            return partner.id
+
+        if lead.partner_name:  # search through the existing partners based on the lead's partner or contact name
+            partner = Partner.search([('name', 'ilike', '%' + lead.partner_name + '%')], limit=1)
+            return partner.id
+
+        if lead.contact_name:
+            partner = Partner.search([('name', 'ilike', '%' + lead.contact_name + '%')], limit=1)
+            return partner.id
+
+        return False
 
     @api.multi
     def _create_lead_partner(self):
         """ Create a partner from lead data
             :returns res.partner record
         """
-        Partner = self.env['res.partner']
-        # contact_name = self.contact_name
-        # if not contact_name:
-        #    contact_name = Partner._parse_partner_name(self.email_from)[0] if self.email_from else False
-
-        # if self.partner_name:
-        #    partner_company = Partner.create(self._create_lead_partner_data(self.partner_name, True))
-        # elif self.partner_id:
-        #    partner_company = self.partner_id
-        # else:
-        #    partner_company = None
-
-        # if contact_name:
-        #    return Partner.create(
-        #        self._create_lead_partner_data(contact_name, False, partner_company.id if partner_company else False))
-
-        # if partner_company:
-        #    return partner_company
+        partner = self.env['res.partner']
         if self.partner_name:
-            return Partner.create(self._create_lead_partner_data(self.partner_name, False))
-
-
+            return partner.create(self._create_lead_partner_data(self.partner_name, False))
