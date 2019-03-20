@@ -33,12 +33,25 @@ class Lead2OpportunityPartner(models.TransientModel):
             lead = self.env['crm.lead'].browse(self._context['active_id'])
             enquiry = lead.enquiry_id
             print(fields)
+
+            if 'partner_id' in fields:
+                result['partner_id'] = lead.partner_id.id
+            if lead.user_id:
+                result['user_id'] = lead.user_id.id
+            if lead.team_id:
+                result['team_id'] = lead.team_id.id
             if enquiry.product_color:
                 result['product_color'] = enquiry.product_color.id
             if enquiry.product_variant:
                 result['product_variant'] = enquiry.product_variant.id
             if enquiry.product_id:
                 result['product_id'] = enquiry.product_id.id
+            if enquiry.partner_name:
+                result['partner_name'] = enquiry.partner_name
+            if enquiry.partner_mobile:
+                result['partner_mobile'] = enquiry.partner_mobile
+            if enquiry.partner_email:
+                result['partner_email'] = enquiry.partner_email
         return result
 
     user_id = fields.Many2one('res.users', 'User')
@@ -83,18 +96,9 @@ class Lead2OpportunityPartner(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
-        print("HELOOOOO OOOO")
-        lead = self.env['crm.lead'].browse(self._context['active_id'])
-        enquiry = lead.enquiry_id
-        self.partner_name = enquiry.partner_name
-        self.partner_mobile = enquiry.partner_mobile
-        self.partner_email = enquiry.partner_email
 
-        print("Partner in apply")
-        print(self.partner_name)
         if not self.partner_id:
             self.partner_id = self._find_matching_partner()
-        print(self.partner_id)
         customer = self.partner_id if self.partner_id else self._create_lead_partner()
         sale = self.env['sale.order']
         product = self.env['product.product'].search([('product_tmpl_id', '=', self.product_id.id),
@@ -195,9 +199,6 @@ class Lead2OpportunityPartner(models.TransientModel):
             the customer's name, email, phone number, etc.
             :return int partner_id if any, False otherwise
         """
-        print("in Find partner")
-        print(self.partner_name)
-
         # find the best matching partner for the active model
         Partner = self.env['res.partner']
         if self.partner_id:  # a partner is set already
@@ -217,5 +218,4 @@ class Lead2OpportunityPartner(models.TransientModel):
         """
         partner = self.env['res.partner']
         if self.partner_name:
-            print("creating partner")
             return partner.create(self._create_lead_partner_data(self.partner_name, False))
