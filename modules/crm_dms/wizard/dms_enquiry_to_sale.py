@@ -30,19 +30,9 @@ class Lead2OpportunityPartner(models.TransientModel):
         """
         result = super(Lead2OpportunityPartner, self).default_get(fields)
         if self._context.get('active_id'):
-            tomerge = {int(self._context['active_id'])}
-
-            partner_id = result.get('partner_id')
             lead = self.env['crm.lead'].browse(self._context['active_id'])
             enquiry = lead.enquiry_id
-            email = lead.partner_id.email if lead.partner_id else lead.email_from
             print(fields)
-            if 'action' in fields and not result.get('action'):
-                result['action'] = 'exist' if partner_id else 'create'
-            if 'partner_id' in fields:
-                result['partner_id'] = lead.partner_id.id
-            if 'name' in fields:
-                result['name'] = 'merge' if len(tomerge) >= 2 else 'convert'
             if lead.user_id:
                 result['user_id'] = lead.user_id.id
             if lead.team_id:
@@ -88,16 +78,12 @@ class Lead2OpportunityPartner(models.TransientModel):
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                              compute='compute_color_attribute_values')
 
-    @api.onchange('action')
-    def onchange_action(self):
-        if self.action == 'exist':
-            self.partner_id = self._find_matching_partner()
-        else:
-            self.partner_id = False
-
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
-        print("HELOOOOOOOO")
+        self.variant_attribute_values = None
+        self.color_attribute_values = None
+        self.product_color = None
+        self.product_variant = None
         products = self.sudo().env['product.product'].search([('product_tmpl_id', '=', self.product_id.id)])
         self.variant_attribute_values = products.mapped('attribute_value_ids').filtered(
             lambda attrib: attrib.attribute_id.name.lower() == 'variant')
@@ -105,25 +91,21 @@ class Lead2OpportunityPartner(models.TransientModel):
 
     @api.onchange('product_variant')
     def compute_color_attribute_values(self):
-        print("HELOOOOOOOO COLOR")
         products = self.sudo().env['product.product'].search(
             [('product_tmpl_id', '=', self.product_id.id), ('variant_value', '=', self.product_variant.name)])
         self.color_attribute_values = products.mapped('attribute_value_ids')
         self.show_color = True
         print(self.color_attribute_values)
 
-
-
     @api.multi
     def action_apply(self):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
-        customer = self.partner_id
-        if self.action == 'create':
-            customer = self._create_lead_partner()
 
-        self.ensure_one()
+        if not self.partner_id:
+            self.partner_id = self._find_matching_partner()
+        customer = self.partner_id if self.partner_id else self._create_lead_partner()
         sale = self.env['sale.order']
         product = self.env['product.product'].search([('product_tmpl_id', '=', self.product_id.id),
                                                       ('color_value', '=', self.product_color.name),
@@ -140,14 +122,9 @@ class Lead2OpportunityPartner(models.TransientModel):
             'opportunity_id': self._context['active_id'],
             'pricelist_id': self.pricelist.id
         }
-        if self.partner_id:
-            values['partner_id'] = self.partner_id.id
-
         order = sale.create(values)
-
         self._create_product_order_line(product, order)
         self._create_component_order_line(product, self.pricelist, order)
-
         if self.pricelist_components:
             self._create_additional_order_line(self.pricelist_components, order)
 
@@ -241,28 +218,16 @@ class Lead2OpportunityPartner(models.TransientModel):
             the customer's name, email, phone number, etc.
             :return int partner_id if any, False otherwise
         """
-        # active model has to be a lead
-        if self._context.get('active_model') != 'crm.lead' or not self._context.get('active_id'):
-            return False
-
-        lead = self.env['crm.lead'].browse(self._context.get('active_id'))
 
         # find the best matching partner for the active model
         Partner = self.env['res.partner']
-        if lead.partner_id:  # a partner is set already
-            return lead.partner_id.id
+        if self.partner_id:  # a partner is set already
+            return self.partner_id
 
-        if lead.email_from:  # search through the existing partners based on the lead's email
-            partner = Partner.search([('email', '=', lead.email_from)], limit=1)
-            return partner.id
-
-        if lead.partner_name:  # search through the existing partners based on the lead's partner or contact name
-            partner = Partner.search([('name', 'ilike', '%' + lead.partner_name + '%')], limit=1)
-            return partner.id
-
-        if lead.contact_name:
-            partner = Partner.search([('name', 'ilike', '%' + lead.contact_name + '%')], limit=1)
-            return partner.id
+        if self.partner_name and self.partner_mobile:  # search through the existing partners based on the lead's partner and mobile
+            partner = Partner.search([('name', 'ilike', '%' + lead.partner_name + '%'),
+                                      ('mobile', 'ilike', '%' + self.partner_mobile + '%')], limit=1)
+            return partner
 
         return False
 

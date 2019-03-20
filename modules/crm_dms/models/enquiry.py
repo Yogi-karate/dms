@@ -23,9 +23,6 @@ class Enquiry(models.Model):
                               default=lambda self: self.env.user)
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
-    # kanban_state = fields.Selection(
-    #    [('grey', 'No next activity planned'), ('red', 'Next activity late'), ('green', 'Next activity is planned')],
-    #   string='Kanban State', compute='_compute_kanban_state')
     state = fields.Selection([
         ('open', 'Open'),
         ('done', 'Closed'),
@@ -33,7 +30,6 @@ class Enquiry(models.Model):
     ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='open')
     product_id = fields.Many2one('product.template', string='Product', required=True)
-    model_name = fields.Char('Model', compute='_compute_model_name')
     product_color = fields.Many2one('product.attribute.value', string='Color')
     product_variant = fields.Many2one('product.attribute.value', string='Variant')
     opportunity_ids = fields.One2many('crm.lead', 'enquiry_id', string='Opportunities')
@@ -100,16 +96,19 @@ class Enquiry(models.Model):
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
-        print("HELOOOOOOOO")
+        self.variant_attribute_values = None
+        self.color_attribute_values = None
+        self.product_color = None
+        self.product_variant = None
         products = self.sudo().env['product.product'].search([('product_tmpl_id', '=', self.product_id.id)])
         self.variant_attribute_values = products.mapped('attribute_value_ids')
+
         print(self.variant_attribute_values)
 
     @api.onchange('product_variant')
     def compute_color_attribute_values(self):
-        print("HELOOOOOOOO COLOR")
         products = self.sudo().env['product.product'].search(
-            [('product_tmpl_id', '=', self.product_id.id),('variant_value', '=', self.product_variant.name)])
+            [('product_tmpl_id', '=', self.product_id.id), ('variant_value', '=', self.product_variant.name)])
         self.color_attribute_values = products.mapped('attribute_value_ids')
         self.show_color = True
         print(self.color_attribute_values)
@@ -278,29 +277,3 @@ class Enquiry(models.Model):
 
         print(user_id)
         return {'user_id': user_id}
-
-    @api.multi
-    def _create_lead_partner(self):
-        """ Create a partner from lead data
-            :returns res.partner record
-        """
-        Partner = self.env['res.partner']
-        # contact_name = self.contact_name
-        # if not contact_name:
-        #    contact_name = Partner._parse_partner_name(self.email_from)[0] if self.email_from else False
-
-        # if self.partner_name:
-        #    partner_company = Partner.create(self._create_lead_partner_data(self.partner_name, True))
-        # elif self.partner_id:
-        #    partner_company = self.partner_id
-        # else:
-        #    partner_company = None
-
-        # if contact_name:
-        #    return Partner.create(
-        #        self._create_lead_partner_data(contact_name, False, partner_company.id if partner_company else False))
-
-        # if partner_company:
-        #    return partner_company
-        if self.partner_name:
-            return Partner.create(self._create_lead_partner_data(self.partner_name, False))
