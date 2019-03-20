@@ -96,10 +96,11 @@ class Enquiry(models.Model):
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
+        if self.variant_attribute_values or self.color_attribute_values:
+            self.product_color = None
+            self.product_variant = None
         self.variant_attribute_values = None
         self.color_attribute_values = None
-        self.product_color = None
-        self.product_variant = None
         products = self.sudo().env['product.product'].search([('product_tmpl_id', '=', self.product_id.id)])
         self.variant_attribute_values = products.mapped('attribute_value_ids')
 

@@ -33,19 +33,18 @@ class Lead2OpportunityPartner(models.TransientModel):
             lead = self.env['crm.lead'].browse(self._context['active_id'])
             enquiry = lead.enquiry_id
             print(fields)
-
             if 'partner_id' in fields:
                 result['partner_id'] = lead.partner_id.id
             if lead.user_id:
                 result['user_id'] = lead.user_id.id
             if lead.team_id:
                 result['team_id'] = lead.team_id.id
+            if enquiry.product_id:
+                result['product_id'] = enquiry.product_id.id
             if enquiry.product_color:
                 result['product_color'] = enquiry.product_color.id
             if enquiry.product_variant:
                 result['product_variant'] = enquiry.product_variant.id
-            if enquiry.product_id:
-                result['product_id'] = enquiry.product_id.id
             if enquiry.partner_name:
                 result['partner_name'] = enquiry.partner_name
             if enquiry.partner_mobile:
@@ -61,12 +60,13 @@ class Lead2OpportunityPartner(models.TransientModel):
     partner_mobile = fields.Char('Customer Mobile')
     partner_email = fields.Char('Customer Email')
     product_id = fields.Many2one('product.template', string='Product', required=True, ondelete="cascade")
-    product_color = fields.Many2one('product.attribute.value', string='Color')
-    product_variant = fields.Many2one('product.attribute.value', string='Variant')
+    product_color = fields.Many2one('product.attribute.value', required=True, string='Color')
+    product_variant = fields.Many2one('product.attribute.value', required=True, string='Variant')
     pricelist = fields.Many2one('product.pricelist', string='Pricelist', required=True, ondelete="cascade")
     pricelist_components = fields.One2many('enquiry.pricelist.component', 'item_id',
                                            string='Price Components', ondelete="cascade")
     show_color = fields.Boolean('Color Visible', default=False)
+    first_change = fields.Boolean('Default Get', default=False)
     variant_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                                compute='compute_variant_attribute_values')
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
@@ -74,10 +74,11 @@ class Lead2OpportunityPartner(models.TransientModel):
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
+        if self.variant_attribute_values or self.color_attribute_values:
+            self.product_variant = False
+            self.product_color = False
         self.variant_attribute_values = None
         self.color_attribute_values = None
-        self.product_color = None
-        self.product_variant = None
         products = self.sudo().env['product.product'].search([('product_tmpl_id', '=', self.product_id.id)])
         self.variant_attribute_values = products.mapped('attribute_value_ids').filtered(
             lambda attrib: attrib.attribute_id.name.lower() == 'variant')
