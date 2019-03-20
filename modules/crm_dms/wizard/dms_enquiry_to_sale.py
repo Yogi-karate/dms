@@ -33,33 +33,14 @@ class Lead2OpportunityPartner(models.TransientModel):
             lead = self.env['crm.lead'].browse(self._context['active_id'])
             enquiry = lead.enquiry_id
             print(fields)
-            if lead.user_id:
-                result['user_id'] = lead.user_id.id
-            if lead.team_id:
-                result['team_id'] = lead.team_id.id
             if enquiry.product_color:
                 result['product_color'] = enquiry.product_color.id
             if enquiry.product_variant:
                 result['product_variant'] = enquiry.product_variant.id
             if enquiry.product_id:
                 result['product_id'] = enquiry.product_id.id
-            if enquiry.partner_name:
-                result['partner_name'] = enquiry.partner_name
-            if enquiry.partner_mobile:
-                result['partner_mobile'] = enquiry.partner_mobile
-            if enquiry.partner_email:
-                result['partner_email'] = enquiry.partner_email
         return result
 
-    name = fields.Selection([
-        ('convert', 'Convert to opportunity'),
-        ('merge', 'Merge with existing opportunities')
-    ], 'Conversion Action', required=True)
-
-    action = fields.Selection([
-        ('exist', 'Link to an existing customer'),
-        ('create', 'Create a new customer')
-    ], 'Related Customer', required=True)
     user_id = fields.Many2one('res.users', 'User')
     team_id = fields.Many2one('crm.team', 'Team')
     partner_id = fields.Many2one('res.partner', 'Customer')
@@ -69,7 +50,7 @@ class Lead2OpportunityPartner(models.TransientModel):
     product_id = fields.Many2one('product.template', string='Product', required=True, ondelete="cascade")
     product_color = fields.Many2one('product.attribute.value', string='Color')
     product_variant = fields.Many2one('product.attribute.value', string='Variant')
-    pricelist = fields.Many2one('product.pricelist', string='Pricelist', ondelete="cascade")
+    pricelist = fields.Many2one('product.pricelist', string='Pricelist', required=True, ondelete="cascade")
     pricelist_components = fields.One2many('enquiry.pricelist.component', 'item_id',
                                            string='Price Components', ondelete="cascade")
     show_color = fields.Boolean('Color Visible', default=False)
@@ -102,9 +83,18 @@ class Lead2OpportunityPartner(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
+        print("HELOOOOO OOOO")
+        lead = self.env['crm.lead'].browse(self._context['active_id'])
+        enquiry = lead.enquiry_id
+        self.partner_name = enquiry.partner_name
+        self.partner_mobile = enquiry.partner_mobile
+        self.partner_email = enquiry.partner_email
 
+        print("Partner in apply")
+        print(self.partner_name)
         if not self.partner_id:
             self.partner_id = self._find_matching_partner()
+        print(self.partner_id)
         customer = self.partner_id if self.partner_id else self._create_lead_partner()
         sale = self.env['sale.order']
         product = self.env['product.product'].search([('product_tmpl_id', '=', self.product_id.id),
@@ -183,20 +173,7 @@ class Lead2OpportunityPartner(models.TransientModel):
             'taxes_id': []
         }
 
-    def _create_partner(self, lead_id, action, partner_id):
-        """ Create partner based on action.
-            :return dict: dictionary organized as followed: {lead_id: partner_assigned_id}
-        """
-        # TODO this method in only called by Lead2OpportunityPartner
-        # wizard and would probably diserve to be refactored or at least
-        # moved to a better place
-        if action == 'each_exist_or_create':
-            partner_id = self.with_context(active_id=lead_id)._find_matching_partner()
-            action = 'create'
-        result = self.env['crm.lead'].browse(lead_id).handle_partner_assignation(action, partner_id)
-        return result.get(lead_id)
-
-    def _create_lead_partner_data(self, name, is_company, parent_id=False):
+    def _create_lead_partner_data(self, name):
         """ extract data from lead to create a partner
             :param name : furtur name of the partner
             :param is_company : True if the partner is a company
@@ -218,6 +195,8 @@ class Lead2OpportunityPartner(models.TransientModel):
             the customer's name, email, phone number, etc.
             :return int partner_id if any, False otherwise
         """
+        print("in Find partner")
+        print(self.partner_name)
 
         # find the best matching partner for the active model
         Partner = self.env['res.partner']
@@ -225,7 +204,7 @@ class Lead2OpportunityPartner(models.TransientModel):
             return self.partner_id
 
         if self.partner_name and self.partner_mobile:  # search through the existing partners based on the lead's partner and mobile
-            partner = Partner.search([('name', 'ilike', '%' + lead.partner_name + '%'),
+            partner = Partner.search([('name', 'ilike', '%' + self.partner_name + '%'),
                                       ('mobile', 'ilike', '%' + self.partner_mobile + '%')], limit=1)
             return partner
 
@@ -238,4 +217,5 @@ class Lead2OpportunityPartner(models.TransientModel):
         """
         partner = self.env['res.partner']
         if self.partner_name:
+            print("creating partner")
             return partner.create(self._create_lead_partner_data(self.partner_name, False))
