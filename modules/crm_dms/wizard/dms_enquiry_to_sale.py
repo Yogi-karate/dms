@@ -219,4 +219,4 @@ class Lead2OpportunityPartner(models.TransientModel):
         """
         partner = self.env['res.partner']
         if self.partner_name:
-            return partner.create(self._create_lead_partner_data(self.partner_name, False))
+            return partner.create(self._create_lead_partner_data(self.partner_name))

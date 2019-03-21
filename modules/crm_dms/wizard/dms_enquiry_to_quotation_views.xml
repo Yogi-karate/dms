@@ -19,9 +19,9 @@
                 </group>
                 <group string="Additional Charges">
                     <field name="pricelist"/>
-                    <field name="pricelist_components">
+                    <field name="pricelist_components" >
                         <tree create="true">
-                            <field name="type_id"/>
+                            <field name="type_id" domain="[('pricelist_components.mandatory','=',False)]"/>
                             <field name="price"/>
                         </tree>
                     </field>
