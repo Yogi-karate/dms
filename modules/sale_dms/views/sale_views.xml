@@ -131,9 +131,9 @@
                                                 <field name="qty_invoiced" attrs="{'invisible': [('parent.state', 'not in', ['sale', 'done'])]}"/>
                                             </div>
                                             <field name="price_unit"/>
-                                            <label for="discount" groups="sale.group_discount_per_so_line"/>
+                                            <label for="discount_price" groups="sale.group_discount_per_so_line"/>
                                             <div name="discount" groups="sale.group_discount_per_so_line">
-                                                <field name="discount" class="oe_inline"/> %%
+                                                <field name="discount_price" class="oe_inline"/> %%
                                             </div>
                                             <!--
                                                 We need the sequence field to be here
@@ -258,7 +258,7 @@
                                         domain="[('type_tax_use','=','sale'),('company_id','=',parent.company_id)]"
                                         attrs="{'readonly': [('qty_invoiced', '&gt;', 0)]}"
                                     />
-                                    <field name="discount" groups="sale.group_discount_per_so_line"/>
+                                    <field name="discount_price" groups="sale.group_discount_per_so_line"/>
                                     <field name="price_subtotal" widget="monetary" groups="account.group_show_line_subtotals_tax_excluded"/>
                                     <field name="price_total" widget="monetary" groups="account.group_show_line_subtotals_tax_included"/>
                                     <field name="state" invisible="1"/>
