@@ -201,7 +201,6 @@
                         <page string="Vehicle Details" attrs="{'invisible': [('product_updatable', '=', False)]}">
                             <group>
                                 <group string="Initial Vehicle Details">
-                                    <field name="show_color" invisible="1"/>
                                     <field name="variant_attribute_values" invisible="1"/>
                                     <field name="color_attribute_values" invisible="1"/>
                                     <field name="product_id" options="{'no_create_edit': True}"
@@ -209,8 +208,7 @@
                                     <field name="product_variant" no_label="1" options="{'no_create_edit': True}"
                                            domain="[('attribute_id.name','=ilike','variant'),('id','in',variant_attribute_values)]"/>
                                     <field name="product_color" options="{'no_create_edit': True}"
-                                           domain="[('attribute_id.name','=ilike','color'),('id','in',color_attribute_values)]"
-                                           attrs="{'invisible': [('show_color', '=', False)]}"/>
+                                           domain="[('attribute_id.name','=ilike','color'),('id','in',color_attribute_values)]"/>
                                 </group>
                             </group>
                         </page>

@@ -88,7 +88,6 @@ class Enquiry(models.Model):
     premium_amount = fields.Monetary('Premium Amount', currency_field='currency_id')
     source_id = fields.Many2one('utm.source', string='Source', required=True)
     medium_id = fields.Many2one('utm.medium', string='Medium')
-    show_color = fields.Boolean('Color Visible', default=False)
     variant_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                                compute='compute_variant_attribute_values')
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
@@ -111,7 +110,6 @@ class Enquiry(models.Model):
         products = self.sudo().env['product.product'].search(
             [('product_tmpl_id', '=', self.product_id.id), ('variant_value', '=', self.product_variant.name)])
         self.color_attribute_values = products.mapped('attribute_value_ids')
-        self.show_color = True
         print(self.color_attribute_values)
 
     @api.depends('type_ids')
