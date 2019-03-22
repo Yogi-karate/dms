@@ -142,7 +142,7 @@ class Lead2OpportunityPartner(models.TransientModel):
                         print("#####################", compos)
                         product = self.env['product.product'].search([('name', '=', compos.type_id.name)])
                         if not product:
-                            product = self.env['product.product'].create(
+                            product = self.sudo().env['product.product'].create(
                                 self._prepare_component_product(compos.type_id.name))
                         vals = {
                             'product_id': product.id,
@@ -159,7 +159,7 @@ class Lead2OpportunityPartner(models.TransientModel):
         for item in pricelist_components:
             product = self.env['product.product'].search([('name', '=', item.type_id.name)])
             if not product:
-                product = self.env['product.product'].create(self._prepare_component_product(item.type_id.name))
+                product = self.sudo().env['product.product'].create(self._prepare_component_product(item.type_id.name))
             vals = {
                 'product_id': product.id,
                 'name': item.type_id.name,

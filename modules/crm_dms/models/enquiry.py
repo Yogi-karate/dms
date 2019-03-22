@@ -213,7 +213,7 @@ class Enquiry(models.Model):
             note=_(
                 "Follow up  on  <a href='#' data-oe-model='%s' data-oe-id='%d'>%s</a> for customer <a href='#' data-oe-model='%s' data-oe-id='%s'>%s</a>") % (
                      lead._name, lead.id, lead.name,
-                     lead.partner_id._name, lead.partner_id.id, lead.partner_id.display_name),
+                     lead.partner_id.name, lead.partner_id.id,self.partner_name),
             date_deadline=self.date_follow_up)
 
     @api.multi

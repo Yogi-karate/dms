@@ -35,6 +35,80 @@
            <field name="context">{'search_default_activities_my': True}</field>
            <field name="domain">[]</field>
        </record>
+     <record id="crm.view_crm_case_opportunities_filter" model="ir.ui.view">
+            <field name="name">crm.lead.search.opportunity</field>
+            <field name="model">crm.lead</field>
+            <field name="priority">15</field>
+            <field name="arch" type="xml">
+                <search string="Search Opportunities">
+                    <field name="name" string="Opportunity" filter_domain="['|','|','|',('partner_id','ilike',self),('partner_name','ilike',self),('email_from','ilike',self),('name', 'ilike', self)]"/>
+                    <field name="tag_ids" string="Tag" filter_domain="[('tag_ids', 'ilike', self)]"/>
+                    <field name="stage_id" domain="[]"/>
+                    <field name="user_id"/>
+                    <field name="team_id"/>
+                    <field name="partner_id" operator="child_of" string="Customer"/>
+                    <field name="city"/>
+                    <field name="country_id"/>
+                    <field name="activity_type_id"/>
+                    <field name="activity_summary"/>
+                    <field name="probability"/>
+                    <field name="lost_reason"/>
+                    <field name="date_conversion"/>
+                    <separator/>
+                    <filter string="My Pipeline" name="assigned_to_me"
+                        domain="[('user_id', '=', uid)]"
+                        help="Opportunities that are assigned to me"/>
+                    <filter string="Unassigned" name="unassigned"
+                        domain="[('user_id','=', False)]" help="No salesperson"/>
+                    <separator/>
+                    <filter string="Unread Messages" name="message_needaction" domain="[('message_needaction','=',True)]"/>
+                    <separator/>
+                    <filter string="Overdue Opportunities" name="overdue_opp"
+                            domain="[('date_deadline', '&lt;', context_today().strftime('%Y-%m-%d')), ('date_closed', '=', False)]"
+                            help="Opportunities with a date of Expected Closing which is in the past"/>
+                    <filter string="Creation Date" name="creation_date" date="create_date"/>
+                    <filter string="Expected Closing" name="close_this_month" date="date_deadline"/>
+                    <filter string="Closed Date" name="close_date" date="date_closed"/>
+                    <separator/>
+                    <filter string="Won" name="won" domain="['&amp;', ('active', '=', True), ('stage_id.probability', '=', 100)]"/>
+                    <filter string="Lost" name="lost" domain="['&amp;', ('active', '=', False), ('probability', '=', 0)]"/>
+                    <separator/>
+                    <filter string="Activities Todo" name="activities_my"
+                            domain="[('activity_ids.user_id', '=', uid)]"/>
+                    <separator/>
+                    <filter string="Late Activities" name="activities_overdue"
+                            domain="[('activity_ids.date_deadline', '&lt;', context_today().strftime('%Y-%m-%d'))]"
+                            help="Show all opportunities for which the next action date is before today"/>
+                    <filter string="Today Activities" name="activities_today"
+                            domain="[('activity_ids.date_deadline', '=', context_today().strftime('%Y-%m-%d'))]"/>
+                    <filter string="Future Activities" name="activities_upcoming_all"
+                        domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))
+                        ]"/>
+                    <group expand="0" string="Group By" colspan="16">
+                        <filter string="Created On" name="create_date"  context="{'group_by':'create_date'}"/>
+                        <filter string="Opportunity" name="name" context="{'group_by':'name'}"/>
+                        <filter string="Customer" name="partner_name" context="{'group_by':'partner_name'}"/>
+                        <filter name="mobile" string="Mobile" context="{'group_by':'mobile'}"/>
+                        <filter name="activity_date_deadline" string="Followup Date" context="{'group_by': 'activity_date_deadline'}"/>
+                        <filter string="Stage" name="stage_id" context="{'group_by':'stage_id'}"/>
+                        <filter string="Vehicle" name="vehicle_name" context="{'group_by':'vehicle_name'}"/>
+                        <filter string="Variant" name="variant_value" context="{'group_by':'variant_value'}"/>
+                        <filter string="Color" name="color_value" context="{'group_by':'color_value'}"/>
+                        <filter string="Sales Team" name="team_id" context="{'group_by':'team_id'}"/>
+                        <filter string="Salesperson" name="user_id"  context="{'group_by':'user_id'}"/>
+                        <filter string="Team Lead" name="team_lead"  context="{'group_by':'team_lead'}"/>
+
+                       <!-- <filter string="Medium" name="medium" domain="[]" context="{'group_by':'medium_id'}"/>
+                        <filter string="Source" name="source" domain="[]" context="{'group_by':'source_id'}"/>
+                        <separator orientation="vertical" />
+                        <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
+                        <filter string="Conversion Date" name="date_conversion" context="{'group_by': 'date_conversion'}" groups="crm.group_use_lead"/>
+                        <filter string="Closed Date" name="date_closed" context="{'group_by':'date_closed'}"/>
+                        <filter string="Expected Closing Date" name="date_deadline" context="{'group_by':'date_deadline'}"/> -->
+                    </group>
+                </search>
+            </field>
+        </record>
 
        <menuitem
                id="enquiry_report_menu1"
@@ -51,4 +125,6 @@
            <field name="context">{'search_default_team_id': active_id}</field>
            <field name="domain">[]</field>
        </record>
+
+
 </odoo>
