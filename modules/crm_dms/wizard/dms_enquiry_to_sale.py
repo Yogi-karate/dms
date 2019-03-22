@@ -131,7 +131,6 @@ class Lead2OpportunityPartner(models.TransientModel):
             'order_id': order.id
         }
         order_line.create(vals)
-
     def _create_component_order_line(self, product, pricelist, order):
         items = pricelist.item_ids.search(
             ['|', ('product_id', '=', product.id), ('product_tmpl_id', '=', product.product_tmpl_id.id)])

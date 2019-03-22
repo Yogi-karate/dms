@@ -13,11 +13,11 @@ class DmsLead(models.Model):
     days_open = fields.Float(compute='_compute_days_open', string='Days Open', store=True)
     enquiry_id = fields.Many2one('dms.enquiry',string='Enquiry')
     opportunity_type = fields.Many2one('dms.opportunity.type', string='Opportunity Type')
-    color_value = fields.Char(compute='_compute_enquiry_values',string='Color',help ='true',store=True)
-    variant_value = fields.Char(compute='_compute_enquiry_values',string='Variant',help ='true',store=True)
-    vehicle_name = fields.Char(compute='_compute_enquiry_values',string='Vehicle',help ='true',store=True)
-    team_lead = fields.Char(compute='_compute_lead',string = 'Team Lead',store=True)
-    customer_before_confirm = fields.Char(compute='_compute_enquiry_values',string='Customer',store=True)
+    color_value = fields.Char(compute='_compute_enquiry_values',string='Color',help ='true')
+    variant_value = fields.Char(compute='_compute_enquiry_values',string='Variant',help ='true')
+    vehicle_name = fields.Char(compute='_compute_enquiry_values',string='Vehicle',help ='true')
+    team_lead = fields.Char(compute='_compute_lead',string = 'Team Lead')
+    customer_before_confirm = fields.Char(compute='_compute_enquiry_values',string='Customer')
 
     @api.model
     def _onchange_user_values(self, user_id):

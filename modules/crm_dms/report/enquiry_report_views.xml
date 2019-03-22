@@ -86,25 +86,11 @@
                         ]"/>
                     <group expand="0" string="Group By" colspan="16">
                         <filter string="Created On" name="create_date"  context="{'group_by':'create_date'}"/>
-                        <filter string="Opportunity" name="name" context="{'group_by':'name'}"/>
-                        <filter string="Customer" name="partner_name" context="{'group_by':'partner_name'}"/>
-                        <filter name="mobile" string="Mobile" context="{'group_by':'mobile'}"/>
                         <filter name="activity_date_deadline" string="Followup Date" context="{'group_by': 'activity_date_deadline'}"/>
                         <filter string="Stage" name="stage_id" context="{'group_by':'stage_id'}"/>
-                        <filter string="Vehicle" name="vehicle_name" context="{'group_by':'vehicle_name'}"/>
-                        <filter string="Variant" name="variant_value" context="{'group_by':'variant_value'}"/>
-                        <filter string="Color" name="color_value" context="{'group_by':'color_value'}"/>
                         <filter string="Sales Team" name="team_id" context="{'group_by':'team_id'}"/>
                         <filter string="Salesperson" name="user_id"  context="{'group_by':'user_id'}"/>
-                        <filter string="Team Lead" name="team_lead"  context="{'group_by':'team_lead'}"/>
 
-                       <!-- <filter string="Medium" name="medium" domain="[]" context="{'group_by':'medium_id'}"/>
-                        <filter string="Source" name="source" domain="[]" context="{'group_by':'source_id'}"/>
-                        <separator orientation="vertical" />
-                        <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
-                        <filter string="Conversion Date" name="date_conversion" context="{'group_by': 'date_conversion'}" groups="crm.group_use_lead"/>
-                        <filter string="Closed Date" name="date_closed" context="{'group_by':'date_closed'}"/>
-                        <filter string="Expected Closing Date" name="date_deadline" context="{'group_by':'date_deadline'}"/> -->
                     </group>
                 </search>
             </field>
