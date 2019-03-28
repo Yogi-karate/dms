@@ -181,6 +181,13 @@ class Enquiry(models.Model):
     def create(self, vals):
         # context: no_log, because subtype already handle this
         print(vals)
+        if 'user_id' in vals and vals['user_id'] != self.env.uid:
+            user_id = vals['user_id']
+            team = self.sudo().env['crm.team'].search(
+                ['|', '|', ('member_ids', '=', user_id), ('user_id', '=', user_id), ('manager_user_ids', '=', user_id)])
+            if team:
+                vals['team_id'] = team.id
+
         if 'name' not in vals:
             product_name = self.env['product.template'].browse(vals['product_id']).name
             vals['name'] = product_name
@@ -258,12 +265,22 @@ class Enquiry(models.Model):
     def _assign_enquiry_user(self, type):
         print("starting for " + type.name)
         user = self.user_id
+        print("&&&&&&&&&&&&&&&&&&")
+        print(user)
         user_id = user.id
         user_team = self.sudo().env['crm.team'].search(['|','|',('member_ids', '=', user.id),('user_id','=',user.id),('manager_user_ids','=',user.id)])
+        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+        print(user_team)
         user_team_type = user_team.team_type
         user_team_location = user_team.location_id
+        print("!!!!!!*******")
+        print(user_team_type)
+        print(type.team_type)
+        print(user_team_location)
         if not user_team_type == type.team_type:
+            print("YO")
             if user_team_location:
+                print("YO FROM inside team alloc in user assign")
                 team = self.sudo().env['crm.team'].search([('location_id', 'child_of', user_team_location.id),
                                                            ('team_type', '=', type.team_type)], limit=1)
                 print(team)
@@ -275,4 +292,5 @@ class Enquiry(models.Model):
                     raise UserError(_("Error Assigning Sub Enquiry - Please check your team setup"))
 
         print(user_id)
-        return {'user_id': user_id}
+        return {'user_id': user_id,
+                'team_id':user_team.id}
