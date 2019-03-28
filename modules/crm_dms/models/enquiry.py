@@ -209,9 +209,9 @@ class Enquiry(models.Model):
             'crm_dms.mail_activity_data_follow_up',
             user_id=lead.user_id.id,
             note=_(
-                "Follow up  on  <a href='#' data-oe-model='%s' data-oe-id='%d'>%s</a> for customer <a href='#' data-oe-model='%s' data-oe-id='%s'>%s</a>") % (
+                "Follow up  on  <a href='#' data-oe-model='%s' data-oe-id='%d'>%s</a> for customer %s") % (
                      lead._name, lead.id, lead.name,
-                     lead.partner_id.name, lead.partner_id.id,self.partner_name),
+                     self.partner_name),
             date_deadline=self.date_follow_up)
 
     @api.multi
@@ -257,9 +257,9 @@ class Enquiry(models.Model):
     @api.model
     def _assign_enquiry_user(self, type):
         print("starting for " + type.name)
-        user = self.env.user
+        user = self.user_id
         user_id = user.id
-        user_team = self.sudo().env['crm.team'].search([('member_ids', '=', user.id)])
+        user_team = self.sudo().env['crm.team'].search(['|','|',('member_ids', '=', user.id),('user_id','=',user.id),('manager_user_ids','=',user.id)])
         user_team_type = user_team.team_type
         user_team_location = user_team.location_id
         if not user_team_type == type.team_type:
