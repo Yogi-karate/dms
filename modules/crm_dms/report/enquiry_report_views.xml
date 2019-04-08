@@ -86,7 +86,7 @@
                         ]"/>
                     <group expand="0" string="Group By" colspan="16">
                         <filter string="Created On" name="create_date"  context="{'group_by':'create_date'}"/>
-                        <filter name="date_deadline" string="Followup Date" context="{'group_by':'date_deadline'}"/>
+                        <filter name="activity_date_deadline" string="Followup Date" context="{'group_by':'activity_date_deadline'}"/>
                         <filter string="Stage" name="stage_id" context="{'group_by':'stage_id'}"/>
                         <filter string="Sales Team" name="team_id" context="{'group_by':'team_id'}"/>
                         <filter string="Salesperson" name="user_id"  context="{'group_by':'user_id'}"/>
