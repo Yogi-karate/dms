@@ -147,6 +147,7 @@ class Enquiry(models.Model):
             if not pattern.match(enquiry.partner_mobile):
                 raise ValidationError(_("Please Enter a Valid Mobile Number"))
 
+
     @api.multi
     def _compute_categories(self):
         ids = []

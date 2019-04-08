@@ -181,7 +181,7 @@
                             <field name="categ_ids" invisible="1"/>
                             <field name="product_id" options="{'no_create_edit': True}"
                                    domain="[('categ_id','in',categ_ids)]"/>
-                            <field name="date_follow_up"/>
+                            <field name="date_follow_up" options="{'datepicker':{'minDate': 0}}"/>
                         </group>
 
                         <group string="Customer">

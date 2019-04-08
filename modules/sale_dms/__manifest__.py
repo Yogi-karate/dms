@@ -13,6 +13,9 @@
         'views/sale_views.xml',
         'views/crm_team_views.xml',
         'views/pricelist_views.xml',
+        'views/create_product_variant.xml',
+        'views/dms_pricelist_views.xml',
+        'Templates/pdf_report_templates.xml',
         'security/sale_security.xml',
         'security/ir.model.access.csv'
     ],

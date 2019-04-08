@@ -59,7 +59,8 @@ class Lead2OpportunityPartner(models.TransientModel):
     partner_name = fields.Char('Customer Name')
     partner_mobile = fields.Char('Customer Mobile')
     partner_email = fields.Char('Customer Email')
-    product_id = fields.Many2one('product.template', string='Product', required=True, ondelete="cascade")
+    product_id = fields.Many2one('product.template', string='Product', required=True
+                                 )
     product_color = fields.Many2one('product.attribute.value', required=True, string='Color')
     product_variant = fields.Many2one('product.attribute.value', required=True, string='Variant')
     pricelist = fields.Many2one('product.pricelist', string='Pricelist', required=True, ondelete="cascade")
@@ -86,6 +87,9 @@ class Lead2OpportunityPartner(models.TransientModel):
 
     @api.onchange('product_variant')
     def compute_color_attribute_values(self):
+        if self.color_attribute_values:
+            self.product_color = False
+            self.color_attribute_values = None
         products = self.sudo().env['product.product'].search(
             [('product_tmpl_id', '=', self.product_id.id), ('variant_value', '=', self.product_variant.name)])
         self.color_attribute_values = products.mapped('attribute_value_ids')
@@ -189,6 +193,8 @@ class Lead2OpportunityPartner(models.TransientModel):
         return {
             'name': name,
             'mobile': self.partner_mobile,
+            'user_id':self.user_id.id,
+            'team_id':self.team_id.id,
             'email': email_split[0] if email_split else False,
             'customer': True
         }
