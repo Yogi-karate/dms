@@ -9,7 +9,6 @@ class DmsProduct(models.TransientModel):
     product_id = fields.Many2one('product.template', string='Product', ondelete="cascade")
     product_color = fields.Many2one('product.attribute.value', string='Color')
     product_variant = fields.Many2one('product.attribute.value', string='Variant')
-    show_color = fields.Boolean('Color Visible', default=False)
     variant_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                                compute='compute_variant_attribute_values')
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
@@ -35,23 +34,24 @@ class DmsProduct(models.TransientModel):
             self.product_color = False
         self.variant_attribute_values = None
         self.color_attribute_values = None
-        products = self.sudo().env['product.template'].search([('id', '=', self.product_id.id)])
-        self.variant_attribute_values = products.mapped('valid_product_attribute_value_ids').filtered(
-            lambda attrib: attrib.attribute_id.name.lower() == 'variant')
-        print(self.variant_attribute_values)
+        if self.product_id:
+            products = self.sudo().env['product.template'].search([('id', '=', self.product_id.id)])
+            self.variant_attribute_values = products.attribute_line_ids[1].value_ids
+            print(self.variant_attribute_values)
 
     @api.onchange('product_variant')
     def compute_color_attribute_values(self):
         if self.color_attribute_values:
             self.product_color = False
             self.color_attribute_values = None
-        products = self.sudo().env['product.template'].search(
-            [('id', '=', self.product_id.id)])
-        for x in products:
-            print("^^^^^^^^^^^^^",x.valid_product_attribute_value_ids)
-        self.color_attribute_values = products.mapped('valid_product_attribute_value_ids')
-        self.show_color = True
-        print(self.color_attribute_values,"***************************************")
+        if self.product_id:
+            products = self.sudo().env['product.template'].search(
+                [('id', '=', self.product_id.id)])
+            for x in products:
+                print("^^^^^^^^^^^^^",x.attribute_line_ids)
+                print(x.attribute_line_ids[0].value_ids,"--------------------",x.attribute_line_ids[1].value_ids)
+            self.color_attribute_values = products.attribute_line_ids[0].value_ids
+            print(self.color_attribute_values,"***************************************")
 
     @api.one
     @api.depends('product_id')
