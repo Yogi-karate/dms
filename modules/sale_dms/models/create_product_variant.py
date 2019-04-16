@@ -1,5 +1,6 @@
 from odoo import api, fields, models
 from odoo.exceptions import UserError
+from odoo.tools.translate import _
 
 
 
@@ -13,13 +14,10 @@ class DmsProduct(models.TransientModel):
                                                compute='compute_variant_attribute_values')
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                              compute='compute_color_attribute_values')
-    name = fields.Char(string='name',compute='_compute_name')
+    name = fields.Char(compute='_compute_name')
 
     @api.model
     def create(self, vals):
-        print(vals['product_color'])
-        for x in vals:
-            print(x)
         # context: no_log, because subtype already handle this
         res = super(DmsProduct, self).create(vals)
         res.create_product_variant()
@@ -34,8 +32,8 @@ class DmsProduct(models.TransientModel):
             self.product_color = False
         self.variant_attribute_values = None
         self.color_attribute_values = None
-        if self.product_id:
-            products = self.sudo().env['product.template'].search([('id', '=', self.product_id.id)])
+        products = self.sudo().env['product.template'].search([('id', '=', self.product_id.id)])
+        if products.attribute_line_ids:
             self.variant_attribute_values = products.attribute_line_ids[1].value_ids
             print(self.variant_attribute_values)
 
@@ -47,20 +45,13 @@ class DmsProduct(models.TransientModel):
         if self.product_id:
             products = self.sudo().env['product.template'].search(
                 [('id', '=', self.product_id.id)])
-            for x in products:
-                print("^^^^^^^^^^^^^",x.attribute_line_ids)
-                print(x.attribute_line_ids[0].value_ids,"--------------------",x.attribute_line_ids[1].value_ids)
             self.color_attribute_values = products.attribute_line_ids[0].value_ids
-            print(self.color_attribute_values,"***************************************")
+        if self.product_variant and self.product_color:
+            self._compute_name()
 
-    @api.one
-    @api.depends('product_id')
+
     def _compute_name(self):
-        color = self.env['product.attribute.value'].search([('id', '=', self.product_variant.id)])
-        variant = self.env['product.attribute.value'].search([('id', '=', self.product_color.id)])
-        if color and variant:
-             self.name = self.product_id.name + color.name + variant.name
-             print(color.name,"############################@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@",variant.name)
+            self.name = self.product_id.name+"(" +self.product_color.name+"," +self.product_variant.name+ ")"
 
 
 
@@ -72,6 +63,9 @@ class DmsProduct(models.TransientModel):
         existing_product = self.env['product.product'].search([('product_tmpl_id', '=', self.product_id.id),
                                                       ('color_value', '=', self.product_color.name),
                                                       ('variant_value', '=', self.product_variant.name)], limit=1)
+        if self.product_color.id == False or self.product_variant.id == False:
+                raise UserError(_("One of the Product attributes is missing. Can't create!!!"))
+
         if existing_product:
             raise UserError(_("Product already exists"))
         else:
