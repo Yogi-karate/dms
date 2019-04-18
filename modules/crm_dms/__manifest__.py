@@ -24,6 +24,7 @@
         'report/enquiry_report_views.xml',
         'report/performance_report_views.xml',
         'views/crm_lead_views.xml',
+        'report/date_wise_report.xml',
     ],
     'installable': True,
     'auto_install': True,
