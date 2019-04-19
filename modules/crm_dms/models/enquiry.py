@@ -147,7 +147,6 @@ class Enquiry(models.Model):
             if not pattern.match(enquiry.partner_mobile):
                 raise ValidationError(_("Please Enter a Valid Mobile Number"))
 
-
     @api.multi
     def _compute_categories(self):
         ids = []
@@ -264,34 +263,34 @@ class Enquiry(models.Model):
 
     @api.model
     def _assign_enquiry_user(self, type):
-        print("starting for " + type.name)
         user = self.user_id
-        print("&&&&&&&&&&&&&&&&&&")
-        print(user)
         user_id = user.id
-        user_team = self.sudo().env['crm.team'].search(['|','|',('member_ids', '=', user.id),('user_id','=',user.id),('manager_user_ids','=',user.id)])
-        print("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
-        print(user_team)
+        user_team = self.sudo().env['crm.team'].search(
+            ['|', '|', ('member_ids', '=', user.id), ('user_id', '=', user.id), ('manager_user_ids', '=', user.id)])
         user_team_type = user_team.team_type
         user_team_location = user_team.location_id
-        print("!!!!!!*******")
-        print(user_team_type)
-        print(type.team_type)
-        print(user_team_location)
         if not user_team_type == type.team_type:
-            print("YO")
             if user_team_location:
-                print("YO FROM inside team alloc in user assign")
                 team = self.sudo().env['crm.team'].search([('location_id', 'child_of', user_team_location.id),
                                                            ('team_type', '=', type.team_type)], limit=1)
-                print(team)
                 if team and team.user_id:
                     return {'user_id': team.user_id.id,
                             'team_id': team.id
                             }
                 else:
                     raise UserError(_("Error Assigning Sub Enquiry - Please check your team setup"))
-
-        print(user_id)
         return {'user_id': user_id,
-                'team_id':user_team.id}
+                'team_id': user_team.id}
+
+    @api.multi
+    def reassign_enquiry(self, user_id, team_id):
+        for enquiry in self:
+            print(enquiry)
+            vals = {
+                'user_id': user_id,
+                'team_id': team_id
+            }
+            for opportunity in enquiry.opportunity_ids:
+                print(opportunity)
+                opportunity.write(vals)
+            enquiry.write(vals)

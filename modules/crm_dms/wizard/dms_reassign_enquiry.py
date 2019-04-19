@@ -41,7 +41,7 @@ class ReassignEnquiry(models.TransientModel):
     def action_reassign(self):
         self.ensure_one()
         print("Hello from reassign")
-        
+        reassign_enquiries = self.enquiry_ids.reassign_enquiry(self.user_id.id, self.team_id.id)
         # merge_opportunity = self.opportunity_ids.merge_opportunity(self.user_id.id, self.team_id.id)
         #
         # # The newly created lead might be a lead or an opp: redirect toward the right view
