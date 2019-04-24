@@ -182,6 +182,7 @@
                             <field name="product_id" options="{'no_create_edit': True}"
                                    domain="[('categ_id','in',categ_ids)]"/>
                             <field name="date_follow_up" options="{'datepicker':{'minDate': 0}}"/>
+                            <field name="test_drive"/>
                         </group>
 
                         <group string="Customer">
@@ -193,7 +194,7 @@
                             <field name="product_updatable" invisible="1"/>
                             <field name="finance_updatable" invisible="1"/>
                             <field name="insurance_updatable" invisible="1"/>
-                            <field name="source_id"/>
+                            <field name="source_id" options="{'no_create': True}" />
                         </group>
 
                     </group>
