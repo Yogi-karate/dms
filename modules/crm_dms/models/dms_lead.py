@@ -18,6 +18,8 @@ class DmsLead(models.Model):
     vehicle_name = fields.Char(compute='_compute_enquiry_values',string='Vehicle',help ='true')
     team_lead = fields.Char(compute='_compute_lead',string = 'Team Lead')
     customer_before_confirm = fields.Char(compute='_compute_enquiry_values',string='Customer')
+    member_values = fields.One2many('res.users', string='Team',
+                                    compute='compute_member_values')
 
     @api.model
     def _onchange_user_values(self, user_id):
@@ -32,6 +34,18 @@ class DmsLead(models.Model):
                 return {'team_id': team.id}
         team_id = self.env['crm.team']._get_default_team_id(user_id=user_id)
         return {'team_id': team_id}
+
+    @api.onchange('team_id')
+    def compute_member_values(self):
+        self.user_id = False
+        team = self.sudo().env['crm.team'].search([('id', '=', self.team_id.id)])
+        print("****************************************************************************************")
+        member_values = team.mapped('member_ids')
+        manager_values = team.mapped('manager_user_ids')
+        print(member_values, "___________________________________________________________", manager_values)
+        self.member_values = manager_values + member_values + team.user_id
+        print(self.team_id.manager_user_ids)
+
 
     @api.depends('date_open')
     def _compute_days_open(self):
