@@ -16,6 +16,8 @@ class ReassignEnquiry(models.TransientModel):
 
     _name = 'dms.reassign.enquiry'
     _description = 'reassign enquiries to another user'
+    member_values = fields.One2many('res.users', string='Team',
+                                               compute='compute_member_values')
 
     @api.model
     def default_get(self, fields):
@@ -30,8 +32,19 @@ class ReassignEnquiry(models.TransientModel):
                 opp_ids = self.env['dms.enquiry'].browse(record_ids).ids
                 result['enquiry_ids'] = opp_ids
         print("________________")
-        print(result);
+        print(result)
         return result
+
+    @api.onchange('team_id')
+    def compute_member_values(self):
+        self.user_id = False
+        team = self.sudo().env['crm.team'].search([('id', '=', self.team_id.id)])
+        print("****************************************************************************************")
+        member_values = team.mapped('member_ids')
+        manager_values = team.mapped('manager_user_ids')
+        print(member_values,"___________________________________________________________",manager_values)
+        self.member_values = manager_values + member_values + team.user_id
+        print(self.team_id.manager_user_ids)
 
     enquiry_ids = fields.Many2many('dms.enquiry', 'reassign_enquiry_rel', 'reassign_id', 'enquiry_id', string='Enquiries')
     user_id = fields.Many2one('res.users', 'Salesperson', index=True)
@@ -50,15 +63,15 @@ class ReassignEnquiry(models.TransientModel):
         # else:
         #     return merge_opportunity.redirect_lead_view()
 
-    @api.onchange('user_id')
-    def _onchange_user(self):
-        """ When changing the user, also set a team_id or restrict team id
-            to the ones user_id is member of. """
-        team_id = False
-        if self.user_id:
-            user_in_team = False
-            if self.team_id:
-                user_in_team = self.env['crm.team'].search_count([('id', '=', self.team_id.id), '|', ('user_id', '=', self.user_id.id), ('member_ids', '=', self.user_id.id)])
-            if not user_in_team:
-                team_id = self.env['crm.team'].search(['|', ('user_id', '=', self.user_id.id), ('member_ids', '=', self.user_id.id)], limit=1)
-        self.team_id = team_id
+    # @api.onchange('user_id')
+    # def _onchange_user(self):
+    #     """ When changing the user, also set a team_id or restrict team id
+    #         to the ones user_id is member of. """
+    #     team_id = False
+    #     if self.user_id:
+    #         user_in_team = False
+    #         if self.team_id:
+    #             user_in_team = self.env['crm.team'].search_count([('id', '=', self.team_id.id), '|', ('user_id', '=', self.user_id.id), ('member_ids', '=', self.user_id.id)])
+    #         if not user_in_team:
+    #             team_id = self.env['crm.team'].search(['|', ('user_id', '=', self.user_id.id), ('member_ids', '=', self.user_id.id)], limit=1)
+    #     self.team_id = team_id
