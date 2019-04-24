@@ -86,12 +86,13 @@ class Enquiry(models.Model):
         'res.currency', string='Currency')
     idv = fields.Monetary('IDV', currency_field='currency_id')
     premium_amount = fields.Monetary('Premium Amount', currency_field='currency_id')
-    source_id = fields.Many2one('utm.source', string='Source', required=True)
+    source_id = fields.Many2one('utm.source', string='Source', required=True,read=['sales_team.group_sale_manager'], write=['sales_team.group_sale_manager'])
     medium_id = fields.Many2one('utm.medium', string='Medium')
     variant_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                                compute='compute_variant_attribute_values')
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                              compute='compute_color_attribute_values')
+    test_drive = fields.Boolean('Test Drive',default = False, store = True)
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
@@ -150,9 +151,12 @@ class Enquiry(models.Model):
     @api.multi
     def _compute_categories(self):
         ids = []
-        for type_id in self.type_ids:
-            ids.append(type_id.categ_id.id)
-        self.categ_ids = ids
+       # print(self,"*****************************************categ type")
+        for item in self:
+            for type_ids in item.type_ids:
+                for type_id in type_ids:
+                    ids.append(type_id.categ_id.id)
+                item.categ_ids = ids
 
     @api.onchange('type_ids')
     def _on_change_type(self):
@@ -160,13 +164,18 @@ class Enquiry(models.Model):
         self._compute_categories()
         return
 
-    @api.depends('type_ids')
-    @api.multi
+
+    @api.onchange('type_ids')
     def _compute_type_changes(self):
-        print(self.type_ids)
-        leads = self.env['crm.lead'].search([('enquiry_id', '=', self.id)])
-        print(leads)
-        if leads:
+        print(self.type_ids,"______________________________________________________________________________________code is here",self.id,self._origin.id)
+        leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self._origin.id)])
+        for x in leads:
+            print(x.name)
+        print(len(leads),"____",len(self.type_ids),"***************************")
+        # if len(leads) > len(self.type_ids) and self._origin.id:
+        #     raise UserError(_('You can add but cannot delete'))
+
+        if self._origin.id and len(self.type_ids) >= 0:
             raise UserError(_('Cannot Change Types after Sub Enquiry creation - Please Create a new enquiry'))
 
     @api.multi
@@ -237,7 +246,24 @@ class Enquiry(models.Model):
 
     @api.multi
     def write(self, vals):
+        if 'product_id' not in vals:
+            vals['product_id'] = self.product_id.id
+        if 'partner_name' not in vals:
+            vals['partner_name'] = self.partner_name
+
+        leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self.id)])
+        product_template = self.env['product.template'].browse(vals['product_id'])
+        print(product_template.name, "(((((((((((((((((((((())))))))))))))))))))))))))))")
+        vals['name'] = product_template.name + "-" + vals['partner_name']
+        for lead in leads:
+            values = {
+                'name': lead.opportunity_type.name + "-" + product_template.name
+            }
+            print(values)
+            lead.write(values)
+            print(lead.name)
         return super(Enquiry, self).write(vals)
+    
 
     def action_create_opportunities(self):
         self._create_opportunities(None)
@@ -284,13 +310,17 @@ class Enquiry(models.Model):
 
     @api.multi
     def reassign_enquiry(self, user_id, team_id):
+        print("******************************************************************",self)
         for enquiry in self:
-            print(enquiry)
+            print(enquiry.user_id.name)
+            print(enquiry.team_id.name)
             vals = {
                 'user_id': user_id,
                 'team_id': team_id
             }
+            print(vals)
             for opportunity in enquiry.opportunity_ids:
                 print(opportunity)
                 opportunity.write(vals)
+
             enquiry.write(vals)
