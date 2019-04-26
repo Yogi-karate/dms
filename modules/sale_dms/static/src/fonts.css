@@ -1,0 +1,18 @@
+
+
+@font-face {
+   font-family: headers;
+    src: url("/sale_dms/static/src/HyundaiB.otf") format("opentype");
+}
+@font-face {
+   font-family: hyundai_text_reg;
+    src: url("/sale_dms/static/src/HyundaiSansHead-Regular.otf") format("opentype");
+}
+@font-face {
+   font-family: hyundai_text_bold;
+    src: url("/sale_dms/static/src/HyundaiSansHead-Bold.otf") format("opentype");
+}
+@font-face {
+   font-family: hyundai_text_med;
+    src: url("/sale_dms/static/src/HyundaiSansHead-Medium.otf") format("opentype");
+}
