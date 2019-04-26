@@ -293,6 +293,8 @@ class Enquiry(models.Model):
         user_id = user.id
         user_team = self.sudo().env['crm.team'].search(
             ['|', '|', ('member_ids', '=', user.id), ('user_id', '=', user.id), ('manager_user_ids', '=', user.id)])
+        for x in user_team:
+            print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^66",x)
         user_team_type = user_team.team_type
         user_team_location = user_team.location_id
         if not user_team_type == type.team_type:
@@ -318,9 +320,14 @@ class Enquiry(models.Model):
                 'user_id': user_id,
                 'team_id': team_id
             }
-            print(vals)
-            for opportunity in enquiry.opportunity_ids:
-                print(opportunity)
-                opportunity.write(vals)
-
             enquiry.write(vals)
+            print(vals)
+
+
+            for opportunity in enquiry.opportunity_ids:
+                res = enquiry._prepare_opportunities(opportunity.opportunity_type)
+                res.update(enquiry._assign_enquiry_user(opportunity.opportunity_type))
+                print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",res)
+                print(opportunity.user_id,"******************************************************************************")
+                opportunity.write(res)
+

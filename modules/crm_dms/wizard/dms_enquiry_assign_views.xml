@@ -16,7 +16,7 @@
                             <tree>
                                 <field name="create_date"/>
                                 <field name="name"/>
-                                <field name="type_ids"/>
+                                <field name="type_ids" widget="many2many_tags"/>
                                 <field name="partner_name"/>
                                 <field name="partner_mobile"/>
                                 <field name="user_id"/>
