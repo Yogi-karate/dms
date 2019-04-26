@@ -6,7 +6,7 @@
             <field name="name">user.leads.tree</field>
            <field name="model">user.leads</field>
             <field name="arch" type="xml">
-                <tree string="Enquiries" default_order='created_on desc,user_id asc'>
+                <tree string="Enquiries" default_order='created_on desc'>
                     <field name="user_id" string="Consultant"/>
                     <field name="created_on"/>
                     <field name="count_opportunities"/>
@@ -17,6 +17,7 @@
 
                 </tree>
             </field>
+
         </record>
 
         <record id="view_dms_enquiry_filter3" model="ir.ui.view">
@@ -43,16 +44,20 @@
                         <filter string="Source" name="source" domain="[]" context="{'group_by':'source_id'}"/>
                         <separator orientation="vertical" />
                         <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
+
                     </group> -->
+
                      <group expand="0" string="Group By" colspan="16">
-                        <filter string="Consultant" name="user_id" context="{'group_by':'user_id'}"/>
+                         <filter string="Created On" context="{'group_by':'created_on:day'}" name="day"/>
+                        <!-- <filter string="Created On" context="{'group_by':'created_on:month'}" name="month"/>-->
                         <filter string="Team" name="team_id" context="{'group_by':'team_id'}"/>
                          <filter string="Team Lead" name="teamlead" context="{'group_by':'team_lead'}"/>
-                        <filter string="Created On" context="{'group_by':'created_on:month'}" name="month"/>
+                            <filter string="Consultant" name="user_id" context="{'group_by':'user_id'}"/>
 
                     </group>
                 </search>
             </field>
+
         </record>
 
         <!-- 'My Pipeline' menu : Server action, act_window_views and act_windows -->
@@ -62,9 +67,16 @@
             <field name="res_model">user.leads</field>
             <field name="view_mode">tree,graph,pivot,form</field>
             <field name="context">{
-                    'default_user_id': 1
+                    'default_user_id': 1,
+                'search_default_day': 1,
+                'search_default_teamlead': 1,
+                'search_default_user_id': 1
+
+
             }</field>
             <field name="search_view_id" ref="view_dms_enquiry_filter3"/>
+
+
         </record>
 
         <record id="dms_enquiry_tree_view3_tree" model="ir.actions.act_window.view">

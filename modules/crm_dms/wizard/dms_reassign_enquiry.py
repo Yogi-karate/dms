@@ -47,8 +47,8 @@ class ReassignEnquiry(models.TransientModel):
         print(self.team_id.manager_user_ids)
 
     enquiry_ids = fields.Many2many('dms.enquiry', 'reassign_enquiry_rel', 'reassign_id', 'enquiry_id', string='Enquiries')
-    user_id = fields.Many2one('res.users', 'Salesperson', index=True)
-    team_id = fields.Many2one('crm.team', 'Sales Team', oldname='section_id', index=True)
+    user_id = fields.Many2one('res.users', 'Salesperson', index=True, required=True)
+    team_id = fields.Many2one('crm.team', 'Sales Team', oldname='section_id', index=True,required=True)
 
     @api.multi
     def action_reassign(self):
