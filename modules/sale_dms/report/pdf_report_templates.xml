@@ -408,7 +408,18 @@
                        </tr>
                         <tr>
                             <th>Mobile</th>
-                            <td><span class="m-0" t-field="doc.user_id.partner_id.mobile"/></td>
+                            <t t-if="doc.user_id.partner_id.mobile">
+                            <td>
+                                <span class="m-0" t-field="doc.user_id.partner_id.mobile"/>
+
+                            </td>
+                            </t>
+                             <t t-if="doc.user_id.partner_id.phone">
+                            <td>
+                                <span class="m-0" t-field="doc.user_id.partner_id.phone"/>
+
+                            </td>
+                            </t>
                         </tr>
                     </table> <br/><br/>
                     <h5 style="text-align:left;font-family:headers;">New Thinking.New Possibilities.</h5>
