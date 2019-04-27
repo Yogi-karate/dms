@@ -411,7 +411,7 @@
                             <td><span class="m-0" t-field="doc.user_id.partner_id.mobile"/></td>
                         </tr>
                     </table> <br/><br/>
-                    <h4 style="text-align:left;font-family:headers;">New Thinking.New Possibilities.</h4>
+                    <h5 style="text-align:left;font-family:headers;">New Thinking.New Possibilities.</h5>
 
                 </div>
                     <div style="float:right;width:60%;text-align:right;">
