@@ -26,7 +26,7 @@ class DailyLeads(models.TransientModel):
                     dict = {
                         'user_id': user.id,
                         'created_on': rec_date_from,
-                        'team_id': team.name,
+                        'team_id': team.id,
                         'team_lead': team.user_id.name,
                         'count_opportunities': count
                     }
@@ -53,7 +53,7 @@ class UserLeads(models.Model):
     created_on = fields.Date(string='Create Date')
     count_opportunities = fields.Integer(string="Count")
     name = fields.Char(string='name', compute='_get_name', store=True)
-    team_id = fields.Char(string='Team')
+    team_id = fields.Many2one('crm.team', string='Sales Team', oldname='section_id', index=True)
     team_lead = fields.Char(string='Team Lead')
 
     def _get_name(self):
