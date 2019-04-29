@@ -1,7 +1,7 @@
 import logging
 from odoo import api, fields, tools, models
 
-from datetime import timedelta
+from datetime import datetime,timedelta
 _logger = logging.getLogger(__name__)
 
 
@@ -16,6 +16,7 @@ class DailyLeads(models.TransientModel):
             for user in users:
                 print(user)
                 today = fields.Datetime.now()
+                today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
                 for day in range(20):
                     rec_date_from = today - timedelta(day)
                     rec_date_to = rec_date_from + timedelta(1)
