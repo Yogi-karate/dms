@@ -334,13 +334,13 @@
                             <t t-if="not line.display_type and line.product_id.product_tmpl_id.type == 'product'">
                                 <td style="border:1px solid black;width:60%"><span>Ex-Showroom Price</span></td>
                                 <td style="border:1px solid black;width:40%" class="text-right">
-                                    <span t-field="line.price_unit"/>
+                                    <span t-field="line.price_total"/>
                                 </td>
                             </t>
                                 <t t-if="not line.display_type and line.qty_delivered_method != 'stock_move'">
                                 <td style="border:1px solid black;width:60%"><span t-field="line.name"/></td>
                                 <td style="border:1px solid black;width:40%" class="text-right">
-                                    <span t-field="line.price_unit"/>
+                                    <span t-field="line.price_total"/>
                                 </td>
                             </t>
 
@@ -404,22 +404,15 @@
                        </tr>
                            <tr>
                               <th>Name</th>
-                             <td><span class="m-0" t-field="doc.user_id"/></td>
+                             <td><span class="m-0" t-field="doc.sales_person_name"/></td>
                        </tr>
                         <tr>
                             <th>Mobile</th>
-                            <t t-if="doc.user_id.partner_id.mobile">
                             <td>
-                                <span class="m-0" t-field="doc.user_id.partner_id.mobile"/>
+                                <span class="m-0" t-field="doc.mobile_no"/>
 
                             </td>
-                            </t>
-                             <t t-if="doc.user_id.partner_id.phone">
-                            <td>
-                                <span class="m-0" t-field="doc.user_id.partner_id.phone"/>
 
-                            </td>
-                            </t>
                         </tr>
                     </table> <br/><br/>
                     <h5 style="text-align:left;font-family:headers;">New Thinking.New Possibilities.</h5>
