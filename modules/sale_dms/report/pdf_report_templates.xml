@@ -131,7 +131,7 @@
                    </td>
                </tr>
            </table>
-              <h2 style="text-align:center;font-family:headers;margin-top:10px">QUOTATION/PROFORMA INVOICE</h2>
+              <h3 style="text-align:center;font-family:headers;margin-top:10px">QUOTATION/PROFORMA INVOICE</h3>
 
           <!--  <div class="row">
                 <div class="col-3 mb4">
@@ -312,7 +312,7 @@
             <!-- Is there a discount on at least one line? -->
             <t t-set="display_discount" t-value="any([l.discount for l in doc.order_line])"/>
 
-            <table class="table table-sm o_main_table" style="font-size:13px;margin-top:-20px" >
+            <table class="table table-sm o_main_table" style="font-size:12px;margin-top:-20px" >
                 <thead style="font-family:hyundai_text_bold">
                     <tr>
                         <t t-set="colspan" t-value="5"/>
@@ -371,7 +371,7 @@
                 </tbody>
             </table>
             <h4 style="font-family:hyundai_text_bold">TERMS &amp; CONDITIONS</h4>
-            <ul style="font-size:14px;font-family:hyundai_text_bold">
+            <ul style="font-size:13px;font-family:hyundai_text_bold">
                 <li><strong>Payment for the Vehicle Cost:</strong> By way of pay Order,Demand Drafts favouring SABOO CARS PVT.LTD Payable at Secunderabad</li>
                 <li>For taking vehicle delivery, PAN Number is must as per GOVT of India Rule</li>
                 <li>Delivery:At Secunderabad subject to the date of booking, subject to availability and supply of Model/Color from the manufacturer</li>
@@ -385,7 +385,7 @@
 
               <div style="width:100%;min-height:250px;font-family:hyundai_text_bold;margin-top:-7px">
                 <div style="float:left;width:40%;">
-                       <table style="width:100%;font-size:14px">
+                       <table style="width:100%;font-size:13px">
                           <tr>
                               <th>Payment details</th>
                        </tr>
@@ -408,23 +408,33 @@
                        </tr>
                         <tr>
                             <th>Mobile</th>
-                            <td><span class="m-0" t-field="doc.user_id.partner_id.mobile"/></td>
+                            <t t-if="doc.user_id.partner_id.mobile">
+                            <td>
+                                <span class="m-0" t-field="doc.user_id.partner_id.mobile"/>
+
+                            </td>
+                            </t>
+                             <t t-if="doc.user_id.partner_id.phone">
+                            <td>
+                                <span class="m-0" t-field="doc.user_id.partner_id.phone"/>
+
+                            </td>
+                            </t>
                         </tr>
-                    </table> <br/><br/><br/>
-                    <h4
-                            style="text-align:left;font-family:headers;">New Thinking.New Possibilities.</h4>
+                    </table> <br/><br/>
+                    <h5 style="text-align:left;font-family:headers;">New Thinking.New Possibilities.</h5>
 
                 </div>
                     <div style="float:right;width:60%;text-align:right;">
                         <h4><strong>For SABOO CARS PVT LTD</strong></h4>
-                        <div style="margin-top:45px;font-size:14px">Authorised Signature</div>
-                        <h5 style="margin-top:15px">SABOO HYUNDAI</h5>
-                        <div style="font-size:14px">(Unit of Saboo Cars (P).Ltd.</div>
-                        <div style="font-size:14px"><strong>Registered Office </strong>:3-5-141/2,Ramkote,Eden Bagh, Hyd-01</div>
-                        <div style="font-size:14px"><strong>Corporated Identity Number(CIN):</strong> U34103AP2013PTC091516</div>
-                        <div style="font-size:14px">12-8-452,Opp. Rail Kalyan, Mettuguda, Secunderabad - 17.</div>
-                        <div style="font-size:14px">T : 040-668 11111, 275 33333</div>
-                        <div style="font-size:14px"><strong>Email:</strong> hyundai@saboo.in,<strong>Web :</strong>www.saboohyundai.in</div>
+                        <div style="margin-top:45px;font-size:13px">Authorised Signature</div>
+                        <h5 style="margin-top:14px">SABOO HYUNDAI</h5>
+                        <div style="font-size:13px">(Unit of Saboo Cars (P).Ltd.</div>
+                        <div style="font-size:13px"><strong>Registered Office </strong>:3-5-141/2,Ramkote,Eden Bagh, Hyd-01</div>
+                        <div style="font-size:13px"><strong>Corporated Identity Number(CIN):</strong> U34103AP2013PTC091516</div>
+                        <div style="font-size:13px">12-8-452,Opp. Rail Kalyan, Mettuguda, Secunderabad - 17.</div>
+                        <div style="font-size:13px">T : 040-668 11111, 275 33333</div>
+                        <div style="font-size:13px"><strong>Email:</strong> hyundai@saboo.in,<strong>Web :</strong>www.saboohyundai.in</div>
 
 
                 </div>
