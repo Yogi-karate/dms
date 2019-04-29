@@ -260,6 +260,21 @@
             </field>
         </record>
 
+     <menuitem id="crm.crm_team_config"
+            name="Sales Teams"
+            parent="crm.crm_menu_config"
+            action="sales_team.sales_team_config_action"
+               groups="base.user_admin"
+            sequence="5"/>
+
+    <menuitem id="crm_create_source"
+            name="Source"
+            parent="crm.crm_menu_config"
+            action="utm.utm_source_action"
+               groups="base.user_admin"
+            sequence="5"/>
+
+
 
 
 </odoo>

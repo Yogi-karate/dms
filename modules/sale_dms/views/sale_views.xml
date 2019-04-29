@@ -369,4 +369,11 @@
             </field>
         </record>
 
+    <menuitem id="sale.sales_team_config"
+            name="Sales Teams"
+            parent="sale.menu_sale_config"
+            action="sales_team.sales_team_config_action"
+                 groups="base.user_admin"
+            sequence="2"/>
+
 </odoo>
