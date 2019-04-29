@@ -86,13 +86,14 @@ class Enquiry(models.Model):
         'res.currency', string='Currency')
     idv = fields.Monetary('IDV', currency_field='currency_id')
     premium_amount = fields.Monetary('Premium Amount', currency_field='currency_id')
-    source_id = fields.Many2one('utm.source', string='Source', required=True,read=['sales_team.group_sale_manager'], write=['sales_team.group_sale_manager'])
+    source_id = fields.Many2one('utm.source', string='Source', required=True, read=['sales_team.group_sale_manager'],
+                                write=['sales_team.group_sale_manager'])
     medium_id = fields.Many2one('utm.medium', string='Medium')
     variant_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                                compute='compute_variant_attribute_values')
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                              compute='compute_color_attribute_values')
-    test_drive = fields.Boolean('Test Drive',default = False, store = True)
+    test_drive = fields.Boolean('Test Drive', default=False, store=True)
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
@@ -151,7 +152,7 @@ class Enquiry(models.Model):
     @api.multi
     def _compute_categories(self):
         ids = []
-       # print(self,"*****************************************categ type")
+        # print(self,"*****************************************categ type")
         for item in self:
             for type_ids in item.type_ids:
                 for type_id in type_ids:
@@ -164,14 +165,15 @@ class Enquiry(models.Model):
         self._compute_categories()
         return
 
-
     @api.onchange('type_ids')
     def _compute_type_changes(self):
-        print(self.type_ids,"______________________________________________________________________________________code is here",self.id,self._origin.id)
+        print(self.type_ids,
+              "______________________________________________________________________________________code is here",
+              self.id, self._origin.id)
         leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self._origin.id)])
         for x in leads:
             print(x.name)
-        print(len(leads),"____",len(self.type_ids),"***************************")
+        print(len(leads), "____", len(self.type_ids), "***************************")
         # if len(leads) > len(self.type_ids) and self._origin.id:
         #     raise UserError(_('You can add but cannot delete'))
 
@@ -189,14 +191,15 @@ class Enquiry(models.Model):
     @api.model
     def create(self, vals):
         # context: no_log, because subtype already handle this
-        print(vals)
         if 'user_id' in vals and vals['user_id'] != self.env.uid:
             user_id = vals['user_id']
             team = self.sudo().env['crm.team'].search(
                 ['|', '|', ('member_ids', '=', user_id), ('user_id', '=', user_id), ('manager_user_ids', '=', user_id)])
+            if len(team) > 1:
+                raise UserError(
+                    _('You cannot Create Enquiries as you are part of multiple teams : Check with your Manager'))
             if team:
                 vals['team_id'] = team.id
-
         if 'name' not in vals:
             product_name = self.env['product.template'].browse(vals['product_id']).name
             vals['name'] = product_name
@@ -263,7 +266,6 @@ class Enquiry(models.Model):
             lead.write(values)
             print(lead.name)
         return super(Enquiry, self).write(vals)
-    
 
     def action_create_opportunities(self):
         self._create_opportunities(None)
@@ -293,8 +295,9 @@ class Enquiry(models.Model):
         user_id = user.id
         user_team = self.sudo().env['crm.team'].search(
             ['|', '|', ('member_ids', '=', user.id), ('user_id', '=', user.id), ('manager_user_ids', '=', user.id)])
-        for x in user_team:
-            print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^66",x)
+        if len(user_team) > 1:
+            raise UserError(
+                _('You cannot assign to user who is in multiple teams : Check with your Manager'))
         user_team_type = user_team.team_type
         user_team_location = user_team.location_id
         if not user_team_type == type.team_type:
@@ -302,32 +305,26 @@ class Enquiry(models.Model):
                 team = self.sudo().env['crm.team'].search([('location_id', 'child_of', user_team_location.id),
                                                            ('team_type', '=', type.team_type)], limit=1)
                 if team and team.user_id:
-                    return {'user_id': team.user_id.id,
-                            'team_id': team.id
-                            }
+                    return {
+                        'user_id': team.user_id.id,
+                        'team_id': team.id
+                    }
                 else:
                     raise UserError(_("Error Assigning Sub Enquiry - Please check your team setup"))
-        return {'user_id': user_id,
-                'team_id': user_team.id}
+        return {
+            'user_id': user_id,
+            'team_id': user_team.id
+        }
 
     @api.multi
     def reassign_enquiry(self, user_id, team_id):
-        print("******************************************************************",self)
         for enquiry in self:
-            print(enquiry.user_id.name)
-            print(enquiry.team_id.name)
             vals = {
                 'user_id': user_id,
                 'team_id': team_id
             }
             enquiry.write(vals)
-            print(vals)
-
-
             for opportunity in enquiry.opportunity_ids:
-                res = enquiry._prepare_opportunities(opportunity.opportunity_type)
+                res = {}
                 res.update(enquiry._assign_enquiry_user(opportunity.opportunity_type))
-                print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&",res)
-                print(opportunity.user_id,"******************************************************************************")
                 opportunity.write(res)
-
