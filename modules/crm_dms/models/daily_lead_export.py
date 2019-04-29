@@ -22,16 +22,15 @@ class DailyLeads(models.TransientModel):
                     leads = self.env['crm.lead'].search(
                         [('create_date', '>', str(rec_date_from)), ('create_date', '<', str(rec_date_to)),
                          ('user_id', '=', user.id)])
-                    for x in leads:
-                        count = len(leads.ids)
-                        dict = {
-                            'user_id': user.id,
-                            'created_on': rec_date_from,
-                            'team_id': team.name,
-                            'team_lead': team.user_id.name,
-                            'count_opportunities': count
-                        }
-                        self.env['user.leads'].create(dict)
+                    count = len(leads.ids)
+                    dict = {
+                        'user_id': user.id,
+                        'created_on': rec_date_from,
+                        'team_id': team.name,
+                        'team_lead': team.user_id.name,
+                        'count_opportunities': count
+                    }
+                    self.env['user.leads'].create(dict)
 
     @api.model
     def _process_user_leads(self, autocommit=True):
