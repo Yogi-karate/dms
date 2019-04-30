@@ -398,7 +398,7 @@
                             <td><span class="m-0" t-field="doc.partner_id.company_id.bank_ids[0].acc_number"/></td>
                         </tr>
                     </table> <br/>
-                    <table style="width:100%;font-size:14px">
+                    <table style="width:100%;font-size:13px">
                           <tr>
                               <th>Sales consultant's details</th>
                        </tr>
