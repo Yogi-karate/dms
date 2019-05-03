@@ -249,23 +249,37 @@ class Enquiry(models.Model):
 
     @api.multi
     def write(self, vals):
-        if 'product_id' not in vals:
-            vals['product_id'] = self.product_id.id
-        if 'partner_name' not in vals:
-            vals['partner_name'] = self.partner_name
+        res = {}
+        product_template = self.product_id
+        partner_name = self.partner_name
+        if 'partner_mobile' in vals:
+            res.update({'partner_mobile': vals['partner_mobile']})
+        if 'partner_email' in vals:
+            res.update({'partner_email': vals['partner_email']})
+        if 'partner_name' in vals:
+            res.update({'partner_name': vals['partner_name']})
+            partner_name = vals['partner_name']
+        if 'source_id' in vals:
+            res.update({'source_id': vals['source_id']})
+        if 'product_id' in vals:
+            res.update({'product_id': vals['product_id']})
+            product_template = self.env['product.template'].browse(vals['product_id'])
 
         leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self.id)])
-        product_template = self.env['product.template'].browse(vals['product_id'])
         print(product_template.name, "(((((((((((((((((((((())))))))))))))))))))))))))))")
-        vals['name'] = product_template.name + "-" + vals['partner_name']
+        vals['name'] = product_template.name + "-" + partner_name
+        res.update({'name':vals['name']})
+        print(vals)
         for lead in leads:
             values = {
-                'name': lead.opportunity_type.name + "-" + product_template.name
+                'name': lead.opportunity_type.name + "-" + product_template.name,
+                'partner_name': partner_name
             }
             print(values)
             lead.write(values)
-            print(lead.name)
-        return super(Enquiry, self).write(vals)
+            print(values)
+            print(lead.partner_name)
+        return super(Enquiry, self).write(res)
 
     def action_create_opportunities(self):
         self._create_opportunities(None)
@@ -282,6 +296,7 @@ class Enquiry(models.Model):
         return {
             'name': name,
             'user_id': self.env.context.get('default_user_id') or self.user_id.id,
+            'partner_name':self.partner_name,
             'comment': self.description,
             'team_id': self.team_id.id,
             'mobile': self.partner_mobile,
