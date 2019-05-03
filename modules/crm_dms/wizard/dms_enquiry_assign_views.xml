@@ -8,8 +8,8 @@
                 <form string="Reassign Enquiries">
                     <group string="Assign Enquiries to">
                         <field name="member_values" invisible="1"/>
-                        <field name="team_id" class="oe_inline" domain="['|',('user_id','=',uid),('manager_user_ids','=',uid)]" />
-                        <field name="user_id" class="oe_inline" domain="[('id','in',member_values)]"/>
+                        <field name="team_id" class="oe_inline" domain="['|',('user_id','=',uid),('manager_user_ids','=',uid)]" options="{'no_create': True, 'no_create_edit':True,'no_open': True}"/>
+                        <field name="user_id" class="oe_inline" domain="[('id','in',member_values)]" options="{'no_create': True, 'no_create_edit':True,'no_open': True}" />
                     </group>
                     <group string="Select Enquiries">
                         <field name="enquiry_ids" nolabel="1">
@@ -20,7 +20,7 @@
                                 <field name="partner_name"/>
                                 <field name="partner_mobile"/>
                                 <field name="user_id"/>
-                                <field name="team_id"/>
+                                <field name="team_id" />
                             </tree>
                         </field>
                     </group>
