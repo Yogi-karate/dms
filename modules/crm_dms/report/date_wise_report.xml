@@ -89,7 +89,7 @@
         <menuitem
             id="menu_dms_enquiries3"
             action="dms_enquiry_tree_view3"
-            name="Monthly report"
+            name="Datewise Report"
             parent="crm.crm_menu_report"
             sequence="1"/>
 

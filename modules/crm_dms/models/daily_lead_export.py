@@ -14,24 +14,35 @@ class DailyLeads(models.TransientModel):
         for team in teams:
             users = team.member_ids
             for user in users:
+                self._calculate_leads(user,team)
                 print(user)
-                today = fields.Datetime.now()
-                today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
-                for day in range(20):
-                    rec_date_from = today - timedelta(day)
-                    rec_date_to = rec_date_from + timedelta(1)
-                    leads = self.env['crm.lead'].search(
-                        [('create_date', '>', str(rec_date_from)), ('create_date', '<', str(rec_date_to)),
-                         ('user_id', '=', user.id)])
-                    count = len(leads.ids)
-                    dict = {
-                        'user_id': user.id,
-                        'created_on': rec_date_from,
-                        'team_id': team.id,
-                        'team_lead': team.user_id.name,
-                        'count_opportunities': count
-                    }
-                    self.env['user.leads'].create(dict)
+            self._calculate_leads(team.user_id, team)
+            managers = team.manager_user_ids
+            for manager in managers:
+                self._calculate_leads(manager, team)
+                print(manager)
+                
+            print("+++++++++++++++------------------------xxxxxxxxxxxxxxxxxxxxxxx//////////////////",self.env.uid)
+
+
+    def _calculate_leads(self,user,team):
+        today = fields.Datetime.now()
+        today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
+        for day in range(20):
+            rec_date_from = today - timedelta(day)
+            rec_date_to = rec_date_from + timedelta(1)
+            leads = self.env['crm.lead'].search(
+                [('create_date', '>', str(rec_date_from)), ('create_date', '<', str(rec_date_to)),
+                 ('user_id', '=', user.id)])
+            count = len(leads.ids)
+            dict = {
+                'user_id': user.id,
+                'created_on': rec_date_from,
+                'team_id': team.id,
+                'team_lead': team.user_id.name,
+                'count_opportunities': count
+            }
+            self.env['user.leads'].create(dict)
 
     @api.model
     def _process_user_leads(self, autocommit=True):
