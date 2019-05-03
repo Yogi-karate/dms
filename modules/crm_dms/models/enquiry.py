@@ -253,33 +253,26 @@ class Enquiry(models.Model):
         product_template = self.product_id
         partner_name = self.partner_name
         if 'partner_mobile' in vals:
-            res.update({'partner_mobile': vals['partner_mobile']})
+            res.update({'mobile': vals['partner_mobile']})
         if 'partner_email' in vals:
-            res.update({'partner_email': vals['partner_email']})
+            res.update({'email': vals['partner_email']})
         if 'partner_name' in vals:
             res.update({'partner_name': vals['partner_name']})
             partner_name = vals['partner_name']
         if 'source_id' in vals:
             res.update({'source_id': vals['source_id']})
         if 'product_id' in vals:
-            res.update({'product_id': vals['product_id']})
             product_template = self.env['product.template'].browse(vals['product_id'])
 
         leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self.id)])
         print(product_template.name, "(((((((((((((((((((((())))))))))))))))))))))))))))")
         vals['name'] = product_template.name + "-" + partner_name
-        res.update({'name':vals['name']})
         print(vals)
         for lead in leads:
-            values = {
-                'name': lead.opportunity_type.name + "-" + product_template.name,
-                'partner_name': partner_name
-            }
-            print(values)
-            lead.write(values)
-            print(values)
+            res.update({'name': lead.opportunity_type.name + "-" + product_template.name})
+            lead.write(res)
             print(lead.partner_name)
-        return super(Enquiry, self).write(res)
+        return super(Enquiry, self).write(vals)
 
     def action_create_opportunities(self):
         self._create_opportunities(None)

@@ -7,7 +7,7 @@
             <field name="model_id" ref="model_daily_lead_export"/>
             <field name="state">code</field>
             <field name="code">model._process_user_leads()</field>
-            <field name="user_id" ref="base.group_system"/>
+            <field name="user_id" ref="base.user_admin"/>
             <field name="interval_number">5</field>
             <field name="interval_type">minutes</field>
             <field name="numbercall">-1</field>

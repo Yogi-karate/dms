@@ -63,7 +63,7 @@ class DmsLead(models.Model):
             lead.variant_value = enq.product_variant.name
             lead.vehicle_name = enq.product_id.name
             print("#####################",enq.partner_name)
-            lead.parter_name = enq.partner_name
+            lead.partner_name = enq.partner_name
 
     @api.depends('team_id')
     def _compute_lead(self):
