@@ -59,12 +59,7 @@
         <field name="domain_force">[(1,'=',1)]</field>
         <field name="groups" eval="[(4, ref('base.group_system'))]"/>
     </record>
-    <record id="action_assign_enquiries" model="ir.actions.act_window">
-        <field name="groups_id"
-               eval="[(3,ref('base.group_user')),(3,ref('sales_team.group_sale_salesman')),(4,ref('sales_team.group_sale_salesman_all_leads')),(4, ref('sales_team.group_sale_manager'))]"/>
-    </record>
-
-
+    
     <!--Customer Security rules -->
   <record id="base.res_partner_rule_private_employee" model="ir.rule">
            <field name="name">res.partner.rule.private.employee</field>
