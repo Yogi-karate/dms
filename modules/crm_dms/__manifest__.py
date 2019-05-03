@@ -25,6 +25,7 @@
         'report/performance_report_views.xml',
         'views/crm_lead_views.xml',
         'report/date_wise_report.xml',
+        'views/dms_partner_views.xml',
     ],
     'installable': True,
     'auto_install': True,

@@ -213,8 +213,9 @@
         <div class="page">
 
             <div class="oe_structure"/>
-            <div style="width:100%;min-height:170px;">
+              <div style="width:100%;min-height:170px;">
                 <div style="float:left;width:50%;font-family:hyundai_text_bold">
+
                 <p>    <strong>To</strong></p>
                         <div><strong> <span t-field="doc.partner_id.name"/></strong></div>
                         <div style="font-family:hyundai_text_bold;font-size:12px">
@@ -404,12 +405,12 @@
                        </tr>
                            <tr>
                               <th>Name</th>
-                             <td><span class="m-0" t-field="doc.sales_person_name"/></td>
+                             <td><span class="m-0" t-field="doc.user_name"/></td>
                        </tr>
                         <tr>
                             <th>Mobile</th>
                             <td>
-                                <span class="m-0" t-field="doc.mobile_no"/>
+                                <span class="m-0" t-field="doc.user_mobile"/>
 
                             </td>
 

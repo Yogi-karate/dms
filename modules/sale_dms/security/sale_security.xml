@@ -26,12 +26,7 @@
         <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
     </record>
 
-    <record id="crm.res_partner_menu_customer" model="ir.ui.menu">
-           <field name="groups_id" eval="[(3,ref('base.group_user')),(3,ref('sales_team.group_sale_salesman_all_leads')),(4, ref('sales_team.group_sale_manager'))]"/>
-       </record>
-    <record id="sale.res_partner_menu" model="ir.ui.menu">
-           <field name="groups_id" eval="[(3,ref('base.group_user')),(3,ref('sales_team.group_sale_salesman_all_leads')),(4, ref('sales_team.group_sale_manager'))]"/>
-       </record>
+
 
 
 </odoo>
