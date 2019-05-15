@@ -183,6 +183,7 @@
                                    domain="[('categ_id','in',categ_ids)]"/>
                             <field name="date_follow_up" options="{'datepicker':{'minDate': 0}}"/>
                             <field name="test_drive"/>
+                            <field name="test_drive_date"/>
                         </group>
 
                         <group string="Customer">

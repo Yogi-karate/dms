@@ -94,6 +94,7 @@ class Enquiry(models.Model):
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                              compute='compute_color_attribute_values')
     test_drive = fields.Boolean('Test Drive', default=False, store=True)
+    test_drive_date = fields.Date('Test Drive Date', help="Date of test drive")
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
@@ -263,6 +264,7 @@ class Enquiry(models.Model):
             res.update({'source_id': vals['source_id']})
         if 'product_id' in vals:
             product_template = self.env['product.template'].browse(vals['product_id'])
+
 
         leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self.id)])
         print(product_template.name, "(((((((((((((((((((((())))))))))))))))))))))))))))")
