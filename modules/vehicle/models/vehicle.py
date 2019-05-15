@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
@@ -33,6 +34,9 @@ class Vehicle(models.Model):
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], required=True)
     color = fields.Char('Color', readonly=True, compute='_get_color')
+    partner_name = fields.Char('Customer',compute='_get_sale_order')
+    partner_mobile = fields.Char('Mobile No.', compute='_get_sale_order')
+    order_date = fields.Char('Order Date',compute='_get_sale_order')
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -54,11 +58,13 @@ class Vehicle(models.Model):
         return super(Vehicle, self).write(vals)
 
     @api.one
-    def _get_customer(self):
+    def _get_sale_order(self):
         # We only care for the customer if sale order is entered.
-        if self.order_id:
-            customer_id = self.order_id.partner_id
-            self.customer_id = customer_id
+        order = self.env['sale.order'].sudo().search([('name', '=', self.ref)])
+        self.partner_name = order.partner_id.name
+        self.partner_mobile = order.partner_id.mobile
+        self.order_date = order.date_order
+        print(order.partner_id.name,"***************************************************************************)()()()()()()()(")
 
     @api.one
     def _get_color(self):
