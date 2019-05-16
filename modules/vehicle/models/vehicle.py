@@ -11,7 +11,7 @@ class Vehicle(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Vehicle'
     name = fields.Char(
-        'Vehicle Number', default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
+        'Engine Number', default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
         required=True, help="Unique Machine Number")
     _sql_constraints = [
         ('name_ref_uniq', 'unique (name, product_id)', 'The combination of serial number and product must be unique !'),
@@ -36,7 +36,9 @@ class Vehicle(models.Model):
     color = fields.Char('Color', readonly=True, compute='_get_color')
     partner_name = fields.Char('Customer',compute='_get_sale_order')
     partner_mobile = fields.Char('Mobile No.', compute='_get_sale_order')
-    order_date = fields.Char('Order Date',compute='_get_sale_order')
+    partner_email = fields.Char('Email', compute='_get_sale_order')
+    order_date = fields.Char('Sale Date',compute='_get_sale_order')
+    address = fields.Char('Address', compute='_get_sale_order')
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -63,6 +65,8 @@ class Vehicle(models.Model):
         order = self.env['sale.order'].sudo().search([('name', '=', self.ref)])
         self.partner_name = order.partner_id.name
         self.partner_mobile = order.partner_id.mobile
+        self.partner_email = order.partner_id.email
+        self.address = order.partner_id.street
         self.order_date = order.date_order
         print(order.partner_id.name,"***************************************************************************)()()()()()()()(")
 

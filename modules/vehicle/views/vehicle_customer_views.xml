@@ -24,7 +24,11 @@
                         <field name="chassis_no"/>
                          <field name="battery_no"/>
                         <field name="registration_no"/>
-                        <field name="color"/>
+                         <field name="partner_name"/>
+                <field name="partner_mobile"/>
+                <field name="partner_email"/>
+                <field name="address"/>
+                <field name="order_date"/>
                     </group>
                 </group>
                 </sheet>
@@ -43,14 +47,16 @@
         <field name="arch" type="xml">
             <tree string="vehicles">
                 <field name="name"/>
-                <field name="ref"/>
                 <field name="product_id"/>
-                <field name="create_date"/>
+                <field name="registration_no"/>
                 <field name="chassis_no"/>
                 <field name="battery_no"/>
                 <field name="partner_name"/>
                 <field name="partner_mobile"/>
+                <field name="partner_email"/>
+                <field name="address"/>
                 <field name="order_date"/>
+
 
             </tree>
         </field>
