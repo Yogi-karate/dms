@@ -65,10 +65,14 @@ class Vehicle(models.Model):
         order = self.env['sale.order'].sudo().search([('name', '=', self.ref)])
         self.partner_name = order.partner_id.name
         self.partner_mobile = order.partner_id.mobile
-        self.partner_email = order.partner_id.email
+        email = order.partner_id.email.split('/')
+        mail = ''
+        for x in email:
+            mail += x
+            mail += ' '
+        self.partner_email = mail
         self.address = order.partner_id.street
         self.order_date = order.date_order
-        print(order.partner_id.name,"***************************************************************************)()()()()()()()(")
 
     @api.one
     def _get_color(self):
