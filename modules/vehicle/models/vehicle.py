@@ -3,6 +3,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
+from datetime import datetime
 
 from odoo.addons import decimal_precision as dp
 
@@ -37,7 +38,7 @@ class Vehicle(models.Model):
     partner_name = fields.Char('Customer',compute='_get_sale_order')
     partner_mobile = fields.Char('Mobile No.', compute='_get_sale_order')
     partner_email = fields.Char('Email', compute='_get_sale_order')
-    order_date = fields.Char('Sale Date',compute='_get_sale_order')
+    order_date = fields.Char('SaleDate',compute='_get_sale_order')
     address = fields.Char('Address', compute='_get_sale_order')
 
     @api.model_create_multi
@@ -64,15 +65,27 @@ class Vehicle(models.Model):
         # We only care for the customer if sale order is entered.
         order = self.env['sale.order'].sudo().search([('name', '=', self.ref)])
         self.partner_name = order.partner_id.name
-        self.partner_mobile = order.partner_id.mobile
-        email = order.partner_id.email.split('/')
-        mail = ''
-        for x in email:
-            mail += x
-            mail += ' '
-        self.partner_email = mail
+        self.partner_mobile = self._concat(order.partner_id.mobile)
+        self.partner_email = self._concat(order.partner_id.email)
         self.address = order.partner_id.street
-        self.order_date = order.date_order
+        self.order_date = datetime.strftime(order.date_order,'%d-%b-%Y')
+        #self.order_date = ''.join(self.order_date.split())[:-8].upper()
+    def _concat(self,item):
+        list = item.split('/')
+        final_string = ''
+        for obj in list:
+            final_string = final_string + obj
+            final_string = final_string + ' '
+        return final_string
+    def _concat_date(self,item):
+        item = str(item)
+        final_string = ''
+        list = item.split(' ')
+        for obj in list:
+            final_string = final_string + obj
+            final_string = final_string + '-'
+        return final_string
+
 
     @api.one
     def _get_color(self):
