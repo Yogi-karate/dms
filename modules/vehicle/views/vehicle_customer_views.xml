@@ -50,14 +50,11 @@
                 <field name="product_id"/>
                 <field name="registration_no"/>
                 <field name="chassis_no"/>
-                <field name="battery_no"/>
                 <field name="partner_name"/>
                 <field name="partner_mobile"/>
                 <field name="partner_email"/>
                 <field name="address"/>
                 <field name="order_date"/>
-
-
             </tree>
         </field>
     </record>
