@@ -1,0 +1,104 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- Opportunity Types -->
+
+    <record id="view_university_tree" model="ir.ui.view">
+        <field name="name">university.tree</field>
+        <field name="model">university</field>
+        <field name="arch" type="xml">
+            <tree string="University">
+                <field name="name"/>
+                <field name="course" widget="many2many_tags"/>
+                <field name="address"/>
+                <field name="mobile"/>
+            </tree>
+        </field>
+    </record>
+
+
+  <!--  <record id="view_opportunity_type_kanban" model="ir.ui.view">
+        <field name="name">opportunity.type.kanban</field>
+        <field name="model">dms.opportunity.type</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="description"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="row mb4">
+                                <div class="col-6">
+                                    <strong>
+                                        <span>
+                                            <t t-esc="record.name.value"/>
+                                        </span>
+                                    </strong>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <span class="badge badge-pill">
+                                        <t t-esc="record.description.value"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record> -->
+    <record id="view_university_search" model="ir.ui.view">
+        <field name="name">university.search</field>
+        <field name="model">university</field>
+        <field name="arch" type="xml">
+            <search string="Search Opportunity Types">
+                <field name="name" filter_domain="['|', ('name','ilike',self), ('address','ilike',self)]"
+                       string="Type"/>
+            </search>
+        </field>
+    </record>
+    <record id="university_view_search" model="ir.ui.view">
+        <field name="name">university.search.filters</field>
+        <field name="model">university</field>
+        <field name="arch" type="xml">
+            <search string="Search Universities">
+                <field name="name" filter_domain="['|', ('name','ilike',self), ('address','ilike',self)]"
+                       string="Type"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_university_form" model="ir.ui.view">
+        <field name="name">university.form</field>
+        <field name="model">university</field>
+        <field name="arch" type="xml">
+            <form string="University">
+                <sheet>
+                    <group>
+                            <field name="name"/>
+                            <field name="course" widget="many2many_tags"/>
+                            <field name="address"/>
+                            <field name="mobile"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_university_form" model="ir.actions.act_window">
+        <field name="name">University</field>
+        <field name="res_model">university</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new University
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+            id="menu_dms_universities"
+            action="action_university_form"
+            name="Universities"
+            parent="crm.crm_menu_sales"
+            sequence="1"/>
+</odoo>

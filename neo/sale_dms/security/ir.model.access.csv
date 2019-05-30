@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_dms_price_component,dms.price_component,model_dms_price_component,sales_team.group_sale_salesman,1,1,1,1
+access_dms_pricelist_component,dms.pricelist_component,model_pricelist_component,sales_team.group_sale_salesman,1,1,1,1
+access_dms_product,dms.dms_product,model_dms_product,sales_team.group_sale_salesman,1,1,1,1
+
+

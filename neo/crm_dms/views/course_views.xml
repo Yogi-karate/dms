@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- Opportunity Types -->
+
+    <record id="view_course_tree" model="ir.ui.view">
+        <field name="name">course.tree</field>
+        <field name="model">course</field>
+        <field name="arch" type="xml">
+            <tree string="Course">
+                <field name="name"/>
+                <field name="hod"/>
+                <field name="seats"/>
+            </tree>
+        </field>
+    </record>
+
+
+  <!--  <record id="view_opportunity_type_kanban" model="ir.ui.view">
+        <field name="name">opportunity.type.kanban</field>
+        <field name="model">dms.opportunity.type</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_mobile">
+                <field name="name"/>
+                <field name="description"/>
+                <templates>
+                    <t t-name="kanban-box">
+                        <div t-attf-class="oe_kanban_card oe_kanban_global_click">
+                            <div class="row mb4">
+                                <div class="col-6">
+                                    <strong>
+                                        <span>
+                                            <t t-esc="record.name.value"/>
+                                        </span>
+                                    </strong>
+                                </div>
+                                <div class="col-6 text-right">
+                                    <span class="badge badge-pill">
+                                        <t t-esc="record.description.value"/>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record> -->
+    <record id="view_course_search" model="ir.ui.view">
+        <field name="name">course.search</field>
+        <field name="model">course</field>
+        <field name="arch" type="xml">
+            <search string="Search Courses">
+                <field name="name" filter_domain="['|', ('name','ilike',self), ('hod','ilike',self)]"
+                       string="Type"/>
+            </search>
+        </field>
+    </record>
+    <record id="course_view_search" model="ir.ui.view">
+        <field name="name">course.search.filters</field>
+        <field name="model">course</field>
+        <field name="arch" type="xml">
+            <search string="Search Universities">
+                <field name="name" filter_domain="['|', ('name','ilike',self), ('hod','ilike',self)]"
+                       string="Type"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_course_form" model="ir.ui.view">
+        <field name="name">course.form</field>
+        <field name="model">course</field>
+        <field name="arch" type="xml">
+            <form string="Course">
+                <sheet>
+                    <group>
+                            <field name="name"/>
+                            <field name="hod"/>
+                            <field name="seats"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    <record id="action_course_form" model="ir.actions.act_window">
+        <field name="name">Course</field>
+        <field name="res_model">course</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create a new Course
+            </p>
+        </field>
+    </record>
+
+    <menuitem
+            id="menu_dms_courses"
+            action="action_course_form"
+            name="Courses"
+            parent="crm.crm_menu_sales"
+            sequence="1"/>
+</odoo>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+      <record model="res.bank" id="res_bank_company">
+        <field name="name">CITI UNION Bank</field>
+        <field name="active">True</field>
+    </record>
+    <record model="res.partner.bank" id="res_bank_company_own">
+        <field name="partner_id">1</field>
+        <field name="bank_id" ref="res_bank_company"/>
+        <field name="acc_number">512020010004190</field>
+        <field name="ifsc">CIUB0000076</field>
+        <field name="sequence">1</field>
+    </record>
+
+
+</odoo>

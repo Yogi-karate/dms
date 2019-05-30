@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="web._assets_utils">
+        <link rel="stylesheet" type="text/scss" href="/web/static/lib/bootstrap/scss/_functions.scss"/>
+        <link rel="stylesheet" type="text/scss" href="/web/static/lib/bootstrap/scss/_mixins.scss"/>
+        <link rel="stylesheet" type="text/scss" href="/web/static/src/scss/utils.scss"/>
+        <link rel="stylesheet" type="text/scss" href="/web/static/src/scss/bs_mixins_overrides.scss"/>
+    </template>
+
+    <template id="web._assets_primary_variables">
+        <link rel="stylesheet" type="text/scss" href="/base_dms/static/src/scss/primary.scss"/>
+    </template>
+</odoo>
