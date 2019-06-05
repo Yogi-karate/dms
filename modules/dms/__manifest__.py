@@ -11,7 +11,11 @@
     'depends': ['base_dms','purchase','crm_dms','vehicle','l10n_in'],
     'data': [
         'views/dms_views.xml',
+        'views/crm_lead_views.xml',
         'security/dms_groups.xml',
+        'security/ir.model.access.csv',
+        'views/lead2oppor.xml',
+
     ],
     'installable': True,
     'auto_install': False,
