@@ -8,7 +8,7 @@
     'sequence': 60,
     'summary': 'Handle Vehicles for DMS',
     'description': "Vehicle Business Domain",
-    'depends': ['stock'],
+    'depends': ['base_dms','stock'],
     'data': [
         'security/vehicle_security.xml',
         'security/ir.model.access.csv',

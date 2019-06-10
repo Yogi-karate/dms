@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+
+    <record id="team_vehicle_service_department" model="crm.team">
+        <field name="name">Vehicle Service</field>
+        <field name="member_ids" eval="[(4, ref('base.user_admin'))]"/>
+        <field name="company_id" eval="False"/>
+        <field name="team_type">service</field>
+    </record>
+    <record id="team_business_center" model="crm.team">
+        <field name="name">Business-Center</field>
+        <field name="member_ids" eval="[(4, ref('base.user_admin'))]"/>
+        <field name="company_id" eval="False"/>
+        <field name="team_type">business-center</field>
+    </record>
+    <record model="dms.opportunity.type" id="opportunity_type_service">
+        <field name="name">Service</field>
+        <field name="team_id" ref="team_vehicle_service_department"/>
+        <field name="categ_id" ref="crm_dms.product_category_vehicle"/>
+        <field name="description">Vehicle Service</field>
+    </record>
+</odoo>
