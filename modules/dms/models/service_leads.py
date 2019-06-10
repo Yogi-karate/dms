@@ -48,6 +48,7 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def _allocate_user(self, dict, team_dict):
+        pass
 
 
     @api.model
