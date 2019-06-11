@@ -29,6 +29,8 @@ class Enquiry(models.Model):
         ('cancel', 'Cancelled'),
     ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='open')
+    qualification = fields.Many2many('qualification', string='Qualification')
+    nation = fields.Many2one('res.country',string="Nationality")
     product_id = fields.Many2one('product.template', string='Product')
     product_color = fields.Many2one('product.attribute.value', string='Color')
     product_variant = fields.Many2one('product.attribute.value', string='Variant')
@@ -48,9 +50,10 @@ class Enquiry(models.Model):
     opportunity_count = fields.Integer('# Meetings', compute='_compute_opportunity_count')
     date_follow_up = fields.Date('Follow-Up Date', help="Estimate of the date on which the opportunity will be won.",
                                  required=True)
-    partner_name = fields.Char('Customer Name', required=True)
-    partner_mobile = fields.Char('Customer Mobile', required=True)
-    partner_email = fields.Char('Customer Email')
+    date_of_birth = fields.Date('Date of Birth', help="date of birth")
+    partner_name = fields.Char('Name', required=True)
+    partner_mobile = fields.Char('Mobile', required=True)
+    partner_email = fields.Char('Email')
     description = fields.Text('Notes', track_visibility='onchange', track_sequence=6)
 
     # finance fields added by Yoganand on 31-01-2019
@@ -86,7 +89,7 @@ class Enquiry(models.Model):
         'res.currency', string='Currency')
     idv = fields.Monetary('IDV', currency_field='currency_id')
     premium_amount = fields.Monetary('Premium Amount', currency_field='currency_id')
-    source_id = fields.Many2one('utm.source', string='Source', required=True, read=['sales_team.group_sale_manager'],
+    source_id = fields.Many2one('utm.source', string='Reference', required=True, read=['sales_team.group_sale_manager'],
                                 write=['sales_team.group_sale_manager'])
     medium_id = fields.Many2one('utm.medium', string='Medium')
     variant_attribute_values = fields.One2many('product.attribute.value', string='attributes',
@@ -96,6 +99,25 @@ class Enquiry(models.Model):
     test_drive = fields.Boolean('Test Drive', default=False, store=True)
     university = fields.Many2one('university')
     course = fields.Many2one('course')
+    appeared = fields.Boolean(string='Appeared any competitive exams like EAMCET/NEET?')
+    attempts = fields.Char('No. of Attempts')
+    rank = fields.Char('Rank')
+    hall_ticket_no = fields.Char('Intermediate hall-ticket no')
+    address = fields.Char('Address')
+    pincode = fields.Char('Pin Code')
+    desired_nation = fields.Many2one('res.country',string='Desired Country')
+    pg = fields.Boolean('Interested in PG?')
+    pg_course = fields.Many2one('course',string='Speciality')
+    passport = fields.Boolean('Do you have Passport?')
+    passport_no = fields.Char('Passport number')
+    bank_loan = fields.Boolean('Interested to avail Bank Loan?')
+    relatives = fields.Boolean('Have any of your friends or relatives studied in  abroad?')
+    organization = fields.Selection([
+        ('mci', 'MCI'),
+        ('who', 'WHO'),
+        ('usmle', 'USMLE'),
+        ('ifom','IFOM')
+    ], string='Do you know about?', store=True)
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):

@@ -24,6 +24,7 @@
         'views/dms_partner_views.xml',
         'views/university_views.xml',
         'views/course_views.xml',
+        'views/qualification_views.xml',
     ],
     'installable': True,
     'auto_install': True,

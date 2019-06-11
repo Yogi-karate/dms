@@ -9,7 +9,7 @@
                     <field name="create_date" invisible="1"/>
                     <field name="name" string="Opportunity"/>
                     <field name="partner_name"/>
-                    <field name="days_open"/>
+                  <!--  <field name="days_open"/> -->
                     <field name="activity_date_deadline"/>
                     <field name="activity_summary"/>
                     <field name="medium_id" invisible="1"/>

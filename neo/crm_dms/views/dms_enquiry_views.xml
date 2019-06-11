@@ -175,31 +175,69 @@
                         </button>
                     </div>
                     <group>
-
-                        <group string="Opportunity">
-                            <field name="type_ids" widget="many2many_tags" string="Type"/>
-                            <field name="date_follow_up" options="{'datepicker':{'minDate': 0}}"/>
-
-                        </group>
-
-                        <group string="Customer">
+                         <group string="Enquiry">
                             <field name="partner_name"/>
-                            <field name="partner_mobile"/>
+                             <field name="partner_mobile"/>
                             <field name="partner_email"/>
+                            <field name="date_of_birth"/>
                         </group>
-                        <group string="College details">
+                        <group string="Details">
+                             <field name="type_ids" widget="many2many_tags" string="Type"/>
+                            <field name="date_follow_up" options="{'datepicker':{'minDate': 0}}"/>
+                            <field name="nation"/>
+                             <field name="source_id" options="{'no_create': True}" />
+                        </group>
+
+
+                        <field name="qualification"/>
+                         <group>
+                           <field name="appeared"/>
+                            <field name="attempts"/>
+                            <field name="rank"/>
+                             <field name="hall_ticket_no"/>
+
+                        </group>
+                          <group>
+                        <field name="address"/>
+                        <field name="pincode"/>
+                    </group>
+
+
+
+
+                        <group string="Course Details">
                             <field name="university" options="{'no_create_edit': True}"/>
                             <field name="course" options="{'no_create_edit': True}"/>
+                            <field name="desired_nation"/>
+                            <field name="pg"/>
+                            <field name="pg_course"/>
                         </group>
-                        <group string="Marketing">
+                        <group string="Passport and Bank Details">
+                            <field name="passport"/>
+                            <field name="passport_no"/>
+                            <field name="bank_loan"/>
+
+                        </group>
+
+                       <!-- <group string="Marketing">
                             <field name="product_updatable" invisible="1"/>
                             <field name="finance_updatable" invisible="1"/>
                             <field name="insurance_updatable" invisible="1"/>
-                            <field name="source_id" options="{'no_create': True}" />
-                        </group>
+
+                        </group> -->
 
                     </group>
+                    <group>
+                            <field name="relatives"/>
+
+                        </group>
+                    <group>
+                        <field name="organization"/>
+                    </group>
+
+
                 </sheet>
+
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
                     <field name="activity_ids" widget="mail_activity"/>

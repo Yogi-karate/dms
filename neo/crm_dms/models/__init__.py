@@ -6,3 +6,4 @@ from . import enquiry
 from . import dms_lead
 from . import university
 from . import course
+from . import qualification

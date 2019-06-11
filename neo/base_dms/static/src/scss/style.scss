@@ -24,9 +24,10 @@ $gray-lighter: lighten($gray-base, 93.5%);
 //------------------------
 //$brand-primary: #008DCA;
 //$brand-secondary: #5EC269;
-$brand-secondary:#ea1e63;
-$brand-primary:#26282c;
-$brand-meeting:#7C7BAD;
+$brand-secondary: #AC3B61;//#5cdb95; //#ea1e63;
+//$brand-primary:#26282c;
+$brand-primary: #3AAFA9; //#05386B;//#BCE0FD;    //#009ABB;
+$brand-meeting:$brand-secondary;
 $brand-enquiry:$brand-secondary;
 
 
@@ -41,7 +42,8 @@ $brand-secondary-dark: darken($brand-secondary, 10%);
 body {
 
    // font-family: "Roboto";
-   font-family: "Comic Sans MS";
+   font-family: "Arial";
+
 }
 .o_mail_systray_item .o_notification_counter
 {
@@ -52,7 +54,8 @@ background: $brand-secondary;
 }
 
 .o_main_navbar {
-    background-color : $brand-primary;
+  background-color : $brand-primary;
+ // background-color : navy;
 }
 
 .o_main_navbar > a:hover, .o_main_navbar > a:focus, .o_main_navbar > button:hover, .o_main_navbar > button:focus {
@@ -80,7 +83,7 @@ background: $brand-secondary;
 // Buttons
 
 .btn {
-    border-radius: 0px;
+    border-radius: 8px;
 }
 
 .btn-primary {
@@ -313,10 +316,18 @@ textarea, select, .o_form_view.o_form_editable .o_form_field_many2manytags,
     border-top: 1px solid #e2e2e0;
 }
 
-.table-striped > tbody > tr:nth-of-type(2n+1) {
-    background-color: #eef0f0;
+.table-striped > tbody > tr:nth-of-type(2n) {
+    background-color: $brand-primary; //#2d91f5;
 }
 
+.o_list_view thead , .o_list_view.table thead {
+ background-color: #2d91f5;
+
+}
+
+.ui-autocomplete .ui-menu-item.o_m2o_dropdown_option > a {
+    color: white;
+}
 
 .o_list_view tfoot {
     background-color: $brand-primary;
@@ -436,4 +447,7 @@ background-color:$brand-primary;
 {
 color:white;
 background-color:$brand-primary;
+}
+.dropdown-item:hover {
+color: $brand-secondary;
 }
