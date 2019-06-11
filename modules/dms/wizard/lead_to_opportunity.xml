@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <odoo>
 
-        <record id="view_crm_lead2opportunity_partner_new" model="ir.ui.view">
-            <field name="name">crm.lead2opportunity.partner.new.form</field>
-            <field name="model">crm.lead2opportunity.partner.new</field>
+        <record id="view_dms_lead2opportunity_partner" model="ir.ui.view">
+            <field name="name">dms.lead2opportunity.partner.form</field>
+            <field name="model">dms.lead2opportunity.partner</field>
             <field name="arch" type="xml">
                 <form string="Convert to Opportunity">
                     <group name="name">
@@ -44,12 +44,12 @@
         </record>
 
 
-        <record id="action_crm_lead2opportunity_partner_new" model="ir.actions.act_window">
+        <record id="action_dms_lead2opportunity_partner" model="ir.actions.act_window">
             <field name="name">Convert to opportunity</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">crm.lead2opportunity.partner.new</field>
+            <field name="res_model">dms.lead2opportunity.partner</field>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="view_crm_lead2opportunity_partner_new"/>
+            <field name="view_id" ref="view_dms_lead2opportunity_partner"/>
             <field name="target">new</field>
         </record>
 
