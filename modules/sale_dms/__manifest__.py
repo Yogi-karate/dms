@@ -18,7 +18,9 @@
         'views/res_bank_views.xml',
         'report/pdf_report_templates.xml',
         'security/sale_security.xml',
-        'security/ir.model.access.csv'
+        'security/ir.model.access.csv',
+        'views/dms_product_fuel.xml',
+        'views/source_deactivate.xml',
     ],
     'installable': True,
     'auto_install': True,
