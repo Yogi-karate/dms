@@ -47,8 +47,8 @@ class Source(models.Model):
                 campaign_name = ''
         else:
             campaign_name = self.env['utm.campaign'].browse(vals['campaign']).name
-        mod_name = vals['name'] + '/' + medium_name + '/' + campaign_name
         if 'active' not in vals:
+            mod_name = vals['name'] + '/' + medium_name + '/' + campaign_name
             vals2 = {
                 'name': mod_name,
                 'medium': vals['medium'],
