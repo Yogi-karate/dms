@@ -6,7 +6,8 @@
             <field name="model">dms.deactivate.source</field>
             <field name="arch" type="xml">
                 <form string="Deactivate Sources">
-
+                  <!--  <label string="Do you want to deactivate the selected source(s)?"></label> -->
+                        <separator string="Do you want to deactivate the selected source(s)?" colspan="6"/>
                     <footer>
                         <button name="action_deactivate" type="object" string="Deactivate" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>

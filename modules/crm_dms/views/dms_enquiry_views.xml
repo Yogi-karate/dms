@@ -177,6 +177,7 @@
                     <group>
 
                         <group string="Opportunity">
+                            <field name="id"/>
                             <field name="type_ids" widget="many2many_tags" options="{'no_create_edit': True}"/>
                             <field name="categ_ids" invisible="1"/>
                             <field name="product_id" options="{'no_create_edit': True}"
@@ -260,6 +261,7 @@
         <field name="arch" type="xml">
             <tree string="Enquiries">
                 <field name="create_date"/>
+                <field name="id"/>
                 <field name="name" string="Enquiry"/>
                 <field name="partner_name" string="Customer"/>
                 <field name="partner_mobile" string="Mobile No."/>
