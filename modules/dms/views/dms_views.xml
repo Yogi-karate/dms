@@ -10,6 +10,7 @@
         parent="dms.menu_dms_root"
         web_icon="vehicle,static/description/icon.png"/>
 
+        
         <menuitem action="vehicle.action_vehicle_form" id="menu_action_vehicle_form"
         parent="dms.menu_dms_master_data_root" groups="stock.group_stock_user"
         sequence="1"/>
