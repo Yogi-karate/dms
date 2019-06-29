@@ -23,6 +23,7 @@ class Enquiry(models.Model):
                               default=lambda self: self.env.user)
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
+    custom_id = fields.Char(string='Id',compute='compute_id')
     state = fields.Selection([
         ('open', 'Open'),
         ('done', 'Closed'),
@@ -95,6 +96,11 @@ class Enquiry(models.Model):
                                              compute='compute_color_attribute_values')
     test_drive = fields.Boolean('Test Drive', default=False, store=True)
     test_drive_date = fields.Date('Test Drive Date', help="Date of test drive")
+
+    @api.onchange('id')
+    def compute_id(self):
+        for enquiry in self:
+            enquiry.custom_id = str(enquiry.id)
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
