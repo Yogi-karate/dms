@@ -4,6 +4,11 @@ from odoo import api, fields, models
 class DmsProduct(models.Model):
     _name = 'product.product'
     _inherit = 'product.product'
+    fuel_type = fields.Selection([
+        ('petrol', 'Petrol'),
+        ('diesel', 'Diesel')
+    ], string='Fuel',
+        default='petrol')
 
     color_value = fields.Char('color', compute='_compute_color', help='test color', store=True)
     variant_value = fields.Char('variant', compute='_compute_variant', help='test something', store=True)

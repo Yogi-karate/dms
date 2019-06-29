@@ -24,7 +24,7 @@
                         <field name="chassis_no"/>
                          <field name="battery_no"/>
                         <field name="registration_no"/>
-                        <field name="color"/>
+                        <field name="fuel_type"/>
                     </group>
                 </group>
                 </sheet>
@@ -48,6 +48,7 @@
                 <field name="create_date"/>
                 <field name="chassis_no"/>
                 <field name="battery_no"/>
+                <field name="fuel_type"/>
             </tree>
         </field>
     </record>

@@ -10,5 +10,4 @@ from . import res_bank
 from . import sale_order
 from . import product_product
 from . import fuel_entry
-from . import deactivate
 

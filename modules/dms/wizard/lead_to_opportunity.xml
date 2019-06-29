@@ -6,7 +6,16 @@
             <field name="model">dms.lead2opportunity.partner</field>
             <field name="arch" type="xml">
                 <form string="Convert to Opportunity">
-                    <group name="name">
+                    <group string="Convert to Opportunity">
+                    <field name="name"/>
+                    <field name="service_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
+                    <field name="mobile"/>
+                        <field name="booking_type" attrs="{'invisible': [('service_type', '!=', 'Insurance')]}"/>
+                    <field name="dop" attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
+                    <field name="pick_up_address" attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
+                        <field name="remarks"/>
+                    </group>
+                 <!--   <group name="name">
                         <field name="name" widget="radio"/>
                     </group>
                     <group string="Assign this opportunity to">
@@ -28,7 +37,7 @@
                                 <field name="team_id"/>
                             </tree>
                         </field>
-                    </group>
+                    </group> -->
                     <group name="action" attrs="{'invisible': [('name', '!=', 'convert')]}" string="Customers" col="1">
                         <field name="action" nolabel="1" widget="radio"/>
                         <group col="2">
