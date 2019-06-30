@@ -5,14 +5,15 @@
             <field name="name">dms.lead2opportunity.partner.form</field>
             <field name="model">dms.lead2opportunity.partner</field>
             <field name="arch" type="xml">
-                <form string="Convert to Opportunity">
-                    <group string="Convert to Opportunity">
+                <form string="Convert to Booking">
+                    <group string="Convert to Booking">
                     <field name="name"/>
                     <field name="service_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
                     <field name="mobile"/>
-                        <field name="booking_type" attrs="{'invisible': [('service_type', '!=', 'Insurance')]}"/>
+                        <field name="booking_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
                     <field name="dop" attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
-                    <field name="pick_up_address" attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
+                    <field name="pick_up_address" string="New Pickup Address" attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
+                        <field name="location_id" string="Preferred Service Location"/>
                         <field name="remarks"/>
                     </group>
                  <!--   <group name="name">
@@ -45,7 +46,7 @@
                         </group>
                     </group>
                     <footer>
-                        <button name="action_apply" string="Create Opportunity" type="object" class="btn-primary"/>
+                        <button name="action_apply" string="Confirm Booking" type="object" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
                 </form>

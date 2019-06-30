@@ -39,14 +39,12 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 result['opportunity_ids'] = list(tomerge)
             if lead.user_id:
                 result['user_id'] = lead.user_id.id
+            if lead.id:
+                result['lead_id'] = lead.id
             if lead.name:
                 result['name'] = lead.name
             if lead.mobile:
                 result['mobile'] = lead.mobile
-            if lead.service_type:
-                result['service_type'] = lead.service_type
-            if lead.date_follow_up:
-                result['date_follow_up'] = lead.date_follow_up
 
 
             if lead.team_id:
@@ -77,7 +75,9 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
     ], string='Booking Type', store=True, default='pickup')
     pick_up_address = fields.Char('Pick-up Address')
     remarks = fields.Char('Remarks')
-
+    location_id = fields.Many2one('stock.location', string='Preferred location of service')
+    due_date = fields.Datetime(string='Service Due Date')
+    lead_id = fields.Many2one('dms.vehicle.lead')
     @api.onchange('action')
     def onchange_action(self):
         if self.action == 'exist':
@@ -197,6 +197,19 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         x = self.env['crm.lead'].create(lead_vals)
         leads.write({'lead_id':x.id})
         print(x,"55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555")
+
+        booking_values = {
+            'lead_id': self.lead_id.id,
+            'location_id': self.location_id.id,
+            'remarks': self.remarks,
+            'dop': self.dop,
+            'booking_type': self.booking_type,
+            'pick_up_address': self.pick_up_address,
+            'service_type': self.service_type,
+            'due_date': self.due_date
+
+        }
+        bo = self.env['service.booking'].create(booking_values)
         #return leads[0].redirect_opportunity_view()
         return
 
