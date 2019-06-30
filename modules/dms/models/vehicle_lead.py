@@ -8,7 +8,6 @@ class MailActivity(models.Model):
     _inherit = ['mail.activity']
     customer_name = fields.Char('Customer',compute='_compute_fields')
     mobile = fields.Char('Mobile',compute='_compute_fields')
-    flag= fields.Char('Flag',compute='_compute_fields',store=True)
 
     @api.onchange('id')
     def _compute_fields(self):
@@ -17,8 +16,6 @@ class MailActivity(models.Model):
                 vehicle_lead = self.sudo().env['dms.vehicle.lead'].search([('id','=',activity.res_id)])
                 if vehicle_lead.type == 'lead':
                     print("lead..",vehicle_lead.type)
-                    text ='flag'
-                    activity.write({'flag':text})
                 activity.customer_name = vehicle_lead.partner_name
                 activity.mobile = vehicle_lead.mobile
 
