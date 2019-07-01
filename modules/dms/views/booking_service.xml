@@ -10,7 +10,6 @@
                 <field name="partner_name"/>
                 <field name="mobile"/>
                 <field name="mail"/>
-                <field name="mobile"/>
                 <field name="vehicle_model"/>
                 <field name="service_type"/>
                 <field name="booking_type" string="Pickup/Walkin"/>

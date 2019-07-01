@@ -32,6 +32,8 @@ class ActivityDoneReport(models.Model):
         help="Type is used to separate Leads and Opportunities")
     active = fields.Boolean('Active', readonly=True)
     probability = fields.Float('Probability', group_operator='avg', readonly=True)
+    summary = fields.Char(
+        'Next Activity Summary',)
 
     def _select(self):
         return """
@@ -40,6 +42,7 @@ class ActivityDoneReport(models.Model):
                 m.subtype_id,
                 m.mail_activity_type_id,
                 m.author_id,
+                m.body as summary,
                 m.date,
                 m.subject,
                 l.id as lead_id,
