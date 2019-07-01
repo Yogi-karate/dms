@@ -8,7 +8,7 @@
     'sequence': 60,
     'summary': 'DMS Base Changes',
     'description': "Auto Dealership Business Domain",
-    'depends': ['base'],
+    'depends': ['base','web'],
     'data': [
         'views/res_partner_views.xml',
         'views/assets.xml',

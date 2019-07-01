@@ -20,6 +20,15 @@ class DmsSaleOrder(models.Model):
     _name = "sale.order"
     _inherit = 'sale.order'
 
+state = fields.Selection([
+        ('draft', 'Quotation'),
+        ('sent', 'Quotation Sent'),
+        ('booked', 'Booked'),
+        ('sale', 'Sales Order'),
+        ('done', 'Locked'),
+        ('cancel', 'Cancelled'),
+        ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
+
 
 class DmsSaleOrderLine(models.Model):
     _name = "sale.order.line"

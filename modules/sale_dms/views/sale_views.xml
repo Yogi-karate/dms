@@ -20,6 +20,9 @@
                     <button name="action_confirm" id="action_confirm"
                         string="Confirm" class="btn-primary" type="object"
                         attrs="{'invisible': [('state', 'not in', ['sent'])]}"/>
+                    <button name="%(sale_dms.action_view_sale_booking_payment_inv)d" string="Book"
+                    type="action"
+                    attrs="{'invisible': [('state', '!=', 'sale')]}"/>
                     <button name="action_confirm"
                         string="Confirm" type="object"
                         attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
@@ -375,5 +378,22 @@
             action="sales_team.sales_team_config_action"
                  groups="base.user_admin"
             sequence="2"/>
-
+<record id="sale_management.sale_order_view_form" model="ir.ui.view">
+        <field name="name">sale.order.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group[@name='sale_pay']/field[@name='invoice_status']" position="attributes">
+                <attribute name="invisible" eval="False"/>
+            </xpath>
+            <xpath expr="//button[@name='action_quotation_send']" position="before">
+                <button name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
+                    type="action" class="btn-primary"
+                    attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                <button name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
+                    type="action" context="{'default_advance_payment_method': 'percentage'}"
+                    attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'booked')]}"/>
+            </xpath>
+        </field>
+    </record>
 </odoo>
