@@ -29,6 +29,7 @@
                 <field name="partner_email"/>
                 <field name="address"/>
                 <field name="order_date"/>
+                        <field name="fuel_type"/>
                     </group>
                 </group>
                 </sheet>
@@ -55,6 +56,7 @@
                 <field name="partner_mobile"/>
                 <field name="partner_email"/>
                 <field name="address"/>
+                <field name="fuel_type"/>
             </tree>
         </field>
     </record>

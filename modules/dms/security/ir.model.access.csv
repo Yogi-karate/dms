@@ -1,2 +1,4 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_dms_vehicle_lead,dms vehicle lead,model_dms_vehicle_lead,vehicle.group_vehicle_user,1,1,1,1
+access_crm_activity_done_report,dms crm_activity_done_report,model_crm_activity_done_report,vehicle.group_vehicle_user,1,1,1,1
+access_service_booking,dms service_booking,model_service_booking,vehicle.group_vehicle_user,1,1,1,1

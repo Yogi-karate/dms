@@ -8,8 +8,8 @@
             <field name="state">code</field>
             <field name="code">model._create_leads()</field>
             <field name="user_id" ref="base.user_admin"/>
-            <field name="interval_number">2</field>
-            <field name="interval_type">minutes</field>
+            <field name="interval_number">24</field>
+            <field name="interval_type">hours</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>
         </record>

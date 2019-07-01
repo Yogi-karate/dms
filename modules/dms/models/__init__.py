@@ -6,3 +6,4 @@ from . import order_confirm
 from . import location
 from . import vehicle_lead
 from . import service_leads
+from . import ActivityDoneReport

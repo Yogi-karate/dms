@@ -38,8 +38,10 @@ class Vehicle(models.Model):
     partner_name = fields.Char('Customer', compute='_get_sale_order')
     partner_mobile = fields.Char('Mobile No.', compute='_get_sale_order')
     partner_email = fields.Char('Email', compute='_get_sale_order')
+    date_order = fields.Datetime('Sale-Date', compute='_get_sale_order')
     order_date = fields.Char('SaleDate', compute='_get_sale_order')
     address = fields.Char('Address', compute='_get_sale_order')
+    fuel_type = fields.Char('Fuel Type',compute='_get_vehicle_details')
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -68,7 +70,12 @@ class Vehicle(models.Model):
         self.partner_mobile = order.partner_id.mobile
         self.partner_email = order.partner_id.email
         self.address = order.partner_id.street
+        self.date_order = order.date_order
         self.order_date = datetime.strftime(order.date_order, '%d-%b-%Y')
+
+    @api.one
+    def _get_vehicle_details(self):
+        self.fuel_type = self.product_id.fuel_type
 
     @api.one
     def _get_color(self):

@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<odoo>
+        <!-- Merge Opportunities  -->
+        <record id="deactivate_source_form" model="ir.ui.view">
+            <field name="name">dms.deactivate.source.form</field>
+            <field name="model">dms.deactivate.source</field>
+            <field name="arch" type="xml">
+                <form string="Deactivate Sources">
+                  <!--  <label string="Do you want to deactivate the selected source(s)?"></label> -->
+                        <separator string="Do you want to deactivate the selected source(s)?" colspan="6"/>
+                    <footer>
+                        <button name="action_deactivate" type="object" string="Deactivate" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!--  Merge leads/opportunities action -->
+        <record id="deactivate_source" model="ir.actions.act_window">
+            <field name="name">Deactivate Sources</field>
+            <field name="res_model">dms.deactivate.source</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="deactivate_source_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <act_window
+            id="action_assign_enquiries"
+            name="Deactivate"
+            multi="True"
+            key2="client_action_multi"
+            res_model="dms.deactivate.source"
+            src_model="utm.source"
+            view_mode="form"
+            target="new"
+            view_type="form"
+            groups="base.group_system"/>
+
+    <record id="utm.utm_source_action" model="ir.actions.act_window">
+            <field name="name">Sources</field>
+            <field name="res_model">utm.source</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        <field name="domain">{'active':True}</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Define a new source
+              </p>
+            </field>
+        </record>
+        <!-- utm.source -->
+        <record id="utm.utm_source_view_tree" model="ir.ui.view">
+            <field name="name">utm.source.tree</field>
+            <field name="model">utm.source</field>
+            <field name="arch" type="xml">
+                <tree string="Medium">
+                    <field name="name"/>
+                    <field name="medium"/>
+                    <field name="campaign"/>
+                </tree>
+            </field>
+        </record>
+        <record id="utm.utm_source_view_form" model="ir.ui.view">
+            <field name="name">utm.source.form</field>
+            <field name="model">utm.source</field>
+            <field name="arch" type="xml">
+                <form string="Channel">
+                    <group>
+                        <field name="name"/>
+                        <field name="medium"/>
+                        <field name="campaign"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+
+</odoo>
