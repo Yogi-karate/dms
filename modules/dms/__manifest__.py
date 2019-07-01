@@ -10,11 +10,11 @@
     'description': "Vehicle Dealership Business Domain",
     'depends': ['base_dms','purchase','crm_dms','vehicle','l10n_in'],
     'data': [
+        'views/dms_views.xml',
         'views/booking_service.xml',
         'views/activity_views.xml',
         'views/activity_done_views.xml',
         'data/opportunity_type_data.xml',
-        'views/dms_views.xml',
         'wizard/lead_to_opportunity.xml',
         'views/crm_lead_views.xml',
         'security/dms_groups.xml',

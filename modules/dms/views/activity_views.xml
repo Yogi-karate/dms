@@ -7,11 +7,37 @@
             <tree string="Activities">
 
                 <field name="create_date" invisible="1"/>
-                <field name="res_name" string="Lead"/>
+                <field name="lead_id" string="Lead"/>
                 <field name="customer_name"/>
                 <field name="mobile"/>
-                <field name="date_deadline"/>
+                <field name="date_deadline" string="Service Due Date"/>
             </tree>
+        </field>
+    </record>
+
+      <record id="crm_case_form_view_activities_new" model="ir.ui.view">
+        <field name="name">mail.activity.new.form</field>
+        <field name="model">mail.activity</field>
+        <field name="arch" type="xml">
+            <form>
+                 <sheet string="Activities">
+                   <group>
+                       <button name="%(action_dms_lead2opportunity_partner)d" string="Book a Service"
+                            type="action"
+                            help="Book a Service" class="oe_highlight"
+                            />
+                                <field name="create_date" invisible="1"/>
+                                <field name="lead_id" string="Lead"/>
+                       <field name="partner_name"/>
+                       <field name="mobile"/>
+                                <field name="customer_name"/>
+                                <field name="mobile"/>
+                                <field name="date_deadline" string="Service Due Date"/>
+                   </group>
+
+            </sheet>
+            </form>
+
         </field>
     </record>
 
@@ -21,7 +47,12 @@
         <field name="res_model">mail.activity</field>
         <field name="view_ids"
                eval="[(5, 0, 0),
-                           (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_activities_new')})]"/>
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_activities_new')}),
+                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_activities_new')})
+
+                           ]"
+
+        />
         <field name="context"></field>
         <field name="domain">[('res_model','=','dms.vehicle.lead')]</field>
         <field name="help" type="html">
@@ -34,5 +65,7 @@
         </field>
     </record>
 
-
+ <menuitem name="Activities Todo" id="menu_dms_activities_root" sequence="10"
+              parent="dms.menu_dms_root" action="action_new_activity_form"
+              />
 </odoo>

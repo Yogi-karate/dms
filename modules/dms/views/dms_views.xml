@@ -6,9 +6,7 @@
               name="Dms"
               web_icon="dms,static/description/icon.png"
               sequence="1"/>
-     <menuitem name="Activities Todo" id="menu_dms_activities_root" sequence="10"
-              parent="dms.menu_dms_root" action="action_new_activity_form"
-              />
+
     <menuitem name="Vehicles" id="menu_dms_master_data_root" sequence="40"
               parent="dms.menu_dms_root"
               web_icon="vehicle,static/description/icon.png"/>
