@@ -16,7 +16,7 @@
                 <field name="pick_up_address" string="Address"/>
                 <field name="vehicle_no"/>
                 <field name="location_id" string="Service Location"/>
-                <field name="tc_name"/>
+                <field name="user_id" string="TC Name"/>
                 <field name="vin_no"/>
             </tree>
         </field>
