@@ -4,3 +4,4 @@ access_dms_vehicle_lead_lead,dms vehicle lead,model_dms_vehicle_lead,group_dms_c
 access_dms_vehicle_lead_manager,dms vehicle lead,model_dms_vehicle_lead,group_dms_callcenter_manager,1,1,1,1
 access_crm_activity_done_report,dms crm_activity_done_report,model_crm_activity_done_report,group_dms_telecaller,1,1,1,1
 access_service_booking,dms service_booking,model_service_booking,group_dms_telecaller,1,1,1,0
+access_dms_vehicle_visibility,dms vehicle,vehicle.model_vehicle,group_dms_telecaller,1,0,0,0

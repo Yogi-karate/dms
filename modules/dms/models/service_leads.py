@@ -12,7 +12,7 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _process_service_leads(self):
         # vehicles = self.env['vehicle'].search([('ref', 'ilike', '2412')])
-        vehicles = self.env['vehicle'].search([])
+        vehicles = self.env['vehicle'].search([], limit=10)
         service_type = self.env['dms.opportunity.type'].search([('name', '=', 'Service')])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
@@ -31,11 +31,11 @@ class ServiceLeads(models.TransientModel):
             service_lead_dict4 = self._create_service_paid_leads(vehicle, service_type, today)
             if service_lead_dict4:
                 leads.append(service_lead_dict4)
-        created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
         teams = self.sudo().env['crm.team'].search([('team_type', '=', 'business-center'), ('member_ids', '!=', False)])
+        self._allocate_user(leads, teams)
+        created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
         for lead in created_leads:
             self._schedule_follow_up(lead, today)
-        self._allocate_user(created_leads, teams)
 
     @api.model
     def _process_insurance_leads(self):
@@ -71,17 +71,20 @@ class ServiceLeads(models.TransientModel):
         previous_team_id = -1
         for lead in leads:
             team_id = self._round_robin(len(teams), previous_team_id)
-            if not team_dict.get(team_id, False):
-                # print("team dict checking","___________________________",team_id)
+            print("team dict checking before ", "___________________________", team_dict)
+            if team_id not in team_dict.keys():
+                print("team dict checking", "___________________________", team_id)
                 team_dict[team_id] = -1
             current_team = teams[team_id]
             members = current_team.member_ids
             for x in members:
                 print(x.name, x)
             user_id = self._round_robin(len(members), team_dict[team_id])
+            print("user id in allocation ---------", user_id)
             user = current_team.member_ids[user_id]
+            print("user name in allocation $$$$$$$$$$", user.name)
             team_dict[team_id] = user_id
-            lead.write({
+            lead.update({
                 'user_id': user.id,
                 'team_id': current_team.id})
             previous_team_id = team_id
@@ -124,9 +127,9 @@ class ServiceLeads(models.TransientModel):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
         print(today - timedelta(11))
-        if today + timedelta(7) == sale_date + timedelta(20):
-            service_type = 'first'
-            dict = self._prepare_leads(vehicle, type, today, service_type)
+        # if today + timedelta(7) == sale_date + timedelta(20):
+        service_type = 'first'
+        dict = self._prepare_leads(vehicle, type, today, service_type)
         return dict
 
     def _create_service_second_leads(self, vehicle, type, today):
