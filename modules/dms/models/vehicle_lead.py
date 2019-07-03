@@ -8,12 +8,18 @@ class MailActivity(models.Model):
     _inherit = ['mail.activity']
     customer_name = fields.Char('Customer',compute='_compute_fields')
     mobile = fields.Char('Mobile',compute='_compute_fields')
+    lead_id = fields.Many2one('dms.vehicle.lead', string='Lead', compute='_compute_fields')
+    partner_name = fields.Char(string='Customer', compute='_compute_fields')
+    mobile = fields.Char(string='Mobile', compute='_compute_fields')
 
     @api.onchange('id')
     def _compute_fields(self):
         for activity in self:
             if activity.res_model == 'dms.vehicle.lead':
                 vehicle_lead = self.sudo().env['dms.vehicle.lead'].search([('id','=',activity.res_id)])
+                activity.lead_id = vehicle_lead.id
+                activity.partner_name = vehicle_lead.partner_name
+                activity.mobile = vehicle_lead.mobile
                 if vehicle_lead.type == 'lead':
                     print("lead..",vehicle_lead.type)
                 activity.customer_name = vehicle_lead.partner_name
