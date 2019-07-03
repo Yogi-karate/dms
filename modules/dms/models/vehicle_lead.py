@@ -37,6 +37,15 @@ class VehicleLead(models.Model):
     registration_no = fields.Char('Registration No.',compute='_get_sale_order')
     vin_no = fields.Char('VIN No.',compute='_get_sale_order')
     dos = fields.Char(string='Date of Sale',compute='_get_sale_order')
+    service_type = fields.Selection([
+        ('first', 'First Free Service'),
+        ('second', 'Second Free Service'),
+        ('third', 'Third Free Service'),
+        ('paid', 'Paid Service'),
+        ('ar', 'Accidental Repair'),
+        ('rr', 'Running Repair'),
+        ('Insurance', 'Insurance'),
+    ], string='Service Type', store=True, default='first')
     @api.model
     def create(self, vals):
         vals['type'] = 'lead'
@@ -74,6 +83,17 @@ class ServiceBooking(models.Model):
         ('walk', 'Walk-In'),
     ], string='Booking Type', store=True, default='pickup')
     pick_up_address = fields.Char('Pick-up Address')
+    due_date = fields.Datetime(string='Service Due Date')
+    partner_name = fields.Char('Customer name',compute='_lead_values')
+    mobile = fields.Char('Customer number',compute='_lead_values')
+    mail = fields.Char('Customer Mail ID',compute='_lead_values')
+    vehicle_id = fields.Many2one('vehicle',compute='_lead_values')
+    vehicle_no = fields.Char('Vehicle no',compute='_lead_values')
+    vin_no = fields.Char('Chassis Number',compute='_lead_values')
+    vehicle_model = fields.Char('Model',compute='_lead_values')
+    source = fields.Many2one('utm.source',compute='_lead_values')
+    user_id = fields.Many2one('res.users',compute='_lead_values')
+    tc_name = fields.Char('TC Name',compute='_lead_values')
     service_type = fields.Selection([
         ('first', 'First Free Service'),
         ('second', 'Second Free Service'),
@@ -82,18 +102,7 @@ class ServiceBooking(models.Model):
         ('ar', 'Accidental Repair'),
         ('rr', 'Running Repair'),
         ('Insurance', 'Insurance'),
-    ], string='Service Type', store=True, default='first')
-    due_date = fields.Datetime(string='Service Due Date')
-    partner_name = fields.Char('Customer name',compute='_lead_values')
-    mobile = fields.Char('Customer number',compute='_lead_values')
-    mail = fields.Char('Customer Mail ID',compute='_lead_values')
-    vehicle_id = fields.Many2one('vehicle')
-    vehicle_no = fields.Char('Vehicle no',compute='_lead_values')
-    vin_no = fields.Char('VIN Number',compute='_lead_values')
-    vehicle_model = fields.Char('Model',compute='_lead_values')
-    source = fields.Many2one('utm.source',compute='_lead_values')
-    user_id = fields.Many2one('res.users',compute='_lead_values')
-    tc_name = fields.Char('TC Name',compute='_lead_values')
+    ], string='Service Type',compute='_lead_values',store=True)
     @api.onchange('id')
     def _lead_values(self):
         for booking in self:
@@ -106,6 +115,8 @@ class ServiceBooking(models.Model):
             booking.source = booking.lead_id.source_id
             booking.user_id = booking.lead_id.user_id
             booking.tc_name = booking.user_id.partner_id.name
+            booking.service_type = booking.lead_id.service_type
+            booking.vehicle_id = booking.lead_id.vehicle_id.id
 
 
 

@@ -9,8 +9,8 @@
                 <field name="lead_id"/>
                 <field name="partner_name"/>
                 <field name="mobile"/>
-                <field name="mail_activity_type_id"/>
-                <field name="date" string="Completed Date -1"/>
+                <field name="summary" widget="html" string="Summary"/>
+                <field name="date" string="Completed Date"/>
 
             </tree>
         </field>

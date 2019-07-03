@@ -131,7 +131,7 @@
                     </group>
                     <notebook>
                         <page name="Vehicle" string="Vehicle">
-                           <!-- <field name="vehicle_id"/> -->
+                            <field name="vehicle_id"/>
 
                         </page>
                         <page string="Internal Notes">
@@ -180,17 +180,16 @@
 
                 <field name="create_date" invisible="1"/>
                 <field name="name" string="Lead"/>
-             <!--   <field name="service_type"/>
+               <field name="service_type"/>
                 <field name="mobile"/>
-                <field name="dos"/>
+                <field name="activity_date_deadline" string="Next Followup Date"/>
+                <field name="date_deadline" string="Service Date"/>
                 <field name="registration_no"/>
-                <field name="due_date"/> -->
+                <field name="activity_summary"/>
                 <field name="contact_name" invisible="1"/>
                 <field name="city" invisible="1"/>
                 <field name="opportunity_type" invisible="1"/>
                 <field name="email_from" invisible="1"/>
-
-                 <field name="date_deadline"/>
                 <field name="user_id" invisible="1"/>
                 <field name="partner_id" invisible="1"/>
                 <field name="team_id" invisible="1"/>
@@ -206,7 +205,7 @@
 
 
     <record id="action_new_lead_form" model="ir.actions.act_window">
-        <field name="name">Leads</field>
+        <field name="name">Calls</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">dms.vehicle.lead</field>
         <field name="view_ids"
@@ -214,7 +213,7 @@
                            (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_leads_new')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_leads_new')})]"/>
         <field name="context"></field>
-        <field name="domain">[('type','=','lead')]</field>
+        <field name="domain">[('type','=','lead'),('activity_ids.user_id','=',uid)]</field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Add a Vehicle

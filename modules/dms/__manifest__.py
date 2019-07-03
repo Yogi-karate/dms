@@ -12,7 +12,6 @@
     'data': [
         'views/dms_views.xml',
         'views/booking_service.xml',
-        'views/activity_views.xml',
         'views/activity_done_views.xml',
         'data/opportunity_type_data.xml',
         'wizard/lead_to_opportunity.xml',
