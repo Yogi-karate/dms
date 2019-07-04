@@ -26,7 +26,7 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
             lead = self.env['dms.vehicle.lead'].browse(self._context['active_id'])
             email = lead.partner_id.email if lead.partner_id else lead.email_from
             print("////////////////////////////////////////////////////////////////////////////////", lead)
-            tomerge.update(self._get_duplicated_leads(partner_id, email, include_lost=True).ids)
+            #tomerge.update(self._get_duplicated_leads(partner_id, email, include_lost=True).ids)
 
             if 'action' in fields and not result.get('action'):
                 result['action'] = 'exist' if partner_id else 'create'
