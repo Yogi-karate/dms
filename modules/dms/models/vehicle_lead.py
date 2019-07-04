@@ -94,7 +94,8 @@ class ServiceBooking(models.Model):
     vin_no = fields.Char('Chassis Number', compute='_lead_values')
     vehicle_model = fields.Char('Model', compute='_lead_values')
     source = fields.Many2one('utm.source', compute='_lead_values')
-    user_id = fields.Many2one('res.users', compute='_lead_values')
+    user_id = fields.Many2one('res.users', compute='_lead_values',store=True)
+    team_id = fields.Many2one('crm.team', compute='_lead_values',store=True)
     service_type = fields.Char('Service Type', compute='_lead_values', store=True)
 
     @api.onchange('id')
@@ -108,4 +109,5 @@ class ServiceBooking(models.Model):
             booking.vehicle_model = booking.vehicle_id.product_id.name
             booking.source = booking.lead_id.source_id
             booking.user_id = booking.lead_id.user_id
+            booking.team_id = booking.lead_id.team_id
             booking.service_type = booking.lead_id.service_type

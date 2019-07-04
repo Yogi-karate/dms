@@ -136,7 +136,9 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
             'booking_type': self.booking_type,
             'pick_up_address': self.pick_up_address,
             'service_type': self.service_type,
-            'due_date': self.due_date
+            'due_date': self.due_date,
+            'user_id': self.user_id.id,
+            'team_id': self.team_id.id
 
         }
         bo = self.env['service.booking'].create(booking_values)

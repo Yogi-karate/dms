@@ -202,7 +202,19 @@
             </tree>
         </field>
     </record>
+ <record id="view_dms_vehicle_lead_filter" model="ir.ui.view">
+        <field name="name">dms.vehicle.lead.search</field>
+        <field name="model">dms.vehicle.lead</field>
+        <field name="arch" type="xml">
+            <search string="Search Activities">
 
+                <filter string="Activities to be done" name="assigned_to_me"
+                        domain="[('activity_ids.user_id', '=', uid)]"
+                        help="Activities to be done"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
 
     <record id="action_new_lead_form" model="ir.actions.act_window">
         <field name="name">Calls</field>
@@ -212,8 +224,13 @@
                eval="[(5, 0, 0),
                            (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_leads_new')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_leads_new')})]"/>
-        <field name="context"></field>
-        <field name="domain">[('type','=','lead'),('activity_ids.user_id','=',uid)]</field>
+        <field name="domain">[('type','=','lead')]</field>
+         <field name="context">{
+            'default_user_id': uid,
+            'search_default_assigned_to_me': 1
+            }
+        </field>
+        <field name="search_view_id" ref="view_dms_vehicle_lead_filter"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Add a Vehicle
