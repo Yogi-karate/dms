@@ -38,10 +38,10 @@ class Vehicle(models.Model):
     partner_name = fields.Char('Customer', compute='_get_sale_order')
     partner_mobile = fields.Char('Mobile No.', compute='_get_sale_order')
     partner_email = fields.Char('Email', compute='_get_sale_order')
-    date_order = fields.Datetime('Sale-Date',compute='_get_sale_order',store=True)
+    date_order = fields.Datetime('Sale-Date',compute='_get_sale_order')
     order_date = fields.Char('SaleDate', compute='_get_sale_order')
     address = fields.Char('Address', compute='_get_sale_order')
-    fuel_type = fields.Char('Fuel Type')
+    fuel_type = fields.Char('Fuel Type',compute='_get_vehicle_details')
     partner_id = fields.Many2one('res.partner')
     source = fields.Selection([
         ('od', 'Other Dealer'),
@@ -69,6 +69,10 @@ class Vehicle(models.Model):
         return super(Vehicle, self).write(vals)
 
     @api.one
+    def _get_vehicle_details(self):
+        self.fuel_type = self.product_id.fuel_type
+
+    @api.one
     def _get_sale_order(self):
         order = self.env['sale.order'].sudo().search([('name', '=', self.ref)])
         if not order:
@@ -86,8 +90,6 @@ class Vehicle(models.Model):
             self.address = self.partner_id.street
 
         # We only care for the customer if sale order is entered.
-        if not self.date_order:
-            self.write({'date_order':order.date_order})
         self.date_order = order.date_order
         self.order_date = datetime.strftime(order.date_order, '%d-%b-%Y')
 

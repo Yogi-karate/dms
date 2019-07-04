@@ -12,7 +12,7 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _process_service_leads(self):
         # vehicles = self.env['vehicle'].search([('ref', 'ilike', '2412')])
-        vehicles = self.env['vehicle'].search([], limit=10)
+        vehicles = self.env['vehicle'].search([])
         service_type = self.env['dms.opportunity.type'].search([('name', '=', 'Service')])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
@@ -127,9 +127,9 @@ class ServiceLeads(models.TransientModel):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
         print(today - timedelta(11))
-        # if today + timedelta(7) == sale_date + timedelta(20):
-        service_type = 'first'
-        dict = self._prepare_leads(vehicle, type, today, service_type)
+        if today + timedelta(7) == sale_date + timedelta(20):
+            service_type = 'first'
+            dict = self._prepare_leads(vehicle, type, today, service_type)
         return dict
 
     def _create_service_second_leads(self, vehicle, type, today):
