@@ -35,25 +35,32 @@ class Vehicle(models.Model):
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], required=True)
     color = fields.Char('Color', readonly=True, compute='_get_color')
-    partner_name = fields.Char('Customer', compute='_get_sale_order')
-    partner_mobile = fields.Char('Mobile No.', compute='_get_sale_order')
-    partner_email = fields.Char('Email', compute='_get_sale_order')
-    date_order = fields.Datetime('Sale-Date',compute='_get_sale_order')
-    order_date = fields.Char('SaleDate', compute='_get_sale_order')
-    address = fields.Char('Address', compute='_get_sale_order')
-    fuel_type = fields.Char('Fuel Type',compute='_get_vehicle_details')
+    partner_name = fields.Char('Customer', compute='_get_customer_details')
+    partner_mobile = fields.Char('Mobile No.', compute='_get_customer_details')
+    partner_email = fields.Char('Email', compute='_get_customer_details')
+    date_order = fields.Datetime('Sale-Date')
+    address = fields.Char('Address', compute='_get_customer_details')
+    fuel_type = fields.Char('Fuel Type', compute='_get_vehicle_details')
     partner_id = fields.Many2one('res.partner')
+    order_id = fields.Many2one('sale.order')
     source = fields.Selection([
         ('od', 'Other Dealer'),
         ('saboo', 'Saboo'),
     ], string='Source', store=True, default='saboo')
+    dealer_name = fields.Char('Dealer', default='saboo')
 
+    @api.depends('order_id')
+    def _on_change_sale_order(self):
+        self.partner_id = self.order_id.partner_id
+        # We only care for the customer if sale order is entered.
+        self.date_order = self.order_id.date_order
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
             print(vals)
-            self._create_vehicle_lot(vals)
+            if not vals['no_lot']:
+                self._create_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
 
     def _create_vehicle_lot(self, vals):
@@ -72,26 +79,13 @@ class Vehicle(models.Model):
     def _get_vehicle_details(self):
         self.fuel_type = self.product_id.fuel_type
 
-    @api.one
-    def _get_sale_order(self):
-        order = self.env['sale.order'].sudo().search([('name', '=', self.ref)])
-        if not order:
-            self.source = 'od'
-        if not self.partner_id:
-            self.partner_name = order.partner_id.name
-            self.partner_mobile = order.partner_id.mobile
-            self.partner_email = order.partner_id.email
-            self.address = order.partner_id.street
-
-        else:
-            self.partner_name = self.partner_id.name
-            self.partner_mobile = self.partner_id.mobile
-            self.partner_email = self.partner_id.email
-            self.address = self.partner_id.street
-
-        # We only care for the customer if sale order is entered.
-        self.date_order = order.date_order
-        self.order_date = datetime.strftime(order.date_order, '%d-%b-%Y')
+    @api.multi
+    def _get_customer_details(self):
+        for vehicle in self:
+            vehicle.partner_name = vehicle.partner_id.name
+            vehicle.partner_mobile = vehicle.partner_id.mobile
+            vehicle.partner_email = vehicle.partner_id.email
+            vehicle.address = vehicle.partner_id.street
 
     @api.one
     def _get_vehicle_details(self):

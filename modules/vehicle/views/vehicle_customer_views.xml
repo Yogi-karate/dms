@@ -28,7 +28,7 @@
                 <field name="partner_mobile"/>
                 <field name="partner_email"/>
                 <field name="address"/>
-                <field name="order_date"/>
+                <field name="date_order"/>
                         <field name="fuel_type"/>
                     </group>
                 </group>
@@ -52,7 +52,7 @@
                 <field name="registration_no"/>
                 <field name="chassis_no"/>
                 <field name="partner_name"/>
-                <field name="order_date"/>
+                <field name="date_order"/>
                 <field name="partner_mobile"/>
                 <field name="partner_email"/>
                 <field name="address"/>

@@ -4,3 +4,4 @@
 
 from . import vehicle
 from . import stock_move_line
+from . import vehicle_import

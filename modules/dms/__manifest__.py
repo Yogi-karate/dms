@@ -19,6 +19,7 @@
         'security/dms_groups.xml',
         'security/ir.model.access.csv',
         'data/service_lead_cron_data.xml',
+        'data/vehicle_import_cron_data.xml',
 
     ],
     'installable': True,

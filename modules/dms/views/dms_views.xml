@@ -21,4 +21,6 @@
     <menuitem action="vehicle.action_vehicle_customer_form" id="menu_action_vehicle_customer_form"
               parent="dms.menu_dms_reports_root" groups="stock.group_stock_user"
               sequence="1"/>
+    <menuitem name="Vehicle Import" id="menu_dms_vehicle_import_root" sequence="30" action="vehicle.action_import_vehicle"
+             parent="dms.menu_dms_root"/>
 </odoo>
