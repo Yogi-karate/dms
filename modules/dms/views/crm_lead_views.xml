@@ -103,6 +103,8 @@
                                 <field name="title" placeholder="Title" domain="[]" options='{"no_open": True}'/>
                             </div>
                             <field name="is_blacklisted" invisible="1"/>
+                            <field name="service_type"/>
+                            <field name="source"/>
                             <label for="email_from" class="oe_inline"/>
                             <div class="o_row o_row_readonly">
                                 <i class="fa fa-ban" style="color: red;" role="img"
@@ -184,6 +186,7 @@
                 <field name="mobile"/>
                 <field name="activity_date_deadline" string="Followup Date"/>
                 <field name="registration_no"/>
+                <field name="user_id" string="Telecaller"/>
                 <field name="activity_summary" string="Summary"/>
                 <field name="contact_name" invisible="1"/>
                 <field name="city" invisible="1"/>

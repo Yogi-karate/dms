@@ -43,6 +43,10 @@ class Vehicle(models.Model):
     address = fields.Char('Address', compute='_get_sale_order')
     fuel_type = fields.Char('Fuel Type')
     partner_id = fields.Many2one('res.partner')
+    source = fields.Selection([
+        ('od', 'Other Dealer'),
+        ('saboo', 'Saboo'),
+    ], string='Source', store=True, default='saboo')
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -65,11 +69,14 @@ class Vehicle(models.Model):
     @api.one
     def _get_sale_order(self):
         order = self.env['sale.order'].sudo().search([('name', '=', self.ref)])
+        if not order:
+            self.source = 'od'
         if not self.partner_id:
             self.partner_name = order.partner_id.name
             self.partner_mobile = order.partner_id.mobile
             self.partner_email = order.partner_id.email
             self.address = order.partner_id.street
+
         else:
             self.partner_name = self.partner_id.name
             self.partner_mobile = self.partner_id.mobile

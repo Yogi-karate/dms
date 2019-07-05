@@ -10,6 +10,8 @@
                 <field name="mobile"/>
                 <field name="summary" widget="html" string="Summary"/>
                 <field name="date" string="Completed Date"/>
+                <field name="user_id" string="Telecaller"/>
+                <field name="team_id" string="Team"/>
 
             </tree>
         </field>

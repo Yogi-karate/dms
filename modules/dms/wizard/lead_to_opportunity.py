@@ -73,7 +73,7 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
     ], string='Booking Type', store=True, default='pickup')
     pick_up_address = fields.Char('Pick-up Address')
     remarks = fields.Char('Remarks')
-    location_id = fields.Many2one('stock.location', string='Preferred location of service')
+    location_id = fields.Many2one('stock.location', string='Preferred location of service',required=True)
     due_date = fields.Datetime(string='Service Due Date')
     lead_id = fields.Many2one('dms.vehicle.lead')
 
@@ -127,20 +127,23 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
             values['partner_id'] = self.partner_id.id
         leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
         leads.write(values)
-        booking_values = {
-            'lead_id': self.lead_id.id,
-            'vehicle_id': self.lead_id.vehicle_id.id,
-            'location_id': self.location_id.id,
-            'remarks': self.remarks,
-            'dop': self.dop,
-            'booking_type': self.booking_type,
-            'pick_up_address': self.pick_up_address,
-            'service_type': self.service_type,
-            'due_date': self.due_date,
-            'user_id': self.user_id.id,
-            'team_id': self.team_id.id
+        if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
+            raise UserError("Please add both pickup date and address")
+        else:
+            booking_values = {
+                'lead_id': self.lead_id.id,
+                'vehicle_id': self.lead_id.vehicle_id.id,
+                'location_id': self.location_id.id,
+                'remarks': self.remarks,
+                'dop': self.dop,
+                'booking_type': self.booking_type,
+                'pick_up_address': self.pick_up_address,
+                'service_type': self.service_type,
+                'due_date': self.due_date,
+                'user_id': self.user_id.id,
+                'team_id': self.team_id.id
 
-        }
+            }
         bo = self.env['service.booking'].create(booking_values)
         # return leads[0].redirect_opportunity_view()
         return
