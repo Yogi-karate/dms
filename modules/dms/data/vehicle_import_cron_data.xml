@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Scheduler for service lead Generation -->
+        <record id="ir_cron_import_vehicle" model="ir.cron">
+            <field name="name">Vehicle Import from xls</field>
+            <field name="model_id" ref="vehicle.model_dms_vehicle_import"/>
+            <field name="state">code</field>
+            <field name="code">model.create_vehicles()</field>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="interval_number">24</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+        <record id="ir_cron_vehicle_order_ref" model="ir.cron">
+            <field name="name">Vehicle update for Sale order</field>
+            <field name="model_id" ref="vehicle.model_dms_vehicle_import"/>
+            <field name="state">code</field>
+            <field name="code">model.update_vehicle_from_ref()</field>
+            <field name="user_id" ref="base.user_admin"/>
+            <field name="interval_number">24</field>
+            <field name="interval_type">hours</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="False"/>
+        </record>
+
+        </data>
+</odoo>
