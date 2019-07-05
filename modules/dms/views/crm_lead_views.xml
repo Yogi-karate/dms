@@ -178,7 +178,7 @@
         <field name="name">crm.lead.tree.lead.new</field>
         <field name="model">dms.vehicle.lead</field>
         <field name="arch" type="xml">
-            <tree string="Leads" decoration-bf="message_needaction==True" decoration-muted="probability == 100">
+            <tree string="Leads" decoration-bf="message_needaction==True" decoration-muted="probability == 100" decoration-danger="activity_date_deadline and (activity_date_deadline &lt; current_date)">
 
                 <field name="create_date" invisible="1"/>
                 <field name="name" string="Lead"/>
@@ -186,6 +186,7 @@
                 <field name="mobile"/>
                 <field name="activity_date_deadline" string="Followup Date"/>
                 <field name="registration_no"/>
+                <field name="source"/>
                 <field name="user_id" string="Telecaller"/>
                 <field name="activity_summary" string="Summary"/>
                 <field name="contact_name" invisible="1"/>
