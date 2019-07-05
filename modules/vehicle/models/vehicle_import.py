@@ -8,7 +8,7 @@ class ODVehicle(models.TransientModel):
     _name = 'dms.vehicle.import'
     vin_no = fields.Char('VIN No')
     reg_no = fields.Char('Reg no')
-    date_of_sale = fields.Char('Date of Sale')
+    date_of_sale = fields.Date('Date of Sale')
     last_service_type = fields.Char('Last Service Type')
     last_service_date = fields.Char('Last Service Date')
     fuel_type = fields.Char('Fuel Type')
@@ -20,13 +20,14 @@ class ODVehicle(models.TransientModel):
     mobile = fields.Char('Mobile')
     partner_id = fields.Many2one('res.partner')
     status = fields.Boolean('status')
+    chassis_no = fields.Char('Chassis No')
 
     def create_vehicles(self):
         self._create_vehicles()
         self.env['dms.vehicle.import'].search([('status', '=', True)]).unlink()
 
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([], limit=10)
+        od_vehicles = self.env['dms.vehicle.import'].search([])
         for vehicle in od_vehicles:
             self = self.sudo()
             product = self.env['product.product'].search(
@@ -36,6 +37,7 @@ class ODVehicle(models.TransientModel):
             partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             vals = {
                 'name': vehicle.vin_no,
+                'chassis_no': vehicle.chassis_no,
                 'registration_no': vehicle.reg_no,
                 'date_order': vehicle.date_of_sale,
                 'dealer_name': vehicle.dealer,
