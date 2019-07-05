@@ -108,7 +108,10 @@ class ServiceLeads(models.TransientModel):
             'date_deadline': date_follow_up + timedelta(7),
             'vehicle_id': [(6, 0, [vehicle.id])],
             'type': 'lead',
-            'service_type': service_type
+            'service_type': service_type,
+            'vin_no': vehicle.chassis_no,
+            'registration_no': vehicle.registration_no,
+            'dos': vehicle.date_order
         }
 
     @api.model

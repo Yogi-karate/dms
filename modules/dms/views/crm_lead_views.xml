@@ -214,6 +214,9 @@
                 <filter string="Activities to be done" name="assigned_to_me"
                         domain="[('activity_ids.user_id', '=', uid)]"
                         help="Activities to be done"/>
+                <field name="vin_no"/>
+                <field name="registration_no"/>
+                <field name="user_id"/>
                 <separator/>
             </search>
         </field>

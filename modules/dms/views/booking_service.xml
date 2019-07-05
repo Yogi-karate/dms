@@ -22,6 +22,18 @@
         </field>
     </record>
 
+    <record id="view_dms_booking_filter" model="ir.ui.view">
+        <field name="name">service.booking.search</field>
+        <field name="model">service.booking</field>
+        <field name="arch" type="xml">
+            <search string="Search Activities">
+                <field name="vin_no"/>
+                <separator/>
+            </search>
+        </field>
+    </record>
+
+
       <record id="action_service_booking" model="ir.actions.act_window">
         <field name="name">Service Bookings</field>
         <field name="type">ir.actions.act_window</field>
@@ -31,6 +43,7 @@
                            (0, 0, {'view_mode': 'tree', 'view_id': ref('tree_view_service_booking')})]"/>
         <field name="context"></field>
         <field name="domain"></field>
+          <field name="search_view_id" ref="view_dms_booking_filter"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Add a Booking

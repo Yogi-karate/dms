@@ -36,9 +36,9 @@ class VehicleLead(models.Model):
     vehicle_id = fields.Many2many('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1,
                                   index=True)
 
-    registration_no = fields.Char('Registration No.', compute='_get_sale_order')
-    vin_no = fields.Char('VIN No.', compute='_get_sale_order')
-    dos = fields.Char(string='Date of Sale', compute='_get_sale_order')
+    registration_no = fields.Char('Registration No.')
+    vin_no = fields.Char('Chassis No.')
+    dos = fields.Datetime(string='Date of Sale')
     source = fields.Char('Source', compute='_get_sale_order')
     service_type = fields.Selection([
         ('first', 'First Free Service'),
@@ -60,9 +60,6 @@ class VehicleLead(models.Model):
     @api.one
     def _get_sale_order(self):
         # We only care for the customer if sale order is entered.
-        self.vin_no = self.vehicle_id.name
-        self.registration_no = self.vehicle_id.registration_no
-        self.dos = self.vehicle_id.order_date
         self.source = self.vehicle_id.source
 
     class CrmLeadLost(models.TransientModel):
@@ -102,7 +99,7 @@ class ServiceBooking(models.Model):
     mobile = fields.Char('Customer number', compute='_lead_values')
     mail = fields.Char('Customer Mail ID', compute='_lead_values')
     vehicle_id = fields.Many2one('vehicle')
-    vin_no = fields.Char('Chassis Number', compute='_lead_values')
+    vin_no = fields.Char('Chassis Number')
     vehicle_model = fields.Char('Model', compute='_lead_values')
     user_id = fields.Many2one('res.users', compute='_lead_values',store=True)
     team_id = fields.Many2one('crm.team', compute='_lead_values',store=True)
@@ -115,7 +112,6 @@ class ServiceBooking(models.Model):
             booking.partner_name = booking.lead_id.partner_name
             booking.mobile = booking.lead_id.mobile
             booking.mail = booking.lead_id.email_from
-            booking.vin_no = booking.vehicle_id.chassis_no
             booking.vehicle_model = booking.vehicle_id.product_id.name
             booking.source = booking.lead_id.source
             booking.user_id = booking.lead_id.user_id
