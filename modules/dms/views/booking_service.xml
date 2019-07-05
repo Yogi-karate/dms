@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <tree string="Service Bookings">
                 <field name="source"/>
-                <field name="due_date" string="Appointment Date"/>
+                <field name="dop" string="Appointment Date"/>
                 <field name="partner_name"/>
                 <field name="mobile"/>
                 <field name="mail"/>
@@ -14,7 +14,7 @@
                 <field name="service_type"/>
                 <field name="booking_type" string="Pickup/Walkin"/>
                 <field name="pick_up_address" string="Address"/>
-                <field name="vehicle_no"/>
+                <field name="vehicle_id"/>
                 <field name="location_id" string="Service Location"/>
                 <field name="user_id" string="TC Name"/>
                 <field name="vin_no"/>
