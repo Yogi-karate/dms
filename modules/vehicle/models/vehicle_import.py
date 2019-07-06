@@ -1,8 +1,6 @@
 import logging
 from odoo import api, fields, models, tools
-from odoo.exceptions import UserError
-from odoo.tools.translate import _
-from datetime import datetime
+
 
 _logger = logging.getLogger(__name__)
 
@@ -25,23 +23,26 @@ class ODVehicle(models.TransientModel):
     status = fields.Boolean('status')
     chassis_no = fields.Char('Chassis No')
 
+    @api.model
     def create_vehicles(self):
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
         self._create_vehicles()
         self.env['dms.vehicle.import'].search([('status', '=', True)]).unlink()
         _logger.info("!!!!!!!!!!!!!!End of ->  Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
 
+    @api.model
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([], limit=1000)
-        _logger.info("The number of records to process =>",len(od_vehicles))
+        od_vehicles = self.env['dms.vehicle.import'].search([], limit=10000)
+        _logger.info("The number of records to process =>", str(len(od_vehicles)))
         for vehicle in od_vehicles:
             self = self.sudo()
             product = self.env['product.product'].search(
                 [('name', 'ilike', vehicle.model), ('fuel_type', 'ilike', vehicle.fuel_type)], limit=1)
-            print("In Vehicle loop of import ^^^^^^^^",vehicle.customer_name,vehicle.vin_no,vehicle.date_of_sale)
+            _logger.info("In Vehicle loop of import ^^^^^^^^", vehicle.customer_name, vehicle.vin_no, vehicle.date_of_sale,
+                  product)
             if not product or not vehicle.vin_no or not vehicle.customer_name or not vehicle.date_of_sale:
                 continue
-            print("-----------Starting creation of partner and vehicle------------")
+            _logger.info("-----------Starting creation of partner and vehicle------------")
             partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             vals = {
                 'name': vehicle.vin_no,
@@ -51,11 +52,13 @@ class ODVehicle(models.TransientModel):
                 'dealer_name': vehicle.dealer,
                 'partner_id': partner.id,
                 'product_id': product.id,
+                'source': 'od',
                 'no_lot': True
             }
             self.env['vehicle'].create(vals)
             vehicle.status = True
 
+    @api.model
     def update_vehicle_from_ref(self):
         vehicles = self.env['vehicle'].search([('ref', '!=', False)])
         for vehicle in vehicles:
@@ -64,9 +67,6 @@ class ODVehicle(models.TransientModel):
                 vehicle.order_id = order_id
                 vehicle.partner_id = order_id.partner_id
                 vehicle.date_order = order_id.date_order
-        od_vehicles = self.env['vehicle'].search([('ref', '=', False)])
-        for vehicle in od_vehicles:
-            vehicle.source = 'od'
 
     def create_partner(self, vehicle):
         return {
