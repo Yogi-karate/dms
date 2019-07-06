@@ -93,6 +93,33 @@
             <field name="groups" eval="[(4, ref('dms.group_dms_callcenter_manager'))]"/>
         </record>
 
+        <!-- Done activities security -->
+         <record id="dms_rule_personal_done_Activity" model="ir.rule">
+            <field name="name">Personal Done Activities </field>
+            <field ref="model_crm_activity_done_report" name="model_id"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('dms.group_dms_telecaller'))]"/>
+        </record>
+        <record id="dms_callcenter_rule_all_lead_done_Activity" model="ir.rule">
+            <field name="name">All Done Activities  Leads</field>
+            <field ref="model_crm_activity_done_report" name="model_id"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups"
+                   eval="[(4, ref('base.group_system'))]"/>
+        </record>
+        <record id="dms_callcenter_rule_team_lead_done_Activity" model="ir.rule">
+            <field name="name">All Team Done Activities  Leads</field>
+            <field ref="model_crm_activity_done_report" name="model_id"/>
+            <field name="domain_force">[('team_id.user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('dms.group_dms_callcenter_lead'))]"/>
+        </record>
+        <record id="dms_rule_manager_done_Activity_lead" model="ir.rule">
+            <field name="name">Manager Done Activities  Leads</field>
+            <field ref="model_crm_activity_done_report" name="model_id"/>
+            <field name="domain_force">['|',('team_id.manager_user_ids','in',user.id),('user_id','=',False)]</field>
+            <field name="groups" eval="[(4, ref('dms.group_dms_callcenter_manager'))]"/>
+        </record>
+
 
 
         <!-- DMS Enquiry Security -->
