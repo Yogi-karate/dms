@@ -1,7 +1,6 @@
 import logging
 from odoo import api, fields, models, tools
 
-
 _logger = logging.getLogger(__name__)
 
 
@@ -32,16 +31,19 @@ class ODVehicle(models.TransientModel):
 
     @api.model
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([], limit=10000)
+        od_vehicles = self.env['dms.vehicle.import'].search([], limit=1000)
         _logger.info("The number of records to process =>", str(len(od_vehicles)))
+        count = 0
         for vehicle in od_vehicles:
+            count = count + 1
             self = self.sudo()
             product = self.env['product.product'].search(
                 [('name', 'ilike', vehicle.model), ('fuel_type', 'ilike', vehicle.fuel_type)], limit=1)
-            _logger.info("In Vehicle loop of import ^^^^^^^^", vehicle.customer_name, vehicle.vin_no, vehicle.date_of_sale,
-                  product)
             if not product or not vehicle.vin_no or not vehicle.customer_name or not vehicle.date_of_sale:
+                print("Cannot process vehicle -> ", vehicle.vin_no, vehicle.customer.name, count)
                 continue
+            print("In Vehicle loop of import ^^^^^^^^", vehicle.customer_name, vehicle.vin_no, vehicle.date_of_sale,
+                  product)
             _logger.info("-----------Starting creation of partner and vehicle------------")
             partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             vals = {
