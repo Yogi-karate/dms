@@ -56,6 +56,10 @@ class ODVehicle(models.TransientModel):
                 vehicle.order_id = order_id
                 vehicle.partner_id = order_id.partner_id
                 vehicle.date_order = order_id.date_order
+        od_vehicles = self.env['vehicle'].search([('ref', '=', False)])
+        for vehicle in od_vehicles:
+            vehicle.source = 'od'
+
 
     def create_partner(self, vehicle):
         return {
