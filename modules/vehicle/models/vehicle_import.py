@@ -27,12 +27,12 @@ class ODVehicle(models.TransientModel):
         self.env['dms.vehicle.import'].search([('status', '=', True)]).unlink()
 
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([])
+        od_vehicles = self.env['dms.vehicle.import'].search([], limit=1000)
         for vehicle in od_vehicles:
             self = self.sudo()
             product = self.env['product.product'].search(
                 [('name', 'ilike', vehicle.model), ('fuel_type', 'ilike', vehicle.fuel_type)], limit=1)
-            if not product:
+            if not product or vehicle.name or vehicle.customer_name or vehicle.date_of_sale:
                 continue
             partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             vals = {
