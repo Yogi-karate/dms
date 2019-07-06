@@ -38,7 +38,7 @@ class Vehicle(models.Model):
     partner_name = fields.Char('Customer', compute='_get_sale_order')
     partner_mobile = fields.Char('Mobile No.', compute='_get_sale_order')
     partner_email = fields.Char('Email', compute='_get_sale_order')
-    date_order = fields.Datetime('Sale-Date')
+    date_order = fields.Datetime('Sale-Date',compute='_get_sale_order',store=True)
     order_date = fields.Char('SaleDate', compute='_get_sale_order')
     address = fields.Char('Address', compute='_get_sale_order')
     fuel_type = fields.Char('Fuel Type')
@@ -47,6 +47,8 @@ class Vehicle(models.Model):
         ('od', 'Other Dealer'),
         ('saboo', 'Saboo'),
     ], string='Source', store=True, default='saboo')
+
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -86,6 +88,7 @@ class Vehicle(models.Model):
         # We only care for the customer if sale order is entered.
         if not self.date_order:
             self.write({'date_order':order.date_order})
+        self.date_order = order.date_order
         self.order_date = datetime.strftime(order.date_order, '%d-%b-%Y')
 
     @api.one
