@@ -50,6 +50,12 @@ class ODVehicle(models.TransientModel):
                 continue
             print("In Vehicle loop of import ^^^^^^^^", vehicle.customer_name, vehicle.vin_no, vehicle.date_of_sale,
                   product)
+            duplicate = self.env['vehicle'].search([('name','=',vehicle.vin_no)])
+            if duplicate:
+                print("Cannot process duplicate vehicle -> ", vehicle.vin_no, vehicle.customer_name, count)
+                vehicle.state = 'cancel'
+                continue
+
             _logger.info("-----------Starting creation of partner and vehicle------------")
             partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             vals = {
