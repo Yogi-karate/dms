@@ -85,6 +85,35 @@
           </p>
         </field>
     </record>
+
+    <record id="form_view_od_vehicle" model="ir.ui.view">
+       <field name="name">od.vehicle.form</field>
+       <field name="model">dms.vehicle.import</field>
+       <field name="arch" type="xml">
+           <form string="Vehicles">
+              <header>
+                  <field name="state" widget="statusbar" statusbar_visible="draft,cancel" options="{'clickable': 1}"/>
+              </header>
+               <group string="Customer details" class="left">
+               <field name="customer_name"/>
+               <field name="mobile" />
+               <field name="address"/>
+               </group>
+               <group string="Vehicle details" class="right">
+                   <field name="chassis_no"/>
+               <field name="vin_no"/>
+               <field name="model"/>
+               <field name="reg_no" />
+               <field name="date_of_sale"/>
+               <field name="last_service_type"/>
+               <field name="fuel_type"/>
+               <field name="last_service_KM"/>
+               <field name="dealer"/>
+               </group>
+
+           </form>
+       </field>
+   </record>
      <record id="tree_view_od_vehicle" model="ir.ui.view">
        <field name="name">od.vehicle.tree</field>
        <field name="model">dms.vehicle.import</field>
@@ -101,6 +130,7 @@
                <field name="customer_name"/>
                <field name="address"/>
                <field name="mobile" />
+               <field name="state"/>
            </tree>
        </field>
    </record>
@@ -111,7 +141,9 @@
        <field name="res_model">dms.vehicle.import</field>
        <field name="view_ids"
               eval="[(5, 0, 0),
-                          (0, 0, {'view_mode': 'tree', 'view_id': ref('tree_view_od_vehicle')})]"/>
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('tree_view_od_vehicle')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('form_view_od_vehicle')})
+                          ]"/>
        <field name="context"></field>
        <field name="domain"></field>
        <field name="help" type="html">

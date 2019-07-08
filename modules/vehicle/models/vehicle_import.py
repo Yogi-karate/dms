@@ -24,7 +24,7 @@ class ODVehicle(models.TransientModel):
     state = fields.Selection([
         ('draft', 'New'),
         ('cancel', 'Cancelled'),
-    ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3,
+    ], string='Status', copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='draft')
 
     @api.model
