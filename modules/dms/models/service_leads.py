@@ -193,7 +193,7 @@ class ServiceLeads(models.TransientModel):
     def _create_insurance_leads(self, vehicle, type, today):
         dict = None
         print("insuranceinsuranceinsuranceinsuranceinsuranceinsuranceinsuranceinsuranceinsuranceinsurance")
-        sale_date = datetime.strptime(vehicle.order_date, '%d-%b-%Y')
+        sale_date = datetime.strptime(vehicle.date_order, '%d-%b-%Y')
         rec_date_from = today - sale_date
         print("TimeDelta Value - ", rec_date_from)
         print("TimeDelta Value 120 days- ", rec_date_from.days % 120)
@@ -215,7 +215,7 @@ class ServiceLeads(models.TransientModel):
     def create_insurance_leads(self, autocommit=True):
         self._clean_insurance_leads()
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Service Leads!!!!!!!!!!!!!!!!")
-        self._process_insurance_leads()
+        # self._process_insurance_leads()
         _logger.info("****************Finished creating Service Leads****************")
         pass
 

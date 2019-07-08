@@ -21,6 +21,11 @@ class ODVehicle(models.TransientModel):
     partner_id = fields.Many2one('res.partner')
     status = fields.Boolean('status')
     chassis_no = fields.Char('Chassis No')
+    state = fields.Selection([
+        ('draft', 'New'),
+        ('cancel', 'Cancelled'),
+    ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3,
+        default='draft')
 
     @api.model
     def create_vehicles(self):
@@ -31,8 +36,8 @@ class ODVehicle(models.TransientModel):
 
     @api.model
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([], limit=1000)
-        _logger.info("The number of records to process =>", str(len(od_vehicles)))
+        od_vehicles = self.env['dms.vehicle.import'].search([('state', '!=', 'cancel')], limit=10000)
+        _logger.info("The number of records to process =>" + str(len(od_vehicles)))
         count = 0
         for vehicle in od_vehicles:
             count = count + 1
@@ -40,7 +45,8 @@ class ODVehicle(models.TransientModel):
             product = self.env['product.product'].search(
                 [('name', 'ilike', vehicle.model), ('fuel_type', 'ilike', vehicle.fuel_type)], limit=1)
             if not product or not vehicle.vin_no or not vehicle.customer_name or not vehicle.date_of_sale:
-                print("Cannot process vehicle -> ", vehicle.vin_no, vehicle.customer.name, count)
+                print("Cannot process vehicle -> ", vehicle.vin_no, vehicle.customer_name, count)
+                vehicle.state = 'cancel'
                 continue
             print("In Vehicle loop of import ^^^^^^^^", vehicle.customer_name, vehicle.vin_no, vehicle.date_of_sale,
                   product)
