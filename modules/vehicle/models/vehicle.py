@@ -58,7 +58,6 @@ class Vehicle(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            print(vals)
             if not vals['no_lot']:
                 self._create_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
