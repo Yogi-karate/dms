@@ -210,7 +210,9 @@
         <field name="name">dms.vehicle.lead.search</field>
         <field name="model">dms.vehicle.lead</field>
         <field name="arch" type="xml">
-            <search string="Search Activities">
+            <search string="Search Partner">
+                  <field name="name" string="Lead"
+                     filter_domain="['|','|','|',('partner_name','ilike',self),('name', 'ilike', self),('mobile','ilike',self),('email_from','ilike',self)]" />
 
                 <filter string="Activities to be done" name="assigned_to_me"
                         domain="[('activity_ids.user_id', '=', uid)]"

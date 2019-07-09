@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<odoo>
+
+
+
+      <record id="action_dms_vehicle_lost" model="ir.actions.act_window">
+        <field name="name">Lost Leads</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.vehicle.lead</field>
+         <field name="view_ids"
+               eval="[(5, 0, 0),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_leads_new')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_leads_new')})]"/>
+        <field name="context"></field>
+        <field name="domain">[('active', '=', False)]</field>
+           <field name="search_view_id" ref="view_dms_vehicle_lead_filter"/>
+    </record>
+
+    <menuitem action="action_dms_vehicle_lost" id="menu_action_dms_vehicle_lost"
+              parent="menu_dms_leads_root"
+               string="Lost Leads"
+              sequence="3"/>
+</odoo>

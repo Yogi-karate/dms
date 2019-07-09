@@ -21,6 +21,7 @@
         'data/service_lead_cron_data.xml',
         'data/vehicle_import_cron_data.xml',
         'wizard/dms_vehicle_lead_assign.xml',
+        'views/dms_vehicle_lost_views.xml',
 
     ],
     'installable': True,
