@@ -18,6 +18,8 @@ class ServiceLeads(models.TransientModel):
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
         leads = []
         for vehicle in vehicles:
+            if not vehicle.date_order:
+                continue
             print("The vehicle in service lead generation", vehicle)
             service_lead_dict1 = self._create_service_first_leads(vehicle, service_type, today)
             if service_lead_dict1:
@@ -31,11 +33,14 @@ class ServiceLeads(models.TransientModel):
             service_lead_dict4 = self._create_service_paid_leads(vehicle, service_type, today)
             if service_lead_dict4:
                 leads.append(service_lead_dict4)
-        created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
+            service_lead_dict5 = self._create_service_periodic_leads(vehicle, service_type, today)
+            if service_lead_dict5:
+                leads.append(service_lead_dict5)
         teams = self.sudo().env['crm.team'].search([('team_type', '=', 'business-center'), ('member_ids', '!=', False)])
+        self._allocate_user(leads, teams)
+        created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
         for lead in created_leads:
             self._schedule_follow_up(lead, today)
-        self._allocate_user(created_leads, teams)
 
     @api.model
     def _process_insurance_leads(self):
@@ -71,17 +76,20 @@ class ServiceLeads(models.TransientModel):
         previous_team_id = -1
         for lead in leads:
             team_id = self._round_robin(len(teams), previous_team_id)
-            if not team_dict.get(team_id, False):
-                # print("team dict checking","___________________________",team_id)
+            print("team dict checking before ", "___________________________", team_dict)
+            if team_id not in team_dict.keys():
+                print("team dict checking", "___________________________", team_id)
                 team_dict[team_id] = -1
             current_team = teams[team_id]
             members = current_team.member_ids
             for x in members:
                 print(x.name, x)
             user_id = self._round_robin(len(members), team_dict[team_id])
+            print("user id in allocation ---------", user_id)
             user = current_team.member_ids[user_id]
+            print("user name in allocation $$$$$$$$$$", user.name)
             team_dict[team_id] = user_id
-            lead.write({
+            lead.update({
                 'user_id': user.id,
                 'team_id': current_team.id})
             previous_team_id = team_id
@@ -102,10 +110,13 @@ class ServiceLeads(models.TransientModel):
             'partner_name': vehicle.partner_name,
             'mobile': vehicle.partner_mobile,
             'opportunity_type': type.id,
-            'date_deadline': date_follow_up,
+            'date_deadline': date_follow_up + timedelta(7),
             'vehicle_id': [(6, 0, [vehicle.id])],
             'type': 'lead',
-            'service_type': service_type
+            'service_type': service_type,
+            'vin_no': vehicle.chassis_no,
+            'registration_no': vehicle.registration_no,
+            'dos': vehicle.date_order
         }
 
     @api.model
@@ -123,8 +134,8 @@ class ServiceLeads(models.TransientModel):
     def _create_service_first_leads(self, vehicle, type, today):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
-        print(today - timedelta(11))
-        if today + timedelta(9) == sale_date + timedelta(20):
+
+        if today + timedelta(7) == sale_date + timedelta(20):
             service_type = 'first'
             dict = self._prepare_leads(vehicle, type, today, service_type)
         return dict
@@ -132,12 +143,12 @@ class ServiceLeads(models.TransientModel):
     def _create_service_second_leads(self, vehicle, type, today):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
-        if today + timedelta(9) == sale_date + timedelta(140) and vehicle.fuel_type == 'diesel':
+        if today + timedelta(7) == sale_date + timedelta(120) and vehicle.fuel_type == 'diesel':
             print(dict, ":::::::::::::::::::::::::::::::::::::::::::::::::::::::condition checked")
             service_type = 'second'
             dict = self._prepare_leads(vehicle, type, today, service_type)
             print(dict, ":::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::dict here")
-        if today + timedelta(9) == sale_date + timedelta(200) and vehicle.fuel_type == 'petrol':
+        if today + timedelta(7) == sale_date + timedelta(180) and vehicle.fuel_type == 'petrol':
             service_type = 'second'
             dict = self._prepare_leads(vehicle, type, today, service_type)
         return dict
@@ -145,10 +156,11 @@ class ServiceLeads(models.TransientModel):
     def _create_service_third_leads(self, vehicle, type, today):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
-        if today + timedelta(9) == sale_date + timedelta(260) and vehicle.fuel_type == 'diesel':
+
+        if today + timedelta(7) == sale_date + timedelta(240) and vehicle.fuel_type == 'diesel':
             service_type = 'third'
             dict = self._prepare_leads(vehicle, type, today, service_type)
-        if today + timedelta(9) == sale_date + timedelta(320) and vehicle.fuel_type == 'petrol':
+        if today + timedelta(7) == sale_date + timedelta(365) and vehicle.fuel_type == 'petrol':
             service_type = 'third'
             dict = self._prepare_leads(vehicle, type, today, service_type)
         return dict
@@ -156,11 +168,25 @@ class ServiceLeads(models.TransientModel):
     def _create_service_paid_leads(self, vehicle, type, today):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
-        print(today - timedelta(11))
-        if today + timedelta(9) == sale_date + timedelta(365) and vehicle.fuel_type == 'diesel':
+        if today + timedelta(7) == sale_date + timedelta(365) and vehicle.fuel_type == 'diesel':
             service_type = 'paid'
             dict = self._prepare_leads(vehicle, type, today, service_type)
-        if today + timedelta(9) == sale_date + timedelta(425) and vehicle.fuel_type == 'petrol':
+        if today + timedelta(7) == sale_date + timedelta(445) and vehicle.fuel_type == 'petrol':
+            service_type = 'paid'
+            dict = self._prepare_leads(vehicle, type, today, service_type)
+        return dict
+
+    def _create_service_periodic_leads(self, vehicle, type, today):
+        sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
+        dict = None
+        print((today + timedelta(7) - sale_date).days % 120,
+              ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        if (today + timedelta(7) - sale_date).days > 365 and (
+                today + timedelta(7) - sale_date).days % 120 == 0 and vehicle.fuel_type == 'diesel':
+            service_type = 'paid'
+            dict = self._prepare_leads(vehicle, type, today, service_type)
+        if (today + timedelta(7) - sale_date).days > 445 and (
+                today + timedelta(7) - sale_date).days % 180 == 0 and vehicle.fuel_type == 'petrol':
             service_type = 'paid'
             dict = self._prepare_leads(vehicle, type, today, service_type)
         return dict
@@ -168,11 +194,11 @@ class ServiceLeads(models.TransientModel):
     def _create_insurance_leads(self, vehicle, type, today):
         dict = None
         print("insuranceinsuranceinsuranceinsuranceinsuranceinsuranceinsuranceinsuranceinsuranceinsurance")
-        sale_date = datetime.strptime(vehicle.order_date, '%d-%b-%Y')
+        sale_date = datetime.strptime(vehicle.date_order, '%d-%b-%Y')
         rec_date_from = today - sale_date
         print("TimeDelta Value - ", rec_date_from)
         print("TimeDelta Value 120 days- ", rec_date_from.days % 120)
-        if today + timedelta(9) == sale_date + timedelta(365):
+        if today + timedelta(7) == sale_date + timedelta(365):
             service_type = 'Insurance'
             dict = self._prepare_leads(vehicle, type, today, service_type)
         # self._schedule_follow_up(lead)
@@ -195,9 +221,19 @@ class ServiceLeads(models.TransientModel):
         pass
 
     @api.model
+    def create_insurance_leads(self, autocommit=True):
+        self._clean_insurance_leads()
+        _logger.info("!!!!!!!!!!!!!!Starting Creation of Service Leads!!!!!!!!!!!!!!!!")
+        # self._process_insurance_leads()
+        _logger.info("****************Finished creating Service Leads****************")
+        pass
+
+    @api.model
     def _clean_insurance_leads(self):
         pass
 
     @api.model
     def _clean_service_leads(self):
+        today = datetime.strptime(datetime.strftime(fields.Datetime.now(), '%Y%m%d'), '%Y%m%d')
+        lead_ids = self.env['dms.vehicle.lead'].search([('create_date', '=', today)]).unlink()
         pass

@@ -12,7 +12,6 @@
     'data': [
         'views/dms_views.xml',
         'views/booking_service.xml',
-        'views/activity_views.xml',
         'views/activity_done_views.xml',
         'data/opportunity_type_data.xml',
         'wizard/lead_to_opportunity.xml',
@@ -20,6 +19,8 @@
         'security/dms_groups.xml',
         'security/ir.model.access.csv',
         'data/service_lead_cron_data.xml',
+        'data/vehicle_import_cron_data.xml',
+        'wizard/dms_vehicle_lead_assign.xml',
 
     ],
     'installable': True,

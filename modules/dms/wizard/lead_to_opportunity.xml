@@ -6,39 +6,16 @@
             <field name="model">dms.lead2opportunity.partner</field>
             <field name="arch" type="xml">
                 <form string="Convert to Booking">
-                    <group string="Convert to Booking">
+                    <group>
                     <field name="name"/>
                     <field name="service_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
                     <field name="mobile"/>
                         <field name="booking_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
                     <field name="dop" attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
-                    <field name="pick_up_address" string="New Pickup Address" attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
-                        <field name="location_id" string="Preferred Service Location"/>
+                    <field name="pick_up_address" string="Pickup Address" attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
+                        <field name="location_id" string="Preferred Service Location" options="{'no_create':True,'no_open':True}"/>
                         <field name="remarks"/>
                     </group>
-                 <!--   <group name="name">
-                        <field name="name" widget="radio"/>
-                    </group>
-                    <group string="Assign this opportunity to">
-                        <field name="user_id" domain="[('share', '=', False)]"/>
-                        <field name="team_id" widget="selection"/>
-                    </group>
-                    <group string="Opportunities" attrs="{'invisible': [('name', '!=', 'merge')]}">
-                        <field name="opportunity_ids" nolabel="1">
-                            <tree>
-                                <field name="create_date"/>
-                                <field name="name"/>
-                                <field name="type"/>
-                                <field name="contact_name"/>
-                                <field name="country_id" invisible="context.get('invisible_country', True)"/>
-                                <field name="email_from"/>
-                                <field name="phone"/>
-                                <field name="stage_id"/>
-                                <field name="user_id"/>
-                                <field name="team_id"/>
-                            </tree>
-                        </field>
-                    </group> -->
                     <group name="action" attrs="{'invisible': [('name', '!=', 'convert')]}" string="Customers" col="1">
                         <field name="action" nolabel="1" widget="radio"/>
                         <group col="2">
@@ -55,7 +32,7 @@
 
 
         <record id="action_dms_lead2opportunity_partner" model="ir.actions.act_window">
-            <field name="name">Convert to opportunity</field>
+            <field name="name">Service Booking</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">dms.lead2opportunity.partner</field>
             <field name="view_mode">form</field>

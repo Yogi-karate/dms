@@ -85,5 +85,42 @@
           </p>
         </field>
     </record>
+     <record id="tree_view_od_vehicle" model="ir.ui.view">
+       <field name="name">od.vehicle.tree</field>
+       <field name="model">dms.vehicle.import</field>
+       <field name="arch" type="xml">
+           <tree string="Vehicles">
+               <field name="vin_no"/>
+               <field name="reg_no" />
+               <field name="date_of_sale"/>
+               <field name="last_service_type"/>
+               <field name="fuel_type"/>
+               <field name="last_service_KM"/>
+               <field name="dealer"/>
+               <field name="model"/>
+               <field name="customer_name"/>
+               <field name="address"/>
+               <field name="mobile" />
+           </tree>
+       </field>
+   </record>
 
+     <record id="action_import_vehicle" model="ir.actions.act_window">
+       <field name="name">Upload Vehicles</field>
+       <field name="type">ir.actions.act_window</field>
+       <field name="res_model">dms.vehicle.import</field>
+       <field name="view_ids"
+              eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('tree_view_od_vehicle')})]"/>
+       <field name="context"></field>
+       <field name="domain"></field>
+       <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+               Add a Booking
+           </p>
+           <p>
+               create booking
+           </p>
+       </field>
+   </record>
 </odoo>

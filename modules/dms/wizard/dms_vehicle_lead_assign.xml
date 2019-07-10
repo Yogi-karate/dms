@@ -1,0 +1,60 @@
+<?xml version="1.0"?>
+<odoo>
+        <!-- Merge Opportunities  -->
+        <record id="reassign_vehicle_lead_form" model="ir.ui.view">
+            <field name="name">dms.vehicle.lead.assign.form</field>
+            <field name="model">dms.vehicle.lead.assign</field>
+            <field name="arch" type="xml">
+                <form string="Reassign Calls">
+                    <group string="Assign Calls to">
+                        <field name="member_values" invisible="1"/>
+                        <field name="team_id" class="oe_inline" domain="['|',('user_id','=',uid),('manager_user_ids','=',uid)]" options="{'no_create': True, 'no_create_edit':True,'no_open': True}"/>
+                        <field name="user_id" class="oe_inline" domain="[('id','in',member_values)]" options="{'no_create': True, 'no_create_edit':True,'no_open': True}" />
+                    </group>
+                    <group string="Select Calls">
+                        <field name="enquiry_ids" nolabel="1">
+                            <tree>
+                                <field name="create_date"/>
+                                <field name="name"/>
+                                <field name="partner_name"/>
+                                <field name="mobile"/>
+                                <field name="user_id"/>
+                                <field name="team_id" />
+                            </tree>
+                        </field>
+                    </group>
+                    <footer>
+                        <button name="action_reassign_team" type="object" string="Assign" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!--  Merge leads/opportunities action -->
+        <record id="reassign_calls_act" model="ir.actions.act_window">
+            <field name="name">Reassign Calls</field>
+            <field name="res_model">dms.vehicle.lead.assign</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="reassign_vehicle_lead_form"/>
+            <field name="target">new</field>
+        </record>
+
+        <act_window
+            id="action_assign_calls"
+            name="Reassign"
+            multi="True"
+            key2="client_action_multi"
+            res_model="dms.vehicle.lead.assign"
+            src_model="dms.vehicle.lead"
+            view_mode="form"
+            target="new"
+            view_type="form"
+            groups="group_dms_callcenter_lead"/>
+
+
+</odoo>
+
+
+

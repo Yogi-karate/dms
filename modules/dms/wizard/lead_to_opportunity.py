@@ -7,7 +7,6 @@ from odoo.tools.translate import _
 
 
 class Lead2OpportunityPartnerNew(models.TransientModel):
-
     _name = 'dms.lead2opportunity.partner'
     _description = 'Convert Lead to Opportunity (not in mass)'
     _inherit = 'dms.partner.binding'
@@ -27,7 +26,7 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
             lead = self.env['dms.vehicle.lead'].browse(self._context['active_id'])
             email = lead.partner_id.email if lead.partner_id else lead.email_from
             print("////////////////////////////////////////////////////////////////////////////////", lead)
-            tomerge.update(self._get_duplicated_leads(partner_id, email, include_lost=True).ids)
+            #tomerge.update(self._get_duplicated_leads(partner_id, email, include_lost=True).ids)
 
             if 'action' in fields and not result.get('action'):
                 result['action'] = 'exist' if partner_id else 'create'
@@ -41,11 +40,10 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 result['user_id'] = lead.user_id.id
             if lead.id:
                 result['lead_id'] = lead.id
-            if lead.name:
-                result['name'] = lead.name
+            if lead.partner_name:
+                result['name'] = lead.partner_name
             if lead.mobile:
                 result['mobile'] = lead.mobile
-
 
             if lead.team_id:
                 result['team_id'] = lead.team_id.id
@@ -53,7 +51,7 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 result['action'] = 'nothing'
         return result
 
-    name = fields.Char('name')
+    name = fields.Char('Customer Name')
     service_type = fields.Selection([
         ('first', 'First Free Service'),
         ('second', 'Second Free Service'),
@@ -75,34 +73,9 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
     ], string='Booking Type', store=True, default='pickup')
     pick_up_address = fields.Char('Pick-up Address')
     remarks = fields.Char('Remarks')
-    location_id = fields.Many2one('stock.location', string='Preferred location of service')
+    location_id = fields.Many2one('stock.location', string='Preferred location of service',required=True)
     due_date = fields.Datetime(string='Service Due Date')
     lead_id = fields.Many2one('dms.vehicle.lead')
-    @api.onchange('action')
-    def onchange_action(self):
-        if self.action == 'exist':
-            self.partner_id = self._find_matching_partner()
-        else:
-            self.partner_id = False
-
-    @api.onchange('user_id')
-    def _onchange_user(self):
-        """ When changing the user, also set a team_id or restrict team id
-            to the ones user_id is member of.
-        """
-        if self.user_id:
-            if self.team_id:
-                user_in_team = self.env['crm.team'].search_count([('id', '=', self.team_id.id), '|', ('user_id', '=', self.user_id.id), ('member_ids', '=', self.user_id.id)])
-            else:
-                user_in_team = False
-            if not user_in_team:
-                values = self.env['dms.vehicle.lead']._onchange_user_values(self.user_id.id if self.user_id else False)
-                self.team_id = values.get('team_id', False)
-
-    @api.model
-    def _get_duplicated_leads(self, partner_id, email, include_lost=False):
-        """ Search for opportunities that have the same partner and that arent done or cancelled """
-        return self.env['dms.vehicle.lead']._get_duplicated_leads_by_emails(partner_id, email, include_lost=include_lost)
 
     # NOTE JEM : is it the good place to test this ?
     @api.model
@@ -141,177 +114,37 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
-        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$",self)
         self.ensure_one()
         values = {
             'name': self.name,
-            'team_id': self.team_id.id,
-            'user_id': self.user_id.id,
-            'dop': self.dop,
-            'booking_type': self.booking_type,
-            'service_type':self.service_type,
-            'mobile':self.mobile,
-            'pick_up_address': self.pick_up_address,
-            'remarks':self.remarks,
+            'service_type': self.service_type,
             'type': 'opportunity',
-            'date_conversion':fields.Datetime.today()
+            'date_conversion': fields.Datetime.today(),
+            'probability': 100
         }
 
         if self.partner_id:
             values['partner_id'] = self.partner_id.id
-
-        # if self.name == 'merge':
-        #     leads = self.with_context(active_test=False).opportunity_ids.merge_opportunity()
-        #     if not leads.active:
-        #         leads.write({'active': True, 'activity_type_id': False, 'lost_reason': False})
-        #     if leads.type == "lead":
-        #         values.update({'lead_ids': leads.ids, 'user_ids': [self.user_id.id]})
-        #         self.with_context(active_ids=leads.ids)._convert_opportunity(values)
-        #     elif not self._context.get('no_force_assignation') or not leads.user_id:
-        #         values['user_id'] = self.user_id.id
-        #         leads.write(values)
-        # else:
-        #     leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
-        #     values.update({'lead_ids': leads.ids, 'user_ids': [self.user_id.id]})
-        #     self._convert_opportunity(values)
         leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
         leads.write(values)
-        lead_vals = {
-            'name': leads.name,
-            'partner_name': leads.partner_name,
-            'type': leads.type,
-            'date_conversion': leads.date_conversion,
-            'mobile': leads.mobile,
-            'email_from': leads.email_from,
-            'street': leads.street,
-            'street2': leads.street2,
-            'city': leads.city,
-            'state_id': leads.state_id,
-            'zip': leads.zip,
-            'user_id': leads.user_id.id,
-            'team_id': leads.team_id.id,
-            'phone': leads.phone,
-            'type': 'opportunity'
+        if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
+            raise UserError("Please add both pickup date and address")
+        else:
+            booking_values = {
+                'lead_id': self.lead_id.id,
+                'vehicle_id': self.lead_id.vehicle_id.id,
+                'location_id': self.location_id.id,
+                'remarks': self.remarks,
+                'dop': self.dop,
+                'booking_type': self.booking_type,
+                'pick_up_address': self.pick_up_address,
+                'service_type': self.service_type,
+                'due_date': self.due_date,
+                'user_id': self.user_id.id,
+                'team_id': self.team_id.id,
+                'vin_no': self.lead_id.vin_no
 
-        }
-        x = self.env['crm.lead'].create(lead_vals)
-        leads.write({'lead_id':x.id})
-        print(x,"55555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555555")
-
-        booking_values = {
-            'lead_id': self.lead_id.id,
-            'location_id': self.location_id.id,
-            'remarks': self.remarks,
-            'dop': self.dop,
-            'booking_type': self.booking_type,
-            'pick_up_address': self.pick_up_address,
-            'service_type': self.service_type,
-            'due_date': self.due_date
-
-        }
+            }
         bo = self.env['service.booking'].create(booking_values)
-        #return leads[0].redirect_opportunity_view()
+        # return leads[0].redirect_opportunity_view()
         return
-
-
-
-    def _create_partner(self, lead_id, action, partner_id):
-        """ Create partner based on action.
-            :return dict: dictionary organized as followed: {lead_id: partner_assigned_id}
-        """
-        #TODO this method in only called by Lead2OpportunityPartner
-        #wizard and would probably diserve to be refactored or at least
-        #moved to a better place
-        if action == 'each_exist_or_create':
-            partner_id = self.with_context(active_id=lead_id)._find_matching_partner()
-            action = 'create'
-        result = self.env['dms.vehicle.lead'].browse(lead_id).handle_partner_assignation(action, partner_id)
-        return result.get(lead_id)
-
-
-class Lead2OpportunityMassConvert(models.TransientModel):
-
-    _name = 'dms.lead2opportunity.partner.mass'
-    _description = 'Convert Lead to Opportunity (in mass)'
-    _inherit = 'dms.lead2opportunity.partner'
-
-    @api.model
-    def default_get(self, fields):
-        res = super(Lead2OpportunityMassConvert, self).default_get(fields)
-        if 'partner_id' in fields:  # avoid forcing the partner of the first lead as default
-            res['partner_id'] = False
-        if 'action' in fields:
-            res['action'] = 'each_exist_or_create'
-        if 'name' in fields:
-            res['name'] = 'convert'
-        if 'opportunity_ids' in fields:
-            res['opportunity_ids'] = False
-        return res
-
-    user_ids = fields.Many2many('res.users', string='Salesmen')
-    team_id = fields.Many2one('crm.team', 'Sales Team', index=True, oldname='section_id')
-    deduplicate = fields.Boolean('Apply deduplication', default=True, help='Merge with existing leads/opportunities of each partner')
-    action = fields.Selection([
-        ('each_exist_or_create', 'Use existing partner or create'),
-        ('nothing', 'Do not link to a customer')
-    ], 'Related Customer', required=True)
-    force_assignation = fields.Boolean('Force assignation', help='If unchecked, this will leave the salesman of duplicated opportunities')
-
-    @api.onchange('action')
-    def _onchange_action(self):
-        if self.action != 'exist':
-            self.partner_id = False
-
-    @api.onchange('deduplicate')
-    def _onchange_deduplicate(self):
-        active_leads = self.env['crm.lead'].browse(self._context['active_ids'])
-        partner_ids = [(lead.partner_id.id, lead.partner_id and lead.partner_id.email or lead.email_from) for lead in active_leads]
-        partners_duplicated_leads = {}
-        for partner_id, email in partner_ids:
-            duplicated_leads = self._get_duplicated_leads(partner_id, email)
-            if len(duplicated_leads) > 1:
-                partners_duplicated_leads.setdefault((partner_id, email), []).extend(duplicated_leads)
-
-        leads_with_duplicates = []
-        for lead in active_leads:
-            lead_tuple = (lead.partner_id.id, lead.partner_id.email if lead.partner_id else lead.email_from)
-            if len(partners_duplicated_leads.get(lead_tuple, [])) > 1:
-                leads_with_duplicates.append(lead.id)
-
-        self.opportunity_ids = self.env['crm.lead'].browse(leads_with_duplicates)
-
-    @api.multi
-    def _convert_opportunity(self, vals):
-        """ When "massively" (more than one at a time) converting leads to
-            opportunities, check the salesteam_id and salesmen_ids and update
-            the values before calling super.
-        """
-        self.ensure_one()
-        salesteam_id = self.team_id.id if self.team_id else False
-        salesmen_ids = []
-        if self.user_ids:
-            salesmen_ids = self.user_ids.ids
-        vals.update({'user_ids': salesmen_ids, 'team_id': salesteam_id})
-        return super(Lead2OpportunityMassConvert, self)._convert_opportunity(vals)
-
-    @api.multi
-    def mass_convert(self):
-        self.ensure_one()
-        if self.name == 'convert' and self.deduplicate:
-            merged_lead_ids = set()
-            remaining_lead_ids = set()
-            lead_selected = self._context.get('active_ids', [])
-            for lead_id in lead_selected:
-                if lead_id not in merged_lead_ids:
-                    lead = self.env['crm.lead'].browse(lead_id)
-                    duplicated_leads = self._get_duplicated_leads(lead.partner_id.id, lead.partner_id.email if lead.partner_id else lead.email_from)
-                    if len(duplicated_leads) > 1:
-                        lead = duplicated_leads.merge_opportunity()
-                        merged_lead_ids.update(duplicated_leads.ids)
-                        remaining_lead_ids.add(lead.id)
-            active_ids = set(self._context.get('active_ids', {}))
-            active_ids = (active_ids - merged_lead_ids) | remaining_lead_ids
-
-            self = self.with_context(active_ids=list(active_ids))  # only update active_ids when there are set
-        no_force_assignation = self._context.get('no_force_assignation', not self.force_assignation)
-        return self.with_context(no_force_assignation=no_force_assignation).action_apply()
