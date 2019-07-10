@@ -12,7 +12,7 @@
                     <group>
                         <field name="count" invisible="[('count','=',1)]" readonly="True"/>
                         <field name="advance_payment_method" class="oe_inline" widget="radio"
-                            attrs="{'invisible': [('count','&gt;',1)]}"/>
+                            invisible="1"/>
                         <field name="product_id"
                             context="{'search_default_services': 1, 'default_type': 'service', 'default_invoice_policy': 'order'}" class="oe_inline"
                             invisible="1"/>
@@ -20,14 +20,16 @@
                         <div attrs="{'invisible': [('advance_payment_method', 'not in', ('fixed','percentage'))]}">
                             <field name="amount"
                                 attrs="{'required': [('advance_payment_method', 'in', ('fixed','percentage'))]}" class="oe_inline" widget="monetary"/>
-                            <span
-                                attrs="{'invisible': [('advance_payment_method', '!=', 'percentage')]}" class="oe_inline">%</span>
                         </div>
                         <field name="deposit_account_id" class="oe_inline"
                             attrs="{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed', 'percentage')), ('product_id', '!=', False)]}" groups="account.group_account_manager"/>
                         <field name="deposit_taxes_id" class="oe_inline" widget="many2many_tags"
                             domain="[('type_tax_use','=','sale')]"
                             attrs="{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed', 'percentage')), ('product_id', '!=', False)]}"/>
+                        <field name="dob"/>
+                        <field name="priority" widget="priority" groups="base.group_user"/>
+
+
                     </group>
                     <footer>
                         <button name="create_booking" string="Book" type="object"

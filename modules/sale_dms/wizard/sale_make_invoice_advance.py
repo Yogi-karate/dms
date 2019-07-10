@@ -8,6 +8,9 @@ from odoo.addons import decimal_precision as dp
 from odoo.exceptions import UserError
 
 
+
+
+
 class SaleAdvancePaymentInv(models.TransientModel):
     _name = "dms.booking.payment.inv"
     _description = "Sales booking Payment Receipt"
@@ -40,12 +43,19 @@ class SaleAdvancePaymentInv(models.TransientModel):
     def _default_deposit_taxes_id(self):
         return self._default_product_id().taxes_id
 
+    priority = fields.Selection([
+        ('0', 'Low'),
+        ('1', 'Medium'),
+        ('2', 'High'),
+        ('3', 'Very High'),
+    ])
+    dob = fields.Datetime('Date of Booking',default=fields.Datetime.now)
     advance_payment_method = fields.Selection([
         ('delivered', 'Invoiceable lines'),
         ('all', 'Invoiceable lines (deduct down payments)'),
         ('percentage', 'Down payment (percentage)'),
         ('fixed', 'Down payment (fixed amount)')
-        ], string='What do you want to invoice?', default=_get_advance_payment_method, required=True)
+        ], string='What do you want to invoice?', default='fixed', required=True)
     product_id = fields.Many2one('product.product', string='Down Payment Product', domain=[('type', '=', 'service')],
         default=_default_product_id)
     count = fields.Integer(default=_count, string='Order Count')
@@ -53,7 +63,6 @@ class SaleAdvancePaymentInv(models.TransientModel):
     deposit_account_id = fields.Many2one("account.account", string="Income Account", domain=[('deprecated', '=', False)],
         help="Account used for deposits", default=_default_deposit_account_id)
     deposit_taxes_id = fields.Many2many("account.tax", string="Customer Taxes", help="Taxes used for deposits", default=_default_deposit_taxes_id)
-
     @api.onchange('advance_payment_method')
     def onchange_advance_payment_method(self):
         if self.advance_payment_method == 'percentage':
@@ -129,6 +138,10 @@ class SaleAdvancePaymentInv(models.TransientModel):
 
     @api.multi
     def create_booking(self):
+        sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
+        sale_orders.write({'state':'booked'})
+        print(self)
+        self.create_invoices()
         print("Hello from booking Action in pop up--------------!!!!!!!")
         return {'type': 'ir.actions.act_window_close'}
 
