@@ -156,6 +156,7 @@ class ServiceLeads(models.TransientModel):
     def _create_service_third_leads(self, vehicle, type, today):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
+
         if today + timedelta(7) == sale_date + timedelta(240) and vehicle.fuel_type == 'diesel':
             service_type = 'third'
             dict = self._prepare_leads(vehicle, type, today, service_type)
@@ -208,6 +209,14 @@ class ServiceLeads(models.TransientModel):
         self._clean_service_leads()
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Service Leads!!!!!!!!!!!!!!!!")
         self._process_service_leads()
+        _logger.info("****************Finished creating Service Leads****************")
+        pass
+
+    @api.model
+    def create_insurance_leads(self, autocommit=True):
+        self._clean_insurance_leads()
+        _logger.info("!!!!!!!!!!!!!!Starting Creation of Service Leads!!!!!!!!!!!!!!!!")
+        self._process_insurance_leads()
         _logger.info("****************Finished creating Service Leads****************")
         pass
 

@@ -10,6 +10,7 @@
     'description': "Vehicle Dealership Business Domain",
     'depends': ['sale_management'],
     'data': [
+        'wizard/sale_booking_views.xml',
         'views/sale_views.xml',
         'views/crm_team_views.xml',
         'views/pricelist_views.xml',

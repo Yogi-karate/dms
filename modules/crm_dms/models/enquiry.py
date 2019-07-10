@@ -96,6 +96,8 @@ class Enquiry(models.Model):
                                              compute='compute_color_attribute_values')
     test_drive = fields.Boolean('Test Drive', default=False, store=True)
     test_drive_date = fields.Date('Test Drive Date', help="Date of test drive")
+    multi_team_user = fields.Boolean('Multi team user', default=False, compute='check_multi_user')
+
 
     @api.onchange('id')
     def compute_id(self):
@@ -249,6 +251,7 @@ class Enquiry(models.Model):
                     res = self._prepare_opportunities(type)
                     res.update(self._assign_enquiry_user(type))
                     print(res)
+                    print("the company id",self.env.user.company_id)
                     id = lead.create(res)
                     self._schedule_follow_up(id)
             else:
@@ -270,8 +273,6 @@ class Enquiry(models.Model):
             res.update({'source_id': vals['source_id']})
         if 'product_id' in vals:
             product_template = self.env['product.template'].browse(vals['product_id'])
-
-
         leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self.id)])
         print(product_template.name, "(((((((((((((((((((((())))))))))))))))))))))))))))")
         vals['name'] = product_template.name + "-" + partner_name
