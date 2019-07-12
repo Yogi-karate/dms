@@ -45,9 +45,9 @@ class SaleAdvancePaymentInv(models.TransientModel):
 
     priority = fields.Selection([
         ('0', 'Low'),
-        ('1', 'Medium'),
-        ('2', 'High'),
-        ('3', 'Very High'),
+        ('1', 'On-Hold'),
+        ('2', 'Medium'),
+        ('3', 'High'),
     ])
     dob = fields.Datetime('Date of Booking',default=fields.Datetime.now)
     advance_payment_method = fields.Selection([
@@ -139,7 +139,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
     @api.multi
     def create_booking(self):
         sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
-        sale_orders.write({'state':'booked'})
+        sale_orders.write({'state':'booked','priority':self.priority,'dob':self.dob})
         print(self)
         self.create_invoices()
         print("Hello from booking Action in pop up--------------!!!!!!!")
@@ -182,7 +182,9 @@ class SaleAdvancePaymentInv(models.TransientModel):
                 so_line = sale_line_obj.create({
                     'name': _('Advance: %s') % (time.strftime('%m %Y'),),
                     'price_unit': amount,
-                    'product_uom_qty': 0.0,
+                    'price_total': amount,
+                    'price_subtotal': amount,
+                    'product_uom_qty': -1.0,
                     'order_id': order.id,
                     'discount': 0.0,
                     'product_uom': self.product_id.uom_id.id,

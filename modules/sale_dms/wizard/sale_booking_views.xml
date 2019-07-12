@@ -27,6 +27,7 @@
                             domain="[('type_tax_use','=','sale')]"
                             attrs="{'invisible': ['|', ('advance_payment_method', 'not in', ('fixed', 'percentage')), ('product_id', '!=', False)]}"/>
                         <field name="dob"/>
+
                         <field name="priority" widget="priority" groups="base.group_user"/>
 
 

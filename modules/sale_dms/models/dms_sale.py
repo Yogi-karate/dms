@@ -28,6 +28,38 @@ class DmsSaleOrder(models.Model):
         ('done', 'Locked'),
         ('cancel', 'Cancelled'),
         ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3, default='draft')
+    priority = fields.Selection([
+        ('0', 'Low'),
+        ('1', 'On-Hold'),
+        ('2', 'Medium'),
+        ('3', 'High'),
+    ])
+    stock_status = fields.Selection([
+        ('allotted', 'Allotted'),
+        ('not-allotted', 'Not-Allotted'),
+        ], string='Status', compute='_calculate_product', default='not-allotted')
+    dob = fields.Datetime('Date of Booking')
+    product_name = fields.Char('Model',compute='_calculate_product')
+    product_variant = fields.Char('Variant',compute='_calculate_product')
+    product_color = fields.Char('Color',compute='_calculate_product')
+
+    def _calculate_product(self):
+        for order in self:
+            for pick in order.picking_ids:
+                if pick.state == 'draft' or pick.state == 'confirmed' or pick.state == 'waiting':
+                    order.stock_status = 'not-allotted'
+                else:
+                    order.stock_status = 'allotted'
+            count = 0
+            for x in order.order_line:
+                if count > 0:
+                    break
+                count += 1
+                print(x.product_id)
+                order.product_name = x.product_id.name
+                order.product_variant = x.product_id.variant_value
+                order.product_color = x.product_id.color_value
+                print("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
 
 
 class DmsSaleOrderLine(models.Model):
