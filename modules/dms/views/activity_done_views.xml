@@ -56,6 +56,7 @@
                     <field name="team_id" string="Service Team"/>
                     <field name="author_id" string="Created By"/>
                     <field name="date" string="Activity Completion Date"/>
+                    
                     <field name="mobile"/>
                     <field name="user_id" string="Telecaller name"/>
                     <group expand="1" string="Group By">
