@@ -64,6 +64,15 @@ class VehicleLead(models.Model):
         # We only care for the customer if sale order is entered.
         self.source = self.vehicle_id.source
 
+    @api.multi
+    def reassign_users(self, user_id, team_id):
+        for enquiry in self:
+            vals = {
+                'user_id': user_id,
+                'team_id': team_id
+            }
+            enquiry.write(vals)
+
 class CrmLeadLost(models.TransientModel):
         _name = 'crm.lead.lost'
         _inherit = ['crm.lead.lost']
@@ -88,14 +97,7 @@ class CrmLeadLost(models.TransientModel):
 
 
 
-        @api.multi
-        def reassign_users(self, user_id, team_id):
-            for enquiry in self:
-                vals = {
-                    'user_id': user_id,
-                    'team_id': team_id
-                }
-                enquiry.write(vals)
+
 
 
 class ServiceBooking(models.Model):
