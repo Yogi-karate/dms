@@ -64,7 +64,7 @@ class SaleCleanup(models.TransientModel):
         _logger.info("The number of records to process =>" + str(len(self)))
         for customer in self:
             order = self.env['sale.order'].search([('name', '=', customer.order_no)], limit=1)
-            partner = self.env['res.partner'].search([('name', '=', customer.name), ('mobile', '=', customer.mobile)])
+            partner = self.env['res.partner'].search([('name', 'ilike', customer.name), ('mobile', '=', customer.mobile)])
             if partner and len(partner) > 1:
                 _logger.info("Duplicate customer in System", customer)
                 customer.write({'state': 'duplicate'})
