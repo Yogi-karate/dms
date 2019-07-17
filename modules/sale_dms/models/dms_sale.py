@@ -55,6 +55,7 @@ class SaleCleanup(models.TransientModel):
         ('draft', 'New'),
         ('duplicate', 'Duplicate'),
         ('cancel', 'Cancelled'),
+        ('no_order', 'No Order'),
         ('complete', 'Complete'),
     ], string='Status', copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='draft')
@@ -64,19 +65,24 @@ class SaleCleanup(models.TransientModel):
         _logger.info("The number of records to process =>" + str(len(self)))
         for customer in self:
             order = self.env['sale.order'].search([('name', '=', customer.order_no)], limit=1)
-            partner = self.env['res.partner'].search([('name', 'ilike', customer.name), ('mobile', '=', customer.mobile)])
+            partner = self.env['res.partner'].search(
+                [('name', 'ilike', customer.name), ('mobile', '=', customer.mobile)])
             if partner and len(partner) > 1:
-                _logger.info("Duplicate customer in System", customer)
+                _logger.info("Duplicate customer in System : %s", customer)
                 customer.write({'state': 'duplicate'})
                 continue
-            if not order or not partner:
-                _logger.info("No such Order or customer to reassign", customer)
+            if not order:
+                _logger.info("No such Order to reassign : %s", customer)
+                customer.write({'state': 'no_order'})
+                continue
+            if not partner:
+                _logger.info("No such customer to reassign : %s", customer)
                 customer.write({'state': 'cancel'})
                 continue
             order.write({'partner_id': partner.id})
             vehicle = self.env['vehicle'].search([('order_id', '=', order.id)])
             if not vehicle:
-                _logger.info("No such vehicle", customer)
+                _logger.info("No such vehicle : %s", order)
                 continue
             vehicle.write({'partner_id': partner.id})
             vehicle_leads = self.env['dms.vehicle.lead'].search([('vehicle_id', '=', vehicle.id)])
