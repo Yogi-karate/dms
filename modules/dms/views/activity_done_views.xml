@@ -86,7 +86,7 @@
             name="Activities Completed"
             parent="menu_dms_reports_root"
             action="crm_activity_report_done_action"
-            sequence="3"/>
+            sequence="3" groups="group_dms_telecaller"/>
 
        <record id="crm_activity_report_action_done_team" model="ir.actions.act_window">
            <field name="name">Activities Analysis</field>

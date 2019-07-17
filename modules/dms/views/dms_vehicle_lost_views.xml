@@ -91,7 +91,7 @@
     </record>
     <menuitem action="action_lost_reasons_screen"
               id ="menu_action_lost_reasons_screen"
-              parent="menu_dms_leads_root"
+              parent="menu_dms_configurations_root"
                string="Lost Reasons"
               sequence="4"/>
 </odoo>

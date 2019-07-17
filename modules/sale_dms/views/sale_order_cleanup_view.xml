@@ -1,0 +1,51 @@
+<odoo>
+     <record id="form_view_sale_order_cleanup" model="ir.ui.view">
+       <field name="name">dms.sale.cleanup.form</field>
+       <field name="model">dms.order.cleanup</field>
+       <field name="arch" type="xml">
+           <form string="Vehicles">
+              <header>
+                  <field name="state" widget="statusbar" statusbar_visible="draft,cancel" options="{'clickable': 1}"/>
+              </header>
+               <group string="Customer details" class="left">
+               <field name="name"/>
+               <field name="mobile"/>
+               <field name="order_no"/>
+               </group>
+           </form>
+       </field>
+   </record>
+     <record id="tree_view_sale_order_cleanup" model="ir.ui.view">
+       <field name="name">dms.sale_order.cleanup.tree</field>
+       <field name="model">dms.order.cleanup</field>
+       <field name="arch" type="xml">
+           <tree string="Cleanup records">
+               <field name="name"/>
+               <field name="mobile"/>
+               <field name="order_no"/>
+               <field name="state"/>
+           </tree>
+       </field>
+   </record>
+
+     <record id="action_clean_sale_orders" model="ir.actions.act_window">
+       <field name="name">Cleanup Saleorders</field>
+       <field name="type">ir.actions.act_window</field>
+       <field name="res_model">dms.order.cleanup</field>
+       <field name="view_ids"
+              eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('tree_view_sale_order_cleanup')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('form_view_sale_order_cleanup')})
+                          ]"/>
+       <field name="context"></field>
+       <field name="domain"></field>
+       <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+               Add a Sale cleanup record
+           </p>
+           <p>
+               create sale order clean up record
+           </p>
+       </field>
+   </record>
+</odoo>
