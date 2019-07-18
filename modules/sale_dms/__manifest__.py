@@ -21,6 +21,7 @@
         'security/sale_security.xml',
         'security/ir.model.access.csv',
         'wizard/source_deactivate.xml',
+        'views/invoice_views.xml',
     ],
     'installable': True,
     'auto_install': True,

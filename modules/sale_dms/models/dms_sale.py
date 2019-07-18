@@ -61,6 +61,54 @@ class DmsSaleOrder(models.Model):
                 order.product_color = x.product_id.color_value
                 print("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
 
+    @api.multi
+    def _write(self, values):
+        """ Override of private write method in order to generate activities
+        based in the invoice status. As the invoice status is a computed field
+        triggered notably when its lines and linked invoice status changes the
+        flow does not necessarily goes through write if the action was not done
+        on the SO itself. We hence override the _write to catch the computation
+        of invoice_status field. """
+        print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+        print(values)
+        print("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv",self.team_id.location_id.name)
+        location_name = self.team_id.location_id.name
+        if not location_name:
+            print("no location")
+        else:
+            if 'state' in values and values['state'] == 'booked':
+                    if 'Tirumalgiri' in location_name:
+                        values['name'] = self.env['ir.sequence'].next_by_code('sale.order.tir') or _('New')
+                    if 'Mettuguda' in location_name:
+                        values['name'] = self.env['ir.sequence'].next_by_code('sale.order.met') or _('New')
+                    if 'Ranigunj' in location_name:
+                        values['name'] = self.env['ir.sequence'].next_by_code('sale.order.rani') or _('New')
+
+        # if values.get('name', _('New')) == _('New'):
+        #     if 'company_id' in vals:
+        #         values['name'] = self.env['ir.sequence'].with_context(force_company=values['company_id']).next_by_code('sale.order') or _('New')
+        #     else:
+        #         values['name'] = self.env['ir.sequence'].next_by_code('sale.order') or _('New')
+        if self.env.context.get('mail_activity_automation_skip'):
+            return super(DmsSaleOrder, self)._write(values)
+
+        if 'invoice_status' in values:
+            if values['invoice_status'] == 'upselling':
+                filtered_self = self.search([('id', 'in', self.ids),
+                                             ('user_id', '!=', False),
+                                             ('invoice_status', '!=', 'upselling')])
+                filtered_self.activity_unlink(['sale.mail_act_sale_upsell'])
+                for order in filtered_self:
+                    order.activity_schedule(
+                        'sale.mail_act_sale_upsell',
+                        user_id=order.user_id.id,
+                        note=_(
+                            "Upsell <a href='#' data-oe-model='%s' data-oe-id='%d'>%s</a> for customer <a href='#' data-oe-model='%s' data-oe-id='%s'>%s</a>") % (
+                                 order._name, order.id, order.name,
+                                 order.partner_id._name, order.partner_id.id, order.partner_id.display_name))
+
+        return super(DmsSaleOrder, self)._write(values)
+
 
 class DmsSaleOrderLine(models.Model):
     _name = "sale.order.line"

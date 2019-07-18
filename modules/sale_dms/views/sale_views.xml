@@ -450,4 +450,27 @@
             parent="sale.sale_order_menu"
               action="action_product_booking"
             sequence="2"/>
+
+    <!-- sequences for sale booking orders-->
+    <record id="mettuguda_sale_order" model="ir.sequence">
+            <field name="name">Sales Order Mettuguda</field>
+            <field name="code">sale.order.met</field>
+            <field name="prefix">METN</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    <record id="tirumalgiri_sale_order" model="ir.sequence">
+            <field name="name">Sales Order Tirumalgiri</field>
+            <field name="code">sale.order.tir</field>
+            <field name="prefix">TRGN</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    <record id="ranigunj_sale_order" model="ir.sequence">
+            <field name="name">Sales Order Ranigunj</field>
+            <field name="code">sale.order.rani</field>
+            <field name="prefix">RNGN</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
 </odoo>
