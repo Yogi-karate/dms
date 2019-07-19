@@ -14,8 +14,9 @@
                 <field name="activity_date_deadline" string="Followup Date"/>
                 <field name="registration_no"/>
                 <field name="source"/>
-                <field name="user_id" string="Telecaller"/>
-                <field name="lost_reason"/>
+                <field name="user_id" string="Telecaller"/>=
+                <field name="dms_lost_reason"/>
+                <field name="lost_remarks"/>
                 <field name="contact_name" invisible="1"/>
                 <field name="city" invisible="1"/>
                 <field name="opportunity_type" invisible="1"/>
@@ -51,4 +52,46 @@
               parent="menu_dms_leads_root"
                string="Lost Leads"
               sequence="3"/>
+
+    <record id="dms_lost_reason_tree_new" model="ir.ui.view">
+        <field name="name">dms.lost.reason.tree</field>
+        <field name="model">dms.lost.reason</field>
+        <field name="arch" type="xml">
+            <tree string="Lost Reasons" >
+                <field name="name"/>
+
+            </tree>
+        </field>
+    </record>
+    <record id="dms_lost_reason_form_new" model="ir.ui.view">
+        <field name="name">dms.lost.reason.form</field>
+        <field name="model">dms.lost.reason</field>
+        <field name="arch" type="xml">
+            <form string="Lost Reasons">
+                <group string="Lost Reasons">
+                <field name="name"/>
+                <field name="active"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+
+<record id="action_lost_reasons_screen" model="ir.actions.act_window">
+        <field name="name">Lost Reasons</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.lost.reason</field>
+         <field name="view_ids"
+               eval="[(5, 0, 0),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('dms_lost_reason_tree_new')}),
+                           (0, 0, {'view_mode': 'form', 'view_id': ref('dms_lost_reason_form_new')})
+                           ]"/>
+        <field name="context"></field>
+        <field name="domain"></field>
+    </record>
+    <menuitem action="action_lost_reasons_screen"
+              id ="menu_action_lost_reasons_screen"
+              parent="menu_dms_configurations_root"
+               string="Lost Reasons"
+              sequence="4"/>
 </odoo>

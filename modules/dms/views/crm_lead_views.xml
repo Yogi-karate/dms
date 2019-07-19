@@ -6,7 +6,8 @@
             <field name="arch" type="xml">
                 <form string="Lost Reason">
                     <group class="oe_title">
-                        <field name="lost_reason_id"/>
+                        <field name="dms_lost_reason"/>
+                        <field name="lost_remarks"/>
                     </group>
                     <footer>
                         <button name="action_lost_reason_apply_new" string="Submit" type="object" class="btn-primary"/>
@@ -104,7 +105,7 @@
                             </div>
                             <field name="is_blacklisted" invisible="1"/>
                             <field name="service_type"/>
-                            <field name="source"/>
+                            <field name="source" groups="dms.group_dms_callcenter_manager"/>
                             <label for="email_from" class="oe_inline"/>
                             <div class="o_row o_row_readonly">
                                 <i class="fa fa-ban" style="color: red;" role="img"
@@ -186,7 +187,7 @@
                 <field name="mobile"/>
                 <field name="activity_date_deadline" string="Followup Date"/>
                 <field name="registration_no"/>
-                <field name="source"/>
+                <field name="source" groups="dms.group_dms_callcenter_manager"/>
                 <field name="user_id" string="Telecaller"/>
                 <field name="activity_summary" string="Summary"/>
                 <field name="contact_name" invisible="1"/>
@@ -252,12 +253,12 @@
 
     <menuitem action="action_new_lead_form" id="menu_action_vehicle_lead_form"
               parent="menu_dms_leads_root"
-              sequence="1"/>
+              sequence="1" groups = "group_dms_telecaller"/>
 
      <menuitem action="action_service_booking" id="menu_action_vehicle_lead_form_oppor"
-              parent="menu_dms_leads_root"
+              parent="menu_dms_reports_root"
                string="Bookings"
-              sequence="2"/>
+              sequence="2" groups = "group_dms_telecaller"/>
 
 
 

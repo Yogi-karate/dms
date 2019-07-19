@@ -49,6 +49,8 @@ class VehicleLead(models.Model):
         ('rr', 'Running Repair'),
         ('Insurance', 'Insurance'),
     ], string='Service Type', store=True, default='first')
+    dms_lost_reason = fields.Many2one('dms.lost.reason', string='Lost Reason')
+    lost_remarks = fields.Char('Remarks')
 
     @api.model
     def create(self, vals):
@@ -62,24 +64,38 @@ class VehicleLead(models.Model):
         # We only care for the customer if sale order is entered.
         self.source = self.vehicle_id.source
 
-    class CrmLeadLost(models.TransientModel):
+class CrmLeadLost(models.TransientModel):
         _name = 'crm.lead.lost'
         _inherit = ['crm.lead.lost']
+        dms_lost_reason = fields.Many2one('dms.lost.reason',string='Lost Reason')
+        lost_remarks = fields.Char('Remarks')
 
         @api.multi
         def action_lost_reason_apply_new(self):
             leads = self.env['dms.vehicle.lead'].browse(self.env.context.get('active_ids'))
-            leads.write({'lost_reason': self.lost_reason_id.id})
+            leads.write({'lost_reason': self.lost_reason_id.id,'dms_lost_reason':self.dms_lost_reason.id,'lost_remarks':self.lost_remarks})
             return leads.action_set_lost()
 
-    @api.multi
-    def reassign_users(self, user_id, team_id):
-        for enquiry in self:
-            vals = {
-                'user_id': user_id,
-                'team_id': team_id
-            }
-            enquiry.write(vals)
+        def action_lost_reason_leads(self,leads):
+            leads.write({'lost_reason': self.lost_reason_id.id,'dms_lost_reason':self.dms_lost_reason.id,'lost_remarks':self.lost_remarks})
+            return leads.action_set_lost()
+
+        @api.multi
+        def action_booking_reason_apply_new(self):
+            bookings = self.env['service.booking'].browse(self.env.context.get('active_ids'))
+            self.action_lost_reason_leads(bookings.lead_id)
+            bookings.write({'active': False})
+
+
+
+        @api.multi
+        def reassign_users(self, user_id, team_id):
+            for enquiry in self:
+                vals = {
+                    'user_id': user_id,
+                    'team_id': team_id
+                }
+                enquiry.write(vals)
 
 
 class ServiceBooking(models.Model):
@@ -105,6 +121,7 @@ class ServiceBooking(models.Model):
     team_id = fields.Many2one('crm.team', compute='_lead_values',store=True)
     service_type = fields.Char('Service Type', compute='_lead_values', store=True)
     source = fields.Char('Source',compute='_lead_values')
+    active = fields.Boolean(default=True)
 
     @api.onchange('id')
     def _lead_values(self):
@@ -117,5 +134,19 @@ class ServiceBooking(models.Model):
             booking.user_id = booking.lead_id.user_id
             booking.team_id = booking.lead_id.team_id
             booking.service_type = booking.lead_id.service_type
+
+    @api.multi
+    def restore_booking_lost_action_new(self):
+        print(self)
+        print(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>")
+        print(self)
+        self.write({'active': True})
+        lead = self.sudo().env['dms.vehicle.lead'].browse(self.lead_id.id)
+        lead.write({'active': True})
+
+class LostReason(models.Model):
+    _name = "dms.lost.reason"
+    _inherit = ["crm.lost.reason"]
+    _description = 'Dms Lost Reason'
 
 

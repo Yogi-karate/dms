@@ -17,6 +17,7 @@
         'views/create_product_variant.xml',
         'views/dms_pricelist_views.xml',
         'views/res_bank_views.xml',
+        'views/sale_order_cleanup_view.xml',
         'report/pdf_report_templates.xml',
         'security/sale_security.xml',
         'security/ir.model.access.csv',
