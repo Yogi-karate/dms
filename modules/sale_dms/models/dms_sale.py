@@ -57,6 +57,14 @@ class DmsSaleOrder(models.Model):
                 order.product_variant = x.product_id.variant_value
                 order.product_color = x.product_id.color_value
                 print("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+    @api.multi
+    def _force_lines_to_invoice_policy_order(self):
+        for line in self.order_line:
+            if self.state in ['sale', 'done']:
+                line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
+            else:
+                line.qty_to_invoice = 0
+
 
     @api.multi
     def _write(self, values):
@@ -80,6 +88,8 @@ class DmsSaleOrder(models.Model):
                         values['name'] = self.env['ir.sequence'].next_by_code('sale.order.met') or _('New')
                     if 'Ranigunj' in location_name:
                         values['name'] = self.env['ir.sequence'].next_by_code('sale.order.rani') or _('New')
+                    if 'Nacharam' in location_name:
+                        values['name'] = self.env['ir.sequence'].next_by_code('sale.order.nac') or _('New')
 
         # if values.get('name', _('New')) == _('New'):
         #     if 'company_id' in vals:
@@ -128,6 +138,21 @@ class DmsSaleOrderLine(models.Model):
                 'price_total': taxes['total_included'],
                 'price_subtotal': taxes['total_excluded'],
             })
+
+    @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state')
+    def _get_to_invoice_qty(self):
+        """
+        Compute the quantity to invoice. If the invoice policy is order, the quantity to invoice is
+        calculated from the ordered quantity. Otherwise, the quantity delivered is used.
+        """
+        for line in self:
+            if line.order_id.state in ['sale','booked', 'done']:
+                if line.product_id.invoice_policy == 'order':
+                    line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
+                else:
+                    line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
+            else:
+                line.qty_to_invoice = 0
 
     @api.depends('price_unit', 'discount_price')
     def _get_price_reduce(self):

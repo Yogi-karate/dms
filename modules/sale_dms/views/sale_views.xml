@@ -23,7 +23,7 @@
                     <button name="%(sale_dms.action_view_sale_booking_payment_inv)d" string="Book"
                     type="action"
 
-                    attrs="{'invisible': [('state', '!=', 'sale')]}"/>
+                    attrs="{'invisible': [('state', '!=', 'sale')]}" groups="account.group_account_invoice"/>
                     <button name="action_confirm"
                         string="Confirm" type="object"
                         attrs="{'invisible': [('state', 'not in', ['draft'])]}"/>
@@ -415,7 +415,7 @@
                     <field name="state"/>
                     <field name="stock_status" string="Allotted/Not Allotted"/>
                     <field name="amount_total" string="Bal Amt" sum="Total Tax Included" widget="monetary" />
-                    <field name="priority" groups="sales_team.group_sale_manager"/>
+                    <field name="priority" groups="sales_team.group_sale_manager" widget="priority" />
                     <field name="commitment_date" groups="sale.group_sale_order_dates" invisible="1"/>
                     <field name="expected_date" groups="sale.group_sale_order_dates" invisible="1"/>
                     <field name="partner_id" invisible="1"/>
@@ -448,6 +448,7 @@
     <menuitem id="sale_booking_menu"
             name="Bookings List"
             parent="sale.sale_order_menu"
+              groups="account.group_account_invoice"
               action="action_product_booking"
             sequence="2"/>
 
@@ -470,6 +471,13 @@
             <field name="name">Sales Order Ranigunj</field>
             <field name="code">sale.order.rani</field>
             <field name="prefix">RNGN</field>
+            <field name="padding">3</field>
+            <field name="company_id" eval="False"/>
+        </record>
+    <record id="nacharam_sale_order" model="ir.sequence">
+            <field name="name">Sales Order Nacharam</field>
+            <field name="code">sale.order.nac</field>
+            <field name="prefix">NAC</field>
             <field name="padding">3</field>
             <field name="company_id" eval="False"/>
         </record>

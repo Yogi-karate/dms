@@ -82,7 +82,8 @@ class SaleAdvancePaymentInv(models.TransientModel):
             account_id = order.fiscal_position_id.map_account(inc_acc).id if inc_acc else False
         if not account_id:
             raise UserError(
-                _('There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') %
+                _(
+                    'There is no income account defined for this product: "%s". You may have to install a chart of account from Accounting app, settings menu.') %
                 (self.product_id.name,))
 
         if self.amount <= 0.00:
@@ -100,7 +101,10 @@ class SaleAdvancePaymentInv(models.TransientModel):
             tax_ids = order.fiscal_position_id.map_tax(taxes, self.product_id, order.partner_shipping_id).ids
         else:
             tax_ids = taxes.ids
-
+        print("kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk")
+        print(self.product_id.uom_id.id)
+        print(self.product_id.id)
+        print(self.env.ref('mail.mt_note').id)
         invoice = inv_obj.create({
             'name': order.client_order_ref or order.name,
             'origin': order.name,
@@ -132,23 +136,14 @@ class SaleAdvancePaymentInv(models.TransientModel):
         })
         invoice.compute_taxes()
         invoice.message_post_with_view('mail.message_origin_link',
-                    values={'self': invoice, 'origin': order},
-                    subtype_id=self.env.ref('mail.mt_note').id)
+                                       values={'self': invoice, 'origin': order},
+                                       subtype_id=self.env.ref('mail.mt_note').id)
         return invoice
-
-    @api.multi
-    def create_booking(self):
-        sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
-        sale_orders.write({'state':'booked','priority':self.priority,'dob':self.dob})
-        print(self)
-        self.create_invoices()
-        print("Hello from booking Action in pop up--------------!!!!!!!")
-        return {'type': 'ir.actions.act_window_close'}
 
     @api.multi
     def create_invoices(self):
         sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
-
+        sale_orders.write({'state': 'booked', 'priority': self.priority, 'dob': self.dob})
         if self.advance_payment_method == 'delivered':
             sale_orders.action_invoice_create()
         elif self.advance_payment_method == 'all':
@@ -167,10 +162,13 @@ class SaleAdvancePaymentInv(models.TransientModel):
                 else:
                     amount = self.amount
                 if self.product_id.invoice_policy != 'order':
-                    raise UserError(_('The product used to invoice a down payment should have an invoice policy set to "Ordered quantities". Please update your deposit product to be able to create a deposit invoice.'))
+                    raise UserError(_(
+                        'The product used to invoice a down payment should have an invoice policy set to "Ordered quantities". Please update your deposit product to be able to create a deposit invoice.'))
                 if self.product_id.type != 'service':
-                    raise UserError(_("The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."))
-                taxes = self.product_id.taxes_id.filtered(lambda r: not order.company_id or r.company_id == order.company_id)
+                    raise UserError(_(
+                        "The product used to invoice a down payment should be of type 'Service'. Please use another product or update this product."))
+                taxes = self.product_id.taxes_id.filtered(
+                    lambda r: not order.company_id or r.company_id == order.company_id)
                 if order.fiscal_position_id and taxes:
                     tax_ids = order.fiscal_position_id.map_tax(taxes, self.product_id, order.partner_shipping_id).ids
                 else:
@@ -182,9 +180,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
                 so_line = sale_line_obj.create({
                     'name': _('Advance: %s') % (time.strftime('%m %Y'),),
                     'price_unit': amount,
-                    'price_total': amount,
-                    'price_subtotal': amount,
-                    'product_uom_qty': -1.0,
+                    'product_uom_qty': 0.0,
                     'order_id': order.id,
                     'discount': 0.0,
                     'product_uom': self.product_id.uom_id.id,
@@ -198,6 +194,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
         if self._context.get('open_invoices', False):
             return sale_orders.action_view_invoice()
         return {'type': 'ir.actions.act_window_close'}
+
 
     def _prepare_deposit_product(self):
         return {

@@ -33,7 +33,7 @@
 
                     </group>
                     <footer>
-                        <button name="create_booking" string="Book" type="object"
+                        <button name="create_invoices" string="Book" type="object"
                             class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
                     </footer>
