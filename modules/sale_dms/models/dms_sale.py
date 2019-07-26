@@ -39,6 +39,7 @@ class DmsSaleOrder(models.Model):
     product_name = fields.Char('Model',compute='_calculate_product')
     product_variant = fields.Char('Variant',compute='_calculate_product')
     product_color = fields.Char('Color',compute='_calculate_product')
+    blnc_amt = fields.Float('Balance Amount',compute='_calculate_product')
 
     def _calculate_product(self):
         for order in self:
@@ -48,15 +49,18 @@ class DmsSaleOrder(models.Model):
                 else:
                     order.stock_status = 'allotted'
             count = 0
+            order.blnc_amt = order.amount_total
             for x in order.order_line:
-                if count > 0:
-                    break
+                if count == 0:
+                    order.product_name = x.product_id.name
+                    order.product_variant = x.product_id.variant_value
+                    order.product_color = x.product_id.color_value
                 count += 1
                 print(x.product_id)
-                order.product_name = x.product_id.name
-                order.product_variant = x.product_id.variant_value
-                order.product_color = x.product_id.color_value
-                print("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+                if x.is_downpayment:
+                    order.blnc_amt = order.amount_total - x.price_unit
+            print("000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
+            print(x.price_unit, "---------", order.name, "..............",order.amount_total,"..............",order.blnc_amt)
     @api.multi
     def _force_lines_to_invoice_policy_order(self):
         for line in self.order_line:

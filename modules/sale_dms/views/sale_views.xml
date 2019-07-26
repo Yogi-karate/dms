@@ -22,7 +22,6 @@
                         attrs="{'invisible': [('state', 'not in', ['sent'])]}"/>
                     <button name="%(sale_dms.action_view_sale_booking_payment_inv)d" string="Book"
                     type="action"
-
                     attrs="{'invisible': [('state', '!=', 'sale')]}" groups="account.group_account_invoice"/>
                     <button name="action_confirm"
                         string="Confirm" type="object"
@@ -390,7 +389,9 @@
             <xpath expr="//button[@name='action_quotation_send']" position="before">
                 <button name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
                     type="action" class="btn-primary"
-                    attrs="{'invisible': [('invoice_status', '!=', 'to invoice')]}"/>
+                    attrs="{'invisible': ['|',('invoice_status', '!=', 'to invoice'),('state', '!=', 'booked')]}"
+                  groups="account.group_account_invoice"
+                />
                 <button name="%(sale.action_view_sale_advance_payment_inv)d" string="Create Invoice"
                     type="action" context="{'default_advance_payment_method': 'percentage'}"
                     attrs="{'invisible': ['|',('invoice_status', '!=', 'no'), ('state', '!=', 'booked')]}"/>
@@ -414,7 +415,7 @@
                     <field name="product_color"/>
                     <field name="state"/>
                     <field name="stock_status" string="Allotted/Not Allotted"/>
-                    <field name="amount_total" string="Bal Amt" sum="Total Tax Included" widget="monetary" />
+                    <field name="blnc_amt" string="Bal Amt" sum="Total Tax Included" widget="monetary" />
                     <field name="priority" groups="sales_team.group_sale_manager" widget="priority" />
                     <field name="commitment_date" groups="sale.group_sale_order_dates" invisible="1"/>
                     <field name="expected_date" groups="sale.group_sale_order_dates" invisible="1"/>
