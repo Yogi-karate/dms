@@ -416,7 +416,7 @@
                     <field name="state"/>
                     <field name="stock_status" string="Allotted/Not Allotted"/>
                     <field name="blnc_amt" string="Bal Amt" sum="Total Tax Included" widget="monetary" />
-                    <field name="priority" groups="sales_team.group_sale_manager" widget="priority" />
+                    <field name="priority" groups="sales_team.group_sale_manager,account.group_account_user" widget="priority" />
                     <field name="commitment_date" groups="sale.group_sale_order_dates" invisible="1"/>
                     <field name="expected_date" groups="sale.group_sale_order_dates" invisible="1"/>
                     <field name="partner_id" invisible="1"/>
