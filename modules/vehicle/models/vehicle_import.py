@@ -4,7 +4,7 @@ from odoo import api, fields, models, tools
 _logger = logging.getLogger(__name__)
 
 
-class ODVehicle(models.TransientModel):
+class ODVehicle(models.Model):
     _name = 'dms.vehicle.import'
     vin_no = fields.Char('VIN No')
     reg_no = fields.Char('Reg no')
@@ -36,28 +36,40 @@ class ODVehicle(models.TransientModel):
 
     @api.model
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([('state', '!=', 'cancel')], limit=10000)
+        od_vehicles = self.env['dms.vehicle.import'].search([])
         _logger.info("The number of records to process =>" + str(len(od_vehicles)))
         count = 0
         for vehicle in od_vehicles:
             count = count + 1
             self = self.sudo()
+            if not vehicle.model:
+                print("no model",vehicle.model)
+                continue
             product = self.env['product.product'].search(
                 [('name', 'ilike', vehicle.model), ('fuel_type', 'ilike', vehicle.fuel_type)], limit=1)
             if not product or not vehicle.vin_no or not vehicle.customer_name or not vehicle.date_of_sale:
-                print("Cannot process vehicle -> ", vehicle.vin_no, vehicle.customer_name, count)
+                print("Cannot process vehicle -> ", count)
                 vehicle.state = 'cancel'
                 continue
             print("In Vehicle loop of import ^^^^^^^^", vehicle.customer_name, vehicle.vin_no, vehicle.date_of_sale,
                   product)
             duplicate = self.env['vehicle'].search([('name','=',vehicle.vin_no)])
             if duplicate:
-                print("Cannot process duplicate vehicle -> ", vehicle.vin_no, vehicle.customer_name, count)
+                print("Cannot process duplicate vehicle -> ", count)
                 vehicle.state = 'cancel'
                 continue
 
             _logger.info("-----------Starting creation of partner and vehicle------------")
-            partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
+            Partner = self.env['res.partner']
+            partner = Partner.search([('name', 'ilike', '%' + vehicle.customer_name + '%'),
+                                      ('mobile', 'ilike', '%' + vehicle.mobile + '%')], limit=1)
+            if not partner:
+                partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
+            source = ''
+            if not self.dealer == 'saboo':
+                    source = 'saboo'
+            else:
+                    source = 'od'
             vals = {
                 'name': vehicle.vin_no,
                 'chassis_no': vehicle.chassis_no,
@@ -66,7 +78,7 @@ class ODVehicle(models.TransientModel):
                 'dealer_name': vehicle.dealer,
                 'partner_id': partner.id,
                 'product_id': product.id,
-                'source': 'od',
+                'source': source,
                 'no_lot': True
             }
             self.env['vehicle'].create(vals)
