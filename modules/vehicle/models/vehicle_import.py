@@ -45,15 +45,25 @@ class ODVehicle(models.Model):
             if not vehicle.model:
                 print("no model",vehicle.model)
                 continue
-            product = self.env['product.product'].search(
-                [('name', 'ilike', vehicle.model), ('fuel_type', 'ilike', vehicle.fuel_type)], limit=1)
+            name = vehicle.model.strip()
+            fuel = vehicle.fuel_type.strip()
+            pro = self.env['product.product'].search([('name', 'ilike',name)], limit=1)
+            print(pro,"length of------------------------ ",vehicle.model,"---is---",len(vehicle.model))
+            product = self.env['product.product'].search([('name', 'ilike', name), ('fuel_type', 'ilike', fuel)], limit=1)
+            if not product:
+                print("not product")
+                print(vehicle.model,"--------------------------------",vehicle.fuel_type)
+                print(vehicle.model)
             if not product or not vehicle.vin_no or not vehicle.customer_name or not vehicle.date_of_sale:
                 print("Cannot process vehicle -> ", count)
+                print(product)
+                print(vehicle.vin_no)
+                print(vehicle.customer_name)
+                print(vehicle.date_of_sale)
+                print("--------------------------------------------------------------------------")
                 vehicle.state = 'cancel'
                 continue
-            print("In Vehicle loop of import ^^^^^^^^", vehicle.customer_name, vehicle.vin_no, vehicle.date_of_sale,
-                  product)
-            duplicate = self.env['vehicle'].search([('name','=',vehicle.vin_no)])
+            duplicate = self.env['vehicle'].search(['|',('name','=',vehicle.vin_no),('chassis_no','=',vehicle.vin_no)])
             if duplicate:
                 print("Cannot process duplicate vehicle -> ", count)
                 vehicle.state = 'cancel'
