@@ -47,15 +47,12 @@ class ODVehicle(models.Model):
                 continue
             name = vehicle.model.strip()
             fuel = vehicle.fuel_type.strip()
-            pro = self.env['product.product'].search([('name', 'ilike',name)], limit=1)
-            print(pro,"length of------------------------ ",vehicle.model,"---is---",len(vehicle.model))
+            # pro = self.env['product.product'].search([('name', 'ilike',name)], limit=1)
+            # print(pro,"length of------------------------ ",vehicle.model,"---is---",len(vehicle.model))
             product = self.env['product.product'].search([('name', 'ilike', name), ('fuel_type', 'ilike', fuel)], limit=1)
-            if not product:
-                print("not product")
-                print(vehicle.model,"--------------------------------",vehicle.fuel_type)
-                print(vehicle.model)
+
             if not product or not vehicle.vin_no or not vehicle.customer_name or not vehicle.date_of_sale:
-                print("Cannot process vehicle -> ", count)
+                print("Cannot process vehicle ----------------> ", count)
                 print(product)
                 print(vehicle.vin_no)
                 print(vehicle.customer_name)
@@ -65,7 +62,7 @@ class ODVehicle(models.Model):
                 continue
             duplicate = self.env['vehicle'].search(['|',('name','=',vehicle.vin_no),('chassis_no','=',vehicle.vin_no)])
             if duplicate:
-                print("Cannot process duplicate vehicle -> ", count)
+                print("Cannot process duplicate vehicle------------------------------------------------------------------------------------ -> ", count)
                 vehicle.state = 'cancel'
                 continue
 
@@ -76,7 +73,9 @@ class ODVehicle(models.Model):
             if not partner:
                 partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             source = ''
-            if not self.dealer == 'saboo':
+            if not vehicle.dealer.lower():
+                    source = 'od'
+            elif 'saboo' in vehicle.dealer.lower() or 'prashant' in vehicle.dealer.lower()  :
                     source = 'saboo'
             else:
                     source = 'od'
