@@ -37,7 +37,7 @@ class ODVehicle(models.Model):
 
     @api.model
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([('state','!=','cancel')],limit=10000)
+        od_vehicles = self.env['dms.vehicle.import'].search([('state', '!=', 'cancel')], limit=10000)
         _logger.info("The number of records to process =>" + str(len(od_vehicles)))
         count = 0
         ignore_reason = ''
@@ -45,16 +45,24 @@ class ODVehicle(models.Model):
             count = count + 1
             self = self.sudo()
             if not vehicle.model:
-                print("no model",vehicle.model)
+                print("no model", vehicle.model)
+                ignore_reason = 'Vehicle Model not present'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
+            if not vehicle.fuel_type:
+                print("no fuel type", vehicle.model)
+                ignore_reason = 'Vehicle Fuel Type not present'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
             name = vehicle.model.strip()
             fuel = vehicle.fuel_type.strip()
             # pro = self.env['product.product'].search([('name', 'ilike',vehicle.model)], limit=1)
             # print(pro,"length of------------------------ ",vehicle.model,"---is---",len(vehicle.model))
-            product = self.env['product.product'].search([('name', 'ilike', name), ('fuel_type', 'ilike', fuel)], limit=1)
+            product = self.env['product.product'].search([('name', 'ilike', name), ('fuel_type', 'ilike', fuel)],
+                                                         limit=1)
             if not product:
                 ignore_reason = 'Product not present'
-                vehicle.write({'ignore_reason':ignore_reason,'state':'cancel'})
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
             if not vehicle.vin_no or not vehicle.date_of_sale:
                 ignore_reason = 'Vin or sale date is null'
@@ -65,9 +73,12 @@ class ODVehicle(models.Model):
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
 
-            duplicate = self.env['vehicle'].search(['|',('name','=',vehicle.vin_no),('chassis_no','=',vehicle.vin_no)])
+            duplicate = self.env['vehicle'].search(
+                ['|', ('name', '=', vehicle.vin_no), ('chassis_no', '=', vehicle.vin_no)])
             if duplicate:
-                print("Cannot process duplicate vehicle------------------------------------------------------------------------------------ -> ", count)
+                print(
+                    "Cannot process duplicate vehicle------------------------------------------------------------------------------------ -> ",
+                    count)
                 ignore_reason = 'Duplicate Vehicle'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
@@ -80,11 +91,11 @@ class ODVehicle(models.Model):
                 partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             source = ''
             if not vehicle.dealer:
-                        source = 'od'
-            elif 'saboo' in vehicle.dealer.lower() or 'prashant' in vehicle.dealer.lower()  :
-                        source = 'saboo'
+                source = 'od'
+            elif 'saboo' in vehicle.dealer.lower() or 'prashant' in vehicle.dealer.lower():
+                source = 'saboo'
             else:
-                        source = 'od'
+                source = 'od'
             vals = {
                 'name': vehicle.vin_no,
                 'chassis_no': vehicle.chassis_no,
