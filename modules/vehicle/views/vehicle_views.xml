@@ -109,6 +109,7 @@
                <field name="fuel_type"/>
                <field name="last_service_KM"/>
                <field name="dealer"/>
+                   <field name="ignore_reason"/>
                </group>
 
            </form>
@@ -131,6 +132,7 @@
                <field name="address"/>
                <field name="mobile" />
                <field name="state"/>
+               <field name="ignore_reason"/>
            </tree>
        </field>
    </record>
