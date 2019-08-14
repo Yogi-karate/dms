@@ -73,12 +73,12 @@ class ODVehicle(models.Model):
             if not partner:
                 partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             source = ''
-            if not vehicle.dealer.lower():
-                    source = 'od'
+            if not vehicle.dealer:
+                        source = 'od'
             elif 'saboo' in vehicle.dealer.lower() or 'prashant' in vehicle.dealer.lower()  :
-                    source = 'saboo'
+                        source = 'saboo'
             else:
-                    source = 'od'
+                        source = 'od'
             vals = {
                 'name': vehicle.vin_no,
                 'chassis_no': vehicle.chassis_no,
