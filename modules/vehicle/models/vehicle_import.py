@@ -37,7 +37,7 @@ class ODVehicle(models.Model):
 
     @api.model
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([])
+        od_vehicles = self.env['dms.vehicle.import'].search([('state','!=','cancel')],limit=10000)
         _logger.info("The number of records to process =>" + str(len(od_vehicles)))
         count = 0
         ignore_reason = ''
