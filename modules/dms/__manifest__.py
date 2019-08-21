@@ -22,6 +22,7 @@
         'data/vehicle_import_cron_data.xml',
         'wizard/dms_vehicle_lead_assign.xml',
         'views/dms_vehicle_lost_views.xml',
+        'views/booking_insurance.xml',
 
     ],
     'installable': True,

@@ -42,4 +42,46 @@
 
 
 
+    <record id="view_dms_lead2opportunity_partner_insurance" model="ir.ui.view">
+            <field name="name">dms.lead2opportunity.partner.form</field>
+            <field name="model">dms.lead2opportunity.partner</field>
+            <field name="arch" type="xml">
+                <form string="Create an Insurance">
+                    <group>
+                        <field name="name"/>
+                        <field name="mobile"/>
+                        <field name="alternate_no"/>
+                        <field name="due_date"/>
+                        <field name="policy_no"/>
+                        <field name="previous_insurance_company"/>
+                        <field name="rollover_company"/>
+                        <field name="previous_idv"/>
+                        <field name="idv"/>
+                        <field name="booking_type_insurance"/>
+                        <field name="final_premimum"/>
+                    </group>
+                    <group name="action" attrs="{'invisible': [('name', '!=', 'convert')]}" string="Customers" col="1">
+                        <field name="action" nolabel="1" widget="radio"/>
+                        <group col="2">
+                            <field name="partner_id" widget="res_partner_many2one" domain="[('customer', '=', True)]" context="{'search_default_customer': 1, 'show_vat': True}" attrs="{'required': [('action', '=', 'exist')], 'invisible':[('action','!=','exist')]}"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_apply_insurance" string="Confirm Booking" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+
+
+    <record id="action_dms_lead2opportunity_partner_insurance" model="ir.actions.act_window">
+            <field name="name">Insurance Booking</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">dms.lead2opportunity.partner</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_dms_lead2opportunity_partner_insurance"/>
+            <field name="target">new</field>
+        </record>
 </odoo>
