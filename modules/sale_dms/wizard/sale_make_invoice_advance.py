@@ -191,6 +191,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
                 })
                 del context
                 self._create_invoice(order, so_line, amount)
+        sale_orders.action_invoice_create(final=True)
         if self._context.get('open_invoices', False):
             return sale_orders.action_view_invoice()
         return {'type': 'ir.actions.act_window_close'}
