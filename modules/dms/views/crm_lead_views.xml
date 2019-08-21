@@ -227,14 +227,14 @@
     </record>
 
     <record id="action_new_lead_form" model="ir.actions.act_window">
-        <field name="name">Calls</field>
+        <field name="name">Service Calls</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">dms.vehicle.lead</field>
         <field name="view_ids"
                eval="[(5, 0, 0),
                            (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_leads_new')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_leads_new')})]"/>
-        <field name="domain">[('type','=','lead')]</field>
+        <field name="domain">['&amp;',('type','=','lead'),('call_type','=','Service')]</field>
          <field name="context">{
             'default_user_id': uid,
             'search_default_assigned_to_me': 1
@@ -251,13 +251,239 @@
         </field>
     </record>
 
-    <menuitem action="action_new_lead_form" id="menu_action_vehicle_lead_form"
+
+
+
+
+
+
+      <record id="crm_case_form_view_leads_new_insur" model="ir.ui.view">
+        <field name="name">crm.lead.form.lead.new.insur</field>
+        <field name="model">dms.vehicle.lead</field>
+        <field name="arch" type="xml">
+            <form string="Leads Form">
+                <header>
+                    <button name="%(action_dms_lead2opportunity_partner)d" string="Book a Service"
+                            type="action"
+                            help="Book a Service" class="oe_highlight"
+                            attrs="{'invisible': [('type', '=', 'opportunity')]}"/>
+                    <button name="toggle_active"
+                            string="Restore"
+                            type="object"
+                            attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}"/>
+                  <!--  <button name="action_set_lost"
+                            string="Mark as Lost"
+                            type="object"
+                            attrs="{'invisible': ['&amp;', ('probability', '=', 0), ('active', '=', False)]}"/> -->
+
+                    <button name="%(crm_lead_lost_action_new)d" string="Mark as Lost"
+                                type="action" class="oe_highlight"
+                                context="{'default_lead_id': active_id}"
+                                attrs="{'invisible': [('active', '=', False),('probability', '&lt;', 100)]}"/>
+                </header>
+                <sheet>
+                    <field name="active" invisible="1"/>
+                    <div class="oe_button_box" name="button_box">
+                    </div>
+                    <div class="badge-pill badge-danger float-right"
+                         attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}">Lost
+                    </div>
+                    <div class="badge-pill badge-success float-right"
+                         attrs="{'invisible': [('probability', '&lt;', 100)]}">Booked
+                    </div>
+                    <div class="oe_title">
+                        <label for="name" class="oe_edit_only" string="Lead"/>
+                        <h1>
+                            <field name="name" placeholder="Describe the lead..."/>
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <!-- Preload all the partner's information -->
+                            <field name="partner_id" string="Customer"
+                                   widget="res_partner_many2one"
+                                   context="{'default_name': contact_name, 'default_street': street, 'default_city': city, 'default_state_id': state_id, 'default_zip': zip, 'default_country_id': country_id, 'default_function': function, 'default_phone': phone, 'default_mobile': mobile, 'default_email': email_from, 'default_user_id': user_id, 'default_team_id': team_id, 'default_website': website, 'show_vat': True}"
+                                   groups="base.group_no_one" invisible="1"/>
+                            <field name="partner_name" string="Customer"/>
+                            <label for="street" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="street" placeholder="Street..." class="o_address_street"/>
+                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                <field name="city" placeholder="City" class="o_address_city"/>
+                                <field name="state_id" class="o_address_state" placeholder="State"
+                                       options='{"no_open": True}' domain="[('country_id','=',104)]"/>
+                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                <field name="country_id" invisible="1" placeholder="Country" class="o_address_country"
+                                       options='{"no_open": True, "no_create": True}'/>
+                            </div>
+                            <field name="website" widget="url" placeholder="e.g. www.odoo.com" invisible="1"/>
+                             <field name="mobile"/>
+                            <field name="phone" string="Alternate Number"/>
+
+                        </group>
+                        <group>
+                           <!-- <field name="service_type" invisible="1"/>
+                            <field name="dos"/>
+                            <field name="vin_no"/>
+                            <field name="registration_no"/>
+                            <field name="location_id"/>
+                            <field name="due_date"/>
+                            <field name="date_follow_up"/> -->
+                            <label for="contact_name" invisible="1"/>
+                            <div class="o_row" invisible="1">
+                                <field name="contact_name"/>
+                                <field name="title" placeholder="Title" domain="[]" options='{"no_open": True}'/>
+                            </div>
+                            <field name="is_blacklisted" invisible="1"/>
+                            <field name="source" groups="dms.group_dms_callcenter_manager"/>
+                            <label for="email_from" class="oe_inline"/>
+                            <div class="o_row o_row_readonly">
+                                <i class="fa fa-ban" style="color: red;" role="img"
+                                   title="This email is blacklisted for mass mailing"
+                                   aria-label="Blacklisted" attrs="{'invisible': [('is_blacklisted', '=', False)]}"
+                                   groups="base.group_user"></i>
+                                <field name="email_from" widget="email"/>
+                            </div>
+                            <field name="function" invisible="1"/>
+                        </group>
+                        <group>
+                            <field name="user_id" invisible="1" domain="[('share', '=', False)]"
+                                   context="{'default_groups_ref': ['base.group_user', 'base.group_partner_manager', 'sales_team.group_sale_salesman_all_leads'], 'team_id': team_id}"/>
+                            <field name="team_id" widget="selection" domain="[('use_leads','=',True)]" invisible="1"/>
+                            <field name="type" invisible="1"/>
+                            <field name="opportunity_type" invisible="1"/>
+                            <!--<field name="remarks"/> -->
+                        </group>
+                        <group>
+                            <field name="priority" widget="priority" invisible="1"/>
+                            <field name="tag_ids" invisible="1" widget="many2many_tags"
+                                   options="{'color_field': 'color', 'no_create_edit': True}"/>
+                         <!--   <field name="pick_up_address" attrs="{'invisible': [('pick_up_address', '=', False)]}"/>
+                            <field name="lead_id" attrs="{'invisible': [('lead_id', '=', False)]}"/> -->
+                        </group>
+                    </group>
+                    <notebook>
+                        <page name="Vehicle" string="Vehicle">
+                            <field name="vehicle_id"/>
+
+                        </page>
+                        <page string="Internal Notes">
+                            <field name="description"/>
+                        </page>
+                        <page name="extra" string="Extra Info">
+                            <group>
+                                <group string="Email" groups="base.group_no_one">
+                                    <field name="message_bounce" readonly="1"/>
+                                </group>
+                                <group string="Tracking" invisible="1"
+                                       groups="base.group_multi_company,base.group_no_one" name="categorization">
+                                    <field name="company_id"
+                                           groups="base.group_multi_company"
+                                           options="{'no_create': True}"/>
+                                    <field name="campaign_id"/>
+                                    <field name="medium_id"/>
+                                    <field name="source_id"/>
+                                    <field name="referred"/>
+                                </group>
+                                <group string="Analysis" groups="base.group_no_one">
+                                    <field name="date_open"/>
+                                    <field name="date_closed"/>
+                                    <field name="probability"/>
+                                </group>
+                            </group>
+                        </page>
+
+                    </notebook>
+                </sheet>
+                <div class="oe_chatter">
+                    <field name="message_follower_ids" widget="mail_followers"/>
+                    <field name="activity_ids" widget="mail_activity"/>
+                    <field name="message_ids" widget="mail_thread" options="{'post_refresh': 'recipients'}"/>
+                </div>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="crm_case_tree_view_leads_new_insur" model="ir.ui.view">
+        <field name="name">crm.lead.tree.lead.new.insur</field>
+        <field name="model">dms.vehicle.lead</field>
+        <field name="arch" type="xml">
+            <tree string="Leads" decoration-bf="message_needaction==True" decoration-muted="probability == 100" decoration-danger="activity_date_deadline and (activity_date_deadline &lt; current_date)">
+
+                <field name="create_date" invisible="1"/>
+                <field name="name" string="Lead"/>
+                <field name="mobile"/>
+                <field name="activity_date_deadline" string="Followup Date"/>
+                <field name="registration_no"/>
+                <field name="source" groups="dms.group_dms_callcenter_manager"/>
+                <field name="user_id" string="Telecaller"/>
+                <field name="activity_summary" string="Summary"/>
+                <field name="contact_name" invisible="1"/>
+                <field name="city" invisible="1"/>
+                <field name="opportunity_type" invisible="1"/>
+                <field name="email_from" invisible="1"/>
+                <field name="date_deadline" string="Service Due Date"/>
+                <field name="dos"/>
+                <field name="user_id" invisible="1"/>
+                <field name="partner_id" invisible="1"/>
+                <field name="team_id" invisible="1"/>
+                <field name="active" invisible="1"/>
+                <field name="probability" invisible="1"/>
+                <field name="campaign_id" invisible="1"/>
+                <field name="referred" invisible="1"/>
+                <field name="medium_id" invisible="1"/>
+                <field name="message_needaction" invisible="1"/>
+            </tree>
+        </field>
+    </record>
+
+
+
+
+
+     <record id="action_new_lead_form_insurance" model="ir.actions.act_window">
+        <field name="name">Insurance Calls</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.vehicle.lead</field>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_leads_new_insur')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_leads_new_insur')})]"/>
+        <field name="domain">['&amp;',('type','=','lead'),('call_type','=','Insurance')]</field>
+         <field name="context">{
+            'default_user_id': uid,
+            'search_default_assigned_to_me': 1
+            }
+        </field>
+        <field name="search_view_id" ref="view_dms_vehicle_lead_filter"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a Vehicle
+            </p>
+            <p>
+                create leads
+            </p>
+        </field>
+    </record>
+
+
+
+    <menuitem action="action_new_lead_form" id="menu_action_vehicle_lead_form_service"
               parent="menu_dms_leads_root"
               sequence="1" groups = "group_dms_telecaller"/>
 
-     <menuitem action="action_service_booking" id="menu_action_vehicle_lead_form_oppor"
+ <menuitem action="action_new_lead_form_insurance" id="menu_action_vehicle_lead_form_insurance"
+              parent="menu_dms_leads_root"
+              sequence="1" groups = "group_dms_telecaller"/>
+
+     <menuitem action="action_service_booking" id="menu_action_vehicle_lead_form_oppor_service"
               parent="menu_dms_reports_root"
-               string="Bookings"
+               string="Service Bookings"
+              sequence="2" groups = "group_dms_telecaller"/>
+    <menuitem action="action_insurance_booking" id="menu_action_vehicle_lead_form_oppor_insurance"
+              parent="menu_dms_reports_root"
+               string="Insurance Bookings"
               sequence="2" groups = "group_dms_telecaller"/>
 
 
