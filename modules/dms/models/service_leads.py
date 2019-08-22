@@ -12,7 +12,7 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _process_service_leads(self):
         # vehicles = self.env['vehicle'].search([('ref', 'ilike', '2412')])
-        vehicles = self.env['vehicle'].search([],limit=100)
+        vehicles = self.env['vehicle'].search([])
         service_type = self.env['dms.opportunity.type'].search([('name', '=', 'Service')])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
