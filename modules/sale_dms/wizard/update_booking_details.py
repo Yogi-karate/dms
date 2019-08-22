@@ -28,28 +28,39 @@ class UpdateBookingDetails(models.TransientModel):
 
         if self._context.get('active_id'):
             order = self.env['sale.order'].browse(self._context['active_id'])
-            print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
-            print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+            print(
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+            print(
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
             if order.finance_type:
-                    result['finance_type'] = order.finance_type
+                result['finance_type'] = order.finance_type
             if order.financier_name:
-                    result['financier_name'] = order.financier_name
+                result['financier_name'] = order.financier_name
             if order.payment_date:
-                    result['payment_date'] = order.payment_date
+                result['payment_date'] = order.payment_date
             if order.delivery_date:
                 result['delivery_date'] = order.delivery_date
 
             print(order)
             print(result)
             print(fields)
-            print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+            print(
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
 
-            print("eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
+            print(
+                "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
 
         return result
 
-
     @api.multi
-    def action_reassign(self):
+    def action_update(self):
         self.ensure_one()
         print("Hello from reassign")
+        sale_order = self.env['sale.order'].browse(self._context.get('active_ids', []))[0]
+        if len(sale_order) > 1:
+            return
+        sale_order.write(
+            {'finance_type': self.finance_type,
+             'financier_name': self.financier_name.id,
+             'payment_date': self.payment_date,
+             'delivery_date': self.delivery_date})
