@@ -85,12 +85,22 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
     rollover_company = fields.Many2one('res.bank',string='Current Insurance Company')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
-    booking_type_insurance = fields.Selection([
+    discount = fields.Char('Discount')
+
+    prev_final_premium = fields.Char('Prev Final Premium')
+    cur_final_premium = fields.Char('Cur Final Premium')
+    cur_ncb = fields.Char('Cur NCB')
+    prev_ncb = fields.Char('Prev NCB')
+    cur_due_date = fields.Datetime(string='Cur Insurance Due Date')
+    prev_due_date = fields.Datetime(string='Prev Insurance Due Date')
+    prev_booking_type_insurance = fields.Selection([
         ('nil-dip', 'NIL-DIP'),
         ('comprehensive', 'Comprehensive'),
-    ], string='NIL-DIP/Comprehensive', store=True, default='comprehensive')
-    final_premimum = fields.Char('Final Premium')
-
+    ], string='Prev NIL-DIP/Comprehensive', store=True, default='comprehensive')
+    cur_booking_type_insurance = fields.Selection([
+        ('nil-dip', 'NIL-DIP'),
+        ('comprehensive', 'Comprehensive'),
+    ], string='Cur NIL-DIP/Comprehensive', store=True, default='comprehensive')
 
 
 
@@ -196,12 +206,14 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 'lead_id': self.lead_id.id,
                 'vehicle_id': self.lead_id.vehicle_id.id,
                 'dop': self.dop,
-                'dip_or_comp': self.booking_type_insurance,
+                'pre_dip_or_comp': self.prev_booking_type_insurance,
+                'cur_dip_or_comp': self.cur_booking_type_insurance,
                 'booking_type': self.booking_type,
                 'alternate_no':self.alternate_no,
                 'service_type': self.service_type,
                 'pick_up_address': self.pick_up_address,
-                'due_date': self.due_date,
+                'pre_due_date': self.prev_due_date,
+                'cur_due_date':self.cur_due_date,
                 'policy_no': self.policy_no,
                 'previous_insurance_company': self.previous_insurance_company.id,
                 'rollover_company': self.rollover_company.id,
@@ -209,7 +221,10 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 'idv': self.idv,
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
-                'final_premimum':self.final_premimum
+                'prev_final_premium':self.prev_final_premium,
+                'cur_final_premium':self.cur_final_premium,
+                'pre_ncb': self.prev_ncb,
+                'cur_ncb': self.cur_ncb
 
             }
         bo = self.env['insurance.booking'].create(booking_values)

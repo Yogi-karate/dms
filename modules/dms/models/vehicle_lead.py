@@ -210,7 +210,6 @@ class Insurance(models.Model):
     engine_no = fields.Char('Engine No',compute='_lead_values')
     chassis_no = fields.Char('VIN No',compute='_lead_values')
     sale_date = fields.Char('Sale Date',compute='_lead_values')
-    due_date = fields.Datetime(string='Insurance Due Date')
     policy_no = fields.Char(string='Policy No')
     previous_insurance_company = fields.Many2one('res.bank',string='Previous Insurance Company')
     user_id = fields.Many2one('res.users', compute='_lead_values', store=True)
@@ -218,21 +217,31 @@ class Insurance(models.Model):
     rollover_company = fields.Many2one('res.bank',string='Current Insurance Company')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
-    dip_or_comp = fields.Selection([
-        ('nil-dip', 'NIL-DIP'),
-        ('comprehensive', 'Comprehensive'),
-    ], string='NIL-DIP/Comprehensive', store=True, default='comprehensive')
-    final_premimum = fields.Char('Final Premium')
 
+    prev_final_premium = fields.Char('Prev Final Premium')
+    cur_final_premium = fields.Char('Cur Final Premium')
+
+    cur_ncb = fields.Char('Cur NCB')
+    prev_ncb = fields.Char('Prev NCB')
+    cur_due_date = fields.Datetime(string='Cur Insurance Due Date')
+    prev_due_date = fields.Datetime(string='Prev Insurance Due Date')
+    discount = fields.Char('Discount')
     dop = fields.Datetime('Date and Time of Pick-Up')
 
+    cur_dip_or_comp = fields.Selection([
+        ('nil-dip', 'NIL-DIP'),
+        ('comprehensive', 'Comprehensive'),
+    ], string='Prev NIL-DIP/Comprehensive', store=True, default='comprehensive')
+    prev_dip_or_comp = fields.Selection([
+        ('nil-dip', 'NIL-DIP'),
+        ('comprehensive', 'Comprehensive'),
+    ], string='Prev NIL-DIP/Comprehensive', store=True, default='comprehensive')
     booking_type = fields.Selection([
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
-    ], string='Booking Type', store=True, default='pickup')
+    ], string='Cur Booking Type', store=True, default='pickup')
 
     pick_up_address = fields.Char('Pick-up Address')
-
 
     @api.onchange('id')
     def _lead_values(self):

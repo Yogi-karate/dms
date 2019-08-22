@@ -33,6 +33,7 @@
 
               <form string="Insurance Bookings">
                       <header>
+                          <field name="active" invisible="1"/>
                           <button name="%(booking_lost_action_new_insurance)d" string="Mark as Lost"
                                   type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
                           <button name="restore_booking_lost_action_new" string="Restore" type="object"
@@ -43,39 +44,41 @@
                             <div class="badge-pill badge-danger float-right"
                          attrs="{'invisible': [('active', '=', True)]}">Lost
                     </div>
-                            <group string="Insurance Bookings">
-                                <group>
-                                     <field name="active" invisible="1"/>
-                            <field name="source"/>
-                            <field name="partner_name"/>
-                            <field name="mobile"/>
-                            <field name="mail"/>
-                            <field name="vehicle_model"/>
-                            <field name="service_type"/>
-                            <field name="vehicle_id"/>
-                            <field name="user_id" string="TC Name"/>
-                                <field name="engine_no"/>
-                <field name="chassis_no"/>
-                                </group>
-                           <group class="right">
-                                    <field name="previous_insurance_company" />
-                               <field name="rollover_company" string="Current Insurance Company"/>
-
-                            <field name="alternate_no"/>
-                            <field name="due_date"/>
+                            <group>
+                                <group class="left">
+                                <field name="partner_name"/>
+                          <field name="vehicle_id"/>
+                          <field name="engine_no"/>
+                          <field name="reg_no"/>
+                               <field name="idv"/>
+                               <field name="prev_ncb"/>
+                               <field name="previous_insurance_company" />
+                               <field name="discount"/>
+                            <field name="prev_dip_or_comp"/>
+                            <field name="prev_due_date"/>
+                               <field name="prev_final_premium"/>
                             <field name="policy_no"/>
-                            <field name="previous_idv"/>
-                        <field name="idv"/>
-                               <field name="dip_or_comp"/>
-                        <field name="booking_type"/>
-                               <field name="dop" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
+
+                           </group>
+                           <group class="right">
+                               <field name="mobile"/>
+                               <field name="chassis_no"/>
+                               <field name="sale_date"/>
+                               <field name="mail"/>
+                               <field name="previous_idv"/>
+                               <field name="cur_ncb"/>
+                               <field name="rollover_company" string="Current Insurance Company"/>
+                               <field name="alternate_no"/>
+                               <field name="cur_dip_or_comp"/>
+                               <field name="cur_due_date"/>
+                               <field name="cur_final_premium"/>
+                               <field name="booking_type"/>
+                                <field name="dop" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
                             <field name="pick_up_address" string="Pickup Address" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
-                        <field name="final_premimum"/>
 
-
-
+                           </group>
                             </group>
-                             </group>
+
 
 
                         </sheet>
@@ -88,7 +91,7 @@
         <field name="name">insurance.booking.tree</field>
         <field name="model">insurance.booking</field>
         <field name="arch" type="xml">
-            <tree string="Service Bookings">
+            <tree string="Insurance Bookings">
                 <field name="active" invisible="1"/>
                 <field name="partner_name"/>
                 <field name="mobile"/>
