@@ -94,12 +94,12 @@
     </record>
 
     <menuitem action="action_dms_insurance_vehicle_lost" id="menu_action_service_dms_vehicle_lost"
-              parent="menu_dms_leads_root"
+              parent="menu_dms_insurance_root"
                string="Lost Insurance Leads"
               groups="group_dms_telecaller_insurance"
               sequence="3"/>
     <menuitem action="action_dms_service_vehicle_lost" id="menu_action_insurance_dms_vehicle_lost"
-              parent="menu_dms_leads_root"
+              parent="menu_dms_service_root"
               string="Lost Service Leads"
               groups="group_dms_telecaller"
               sequence="3"/>
