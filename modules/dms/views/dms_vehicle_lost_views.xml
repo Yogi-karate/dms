@@ -96,10 +96,12 @@
     <menuitem action="action_dms_insurance_vehicle_lost" id="menu_action_service_dms_vehicle_lost"
               parent="menu_dms_leads_root"
                string="Lost Insurance Leads"
+              groups="group_dms_telecaller_insurance"
               sequence="3"/>
     <menuitem action="action_dms_service_vehicle_lost" id="menu_action_insurance_dms_vehicle_lost"
               parent="menu_dms_leads_root"
-               string="Lost Service Leads"
+              string="Lost Service Leads"
+              groups="group_dms_telecaller"
               sequence="3"/>
 
     <record id="dms_lost_reason_tree_new_service" model="ir.ui.view">
@@ -108,7 +110,6 @@
         <field name="arch" type="xml">
             <tree string="Lost Reasons" >
                 <field name="name"/>
-
             </tree>
         </field>
     </record>
@@ -120,7 +121,6 @@
                 <group string="Lost Reasons">
                 <field name="name"/>
                 <field name="active"/>
-
                 </group>
             </form>
         </field>
@@ -145,14 +145,6 @@
                string="Lost Reasons Service"
               groups="group_dms_telecaller"
               sequence="4"/>
-
-
-
-
-
-
-
-
 
      <record id="dms_lost_reason_tree_new_insurance" model="ir.ui.view">
         <field name="name">dms.lost.reason.insurance.tree</field>
