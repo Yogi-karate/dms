@@ -16,7 +16,13 @@ from werkzeug.urls import url_encode
 class DmsSaleOrder(models.Model):
     _name = "sale.order"
     _inherit = 'sale.order'
-
+    finance_type = fields.Selection([
+        ('in', 'in-house'),
+        ('out', 'out-house'),
+    ], string='Finance Type', store=True, default='in')
+    financier_name = fields.Many2one('res.bank', string='Financier', help="Bank for finance")
+    payment_date = fields.Datetime('Payment Date')
+    delivery_date = fields.Datetime('Delivery Date')
     state = fields.Selection([
         ('draft', 'Quotation'),
         ('sent', 'Quotation Sent'),

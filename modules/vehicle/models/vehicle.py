@@ -35,8 +35,8 @@ class Vehicle(models.Model):
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], required=True)
     color = fields.Char('Color', readonly=True, compute='_get_color')
-    partner_name = fields.Char('Customer', compute='_get_customer_details')
-    partner_mobile = fields.Char('Mobile No.', compute='_get_customer_details')
+    partner_name = fields.Char('Customer', compute='_get_customer_details',store=True)
+    partner_mobile = fields.Char('Mobile No.', compute='_get_customer_details',store=True)
     partner_email = fields.Char('Email', compute='_get_customer_details')
     date_order = fields.Datetime('Sale-Date')
     address = fields.Char('Address', compute='_get_customer_details')

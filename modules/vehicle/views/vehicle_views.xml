@@ -58,8 +58,11 @@
         <field name="model">vehicle</field>
         <field name="arch" type="xml">
             <search string="Vehicle Filter">
-                <field name="name" string="Vehicle" filter_domain="['|',('name','ilike',self),('ref','ilike',self)]"/>
+                <field name="name" string="VIN NO" filter_domain="['|',('name','ilike',self),('chassis_no','ilike',self)]"/>
                 <field name="product_id"/>
+                <field name="partner_mobile"/>
+                <field name="registration_no"/>
+                <field name="partner_name"/>
                 <group expand="0" string="Group By">
                     <filter name="group_by_product" string="Product" domain="[]" context="{'group_by':'product_id'}"/>
                 </group>
