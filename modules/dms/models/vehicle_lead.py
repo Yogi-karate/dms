@@ -93,11 +93,6 @@ class CrmLeadLost(models.TransientModel):
         dms_lost_reason_insurance = fields.Many2one('dms.lost.reason.insurance', string='Lost Reason')
 
         lost_remarks = fields.Char('Remarks')
-        call_type = fields.Char('Call Type',compute='_compute_call_type',store=True)
-        @api.model
-        def _compute_call_type(self):
-            leads = self.env['dms.vehicle.lead'].browse(self.env.context.get('active_ids'))
-            self.call_type = leads.call_type
 
         @api.multi
         def action_lost_reason_apply_new(self):
