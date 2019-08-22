@@ -494,19 +494,19 @@
 
 
     <menuitem action="action_new_lead_form" id="menu_action_vehicle_lead_form_service"
-              parent="menu_dms_leads_root"
+              parent="menu_dms_service_root"
               sequence="1" groups = "group_dms_telecaller"/>
 
  <menuitem action="action_new_lead_form_insurance" id="menu_action_vehicle_lead_form_insurance"
-              parent="menu_dms_leads_root"
+              parent="menu_dms_insurance_root"
               sequence="1" groups = "group_dms_telecaller_insurance"/>
 
      <menuitem action="action_service_booking" id="menu_action_vehicle_lead_form_oppor_service"
-              parent="menu_dms_reports_root"
+              parent="menu_dms_service_root"
                string="Service Bookings"
               sequence="2" groups = "group_dms_telecaller"/>
     <menuitem action="action_insurance_booking" id="menu_action_vehicle_lead_form_oppor_insurance"
-              parent="menu_dms_reports_root"
+              parent="menu_dms_insurance_root"
                string="Insurance Bookings"
               sequence="2" groups = "group_dms_telecaller_insurance"/>
 

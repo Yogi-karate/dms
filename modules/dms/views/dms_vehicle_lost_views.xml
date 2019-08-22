@@ -46,7 +46,7 @@
                 <field name="registration_no"/>
                 <field name="source"/>
                 <field name="user_id" string="Telecaller"/>
-                <field name="dms_lost_reason"/>
+                <field name="dms_lost_reason_insurance"/>
                 <field name="lost_remarks"/>
                 <field name="contact_name" invisible="1"/>
                 <field name="city" invisible="1"/>
@@ -92,12 +92,14 @@
     </record>
 
     <menuitem action="action_dms_insurance_vehicle_lost" id="menu_action_service_dms_vehicle_lost"
-              parent="menu_dms_leads_root"
+              parent="menu_dms_insurance_root"
                string="Lost Insurance Leads"
+              groups="group_dms_telecaller_insurance"
               sequence="3"/>
     <menuitem action="action_dms_service_vehicle_lost" id="menu_action_insurance_dms_vehicle_lost"
-              parent="menu_dms_leads_root"
-               string="Lost Service Leads"
+              parent="menu_dms_service_root"
+              string="Lost Service Leads"
+              groups="group_dms_telecaller"
               sequence="3"/>
 
     <record id="dms_lost_reason_tree_new_service" model="ir.ui.view">
@@ -106,7 +108,6 @@
         <field name="arch" type="xml">
             <tree string="Lost Reasons" >
                 <field name="name"/>
-
             </tree>
         </field>
     </record>
@@ -118,7 +119,6 @@
                 <group string="Lost Reasons">
                 <field name="name"/>
                 <field name="active"/>
-
                 </group>
             </form>
         </field>
@@ -144,7 +144,7 @@
               groups="group_dms_telecaller"
               sequence="4"/>
 
-    <record id="dms_lost_reason_tree_new_insurance" model="ir.ui.view">
+     <record id="dms_lost_reason_tree_new_insurance" model="ir.ui.view">
         <field name="name">dms.lost.reason.insurance.tree</field>
         <field name="model">dms.lost.reason.insurance</field>
         <field name="arch" type="xml">
@@ -184,6 +184,6 @@
               id ="menu_action_lost_reasons_screen_insurance"
               parent="menu_dms_configurations_root"
                string="Lost Reasons Insurance"
-              groups="group_dms_telecaller_insurance"
+              groups="group_dms_callcenter_lead_insurance"
               sequence="4"/>
 </odoo>

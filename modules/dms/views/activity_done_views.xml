@@ -72,29 +72,45 @@
             </field>
         </record>
 
-       <record id="crm_activity_report_done_action" model="ir.actions.act_window">
-           <field name="name">Activities Done Analysis</field>
+       <record id="crm_activity_report_done_action_service" model="ir.actions.act_window">
+           <field name="name">Activities Done Analysis Service</field>
            <field name="res_model">crm.activity.done.report</field>
            <field name="view_type">form</field>
            <field name="view_mode">tree,graph,pivot</field>
            <field name="context">{'search_default_activities_my': True}</field>
-           <field name="domain">[]</field>
+           <field name="domain">[('call_type','=','Service')]</field>
+       </record>
+<record id="crm_activity_report_done_action_insur" model="ir.actions.act_window">
+           <field name="name">Activities Done Analysis Insurance</field>
+           <field name="res_model">crm.activity.done.report</field>
+           <field name="view_type">form</field>
+           <field name="view_mode">tree,graph,pivot</field>
+           <field name="context">{'search_default_activities_my': True}</field>
+           <field name="domain">[('call_type','=','Insurance')]</field>
        </record>
 
-       <menuitem
-            id="crm_activity_report_done_menu"
+
+    <menuitem
+            id="crm_activity_report_done_menu_service"
             name="Activities Completed"
-            parent="menu_dms_reports_root"
-            action="crm_activity_report_done_action"
+            parent="menu_dms_service_root"
+            action="crm_activity_report_done_action_service"
             sequence="3" groups="group_dms_telecaller"/>
 
-       <record id="crm_activity_report_action_done_team" model="ir.actions.act_window">
+    <menuitem
+            id="crm_activity_report_done_menu_insurance"
+            name="Activities Completed"
+            parent="menu_dms_insurance_root"
+            action="crm_activity_report_done_action_insur"
+            sequence="3" groups="group_dms_telecaller_insurance"/>
+
+       <!--<record id="crm_activity_report_action_done_team" model="ir.actions.act_window">
            <field name="name">Activities Analysis</field>
            <field name="res_model">crm.activity.done.report</field>
            <field name="view_type">form</field>
            <field name="view_mode">tree,graph,pivot</field>
            <field name="context">{'search_default_team_id': active_id}</field>
            <field name="domain">[]</field>
-       </record>
+       </record>-->
 <!-- -->
 </odoo>

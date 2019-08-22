@@ -34,7 +34,7 @@ class ActivityDoneReport(models.Model):
     probability = fields.Float('Probability', group_operator='avg', readonly=True)
     summary = fields.Char(
         'Next Activity Summary',)
-
+    call_type = fields.Char('Type')
     def _select(self):
         return """
             SELECT
@@ -56,6 +56,7 @@ class ActivityDoneReport(models.Model):
                 l.partner_id,
                 l.type as lead_type,
                 l.active,
+                l.call_type,
                 l.probability
         """
 

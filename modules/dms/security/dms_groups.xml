@@ -150,6 +150,33 @@
             <field name="groups" eval="[(4, ref('dms.group_dms_callcenter_manager'))]"/>
         </record>
 
+            <!--Insurance  Booking objects security -->
+         <record id="dms_rule_personal_booking" model="ir.rule">
+            <field name="name">Personal Insurance Bookings</field>
+            <field ref="model_insurance_booking" name="model_id"/>
+            <field name="domain_force">[('user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('dms.group_dms_telecaller'))]"/>
+        </record>
+        <record id="dms_callcenter_rule_all_lead_booking" model="ir.rule">
+            <field name="name">All Insurance Booking Leads</field>
+            <field ref="model_insurance_booking" name="model_id"/>
+            <field name="domain_force">[(1,'=',1)]</field>
+            <field name="groups"
+                   eval="[(4, ref('base.group_system'))]"/>
+        </record>
+        <record id="dms_callcenter_rule_team_lead_booking" model="ir.rule">
+            <field name="name">All Team Insurance  Booking Leads</field>
+            <field ref="model_insurance_booking" name="model_id"/>
+            <field name="domain_force">[('team_id.user_id','=',user.id)]</field>
+            <field name="groups" eval="[(4, ref('dms.group_dms_callcenter_lead'))]"/>
+        </record>
+        <record id="dms_rule_manager_booking_lead" model="ir.rule">
+            <field name="name">Manager Insurance Booking Leads</field>
+            <field ref="model_insurance_booking" name="model_id"/>
+            <field name="domain_force">['|',('team_id.manager_user_ids','in',user.id),('user_id','=',False)]</field>
+            <field name="groups" eval="[(4, ref('dms.group_dms_callcenter_manager'))]"/>
+        </record>
+
         <!-- Done activities security -->
          <record id="dms_rule_personal_done_Activity" model="ir.rule">
             <field name="name">Personal Done Activities </field>
