@@ -81,8 +81,8 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
     alternate_no = fields.Char('Alternate number')
     due_date = fields.Datetime(string='Insurance Due Date')
     policy_no = fields.Char(string='Policy No')
-    previous_insurance_company = fields.Char('Previous Insurance Company')
-    rollover_company = fields.Char('Roll Over To')
+    previous_insurance_company = fields.Many2one('res.bank',string='Previous Insurance Company')
+    rollover_company = fields.Many2one('res.bank',string='Current Insurance Company')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
     booking_type_insurance = fields.Selection([

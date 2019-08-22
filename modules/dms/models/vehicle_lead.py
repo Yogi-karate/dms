@@ -212,10 +212,10 @@ class Insurance(models.Model):
     sale_date = fields.Char('Sale Date',compute='_lead_values')
     due_date = fields.Datetime(string='Insurance Due Date')
     policy_no = fields.Char(string='Policy No')
-    previous_insurance_company = fields.Char('Previous Insurance Company')
+    previous_insurance_company = fields.Many2one('res.bank',string='Previous Insurance Company')
     user_id = fields.Many2one('res.users', compute='_lead_values', store=True)
     team_id = fields.Many2one('crm.team', compute='_lead_values', store=True)
-    rollover_company = fields.Char('Roll Over To')
+    rollover_company = fields.Many2one('res.bank',string='Current Insurance Company')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
     dip_or_comp = fields.Selection([
