@@ -9,8 +9,8 @@ access_dms_vehicle_lead_lead_i,dms vehicle lead,model_dms_vehicle_lead,group_dms
 access_dms_vehicle_lead_manager_i,dms vehicle lead,model_dms_vehicle_lead,group_dms_callcenter_manager_insurance,1,1,1,1
 
 
-access_crm_activity_done_report,dms crm_activity_done_report,model_crm_activity_done_report,group_dms_telecaller,1,1,1,1
-access_crm_activity_done_report,dms crm_activity_done_report,model_crm_activity_done_report,group_dms_telecaller_insurance,1,1,1,1
+access_crm_activity_done_report_s,dms crm_activity_done_report,model_crm_activity_done_report,group_dms_telecaller,1,1,1,0
+access_crm_activity_done_report_i,dms crm_activity_done_report,model_crm_activity_done_report,group_dms_telecaller_insurance,1,1,1,0
 
 
 access_service_booking,dms service_booking,model_service_booking,group_dms_telecaller,1,1,1,0
@@ -18,7 +18,7 @@ access_service_booking_lead,dms service_booking,model_service_booking,group_dms_
 access_service_booking_manager,dms service_booking,model_service_booking,group_dms_callcenter_manager,1,1,1,1
 
 
-access_insurance_booking_telecaller,dms insurance_booking,model_insurance_booking,group_dms_telecaller_insurance,1,1,0,0
+access_insurance_booking_telecaller,dms insurance_booking,model_insurance_booking,group_dms_telecaller_insurance,1,1,1,0
 access_insurance_booking_lead_insurance,dms insurance_booking,model_insurance_booking,group_dms_callcenter_lead_insurance,1,1,1,1
 
 access_dms_lost_reasons_i,dms dms_lost_reason_insurance,model_dms_lost_reason_insurance,group_dms_telecaller_insurance,1,0,0,0
