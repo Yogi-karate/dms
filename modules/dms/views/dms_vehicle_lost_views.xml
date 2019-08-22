@@ -48,7 +48,7 @@
                 <field name="registration_no"/>
                 <field name="source"/>
                 <field name="user_id" string="Telecaller"/>
-                <field name="dms_lost_reason"/>
+                <field name="dms_lost_reason_insurance"/>
                 <field name="lost_remarks"/>
                 <field name="contact_name" invisible="1"/>
                 <field name="city" invisible="1"/>
@@ -186,6 +186,6 @@
               id ="menu_action_lost_reasons_screen_insurance"
               parent="menu_dms_configurations_root"
                string="Lost Reasons Insurance"
-              groups="group_dms_telecaller_insurance"
+              groups="group_dms_callcenter_lead_insurance"
               sequence="4"/>
 </odoo>
