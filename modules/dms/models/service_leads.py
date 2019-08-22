@@ -12,7 +12,7 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _process_service_leads(self):
         # vehicles = self.env['vehicle'].search([('ref', 'ilike', '2412')])
-        vehicles = self.env['vehicle'].search([])
+        vehicles = self.env['vehicle'].search([],limit=100)
         service_type = self.env['dms.opportunity.type'].search([('name', '=', 'Service')])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
@@ -45,7 +45,7 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _process_insurance_leads(self):
         # vehicles = self.env['vehicle'].search([('ref', 'ilike', '2412')])
-        vehicles = self.env['vehicle'].search([])
+        vehicles = self.env['vehicle'].search([],limit=100)
         insurance_type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Insurance')])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
@@ -72,11 +72,13 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _allocate_insurance_user(self, leads):
         self_team = self.sudo().env['crm.team'].search(
-            [('team_type', '=', 'Insurance Renewal'), ('user_id', '!=', False)], limit=1)
+            [('team_type', '=', 'business-center-insurance-renewal'), ('user_id', '!=', False)], limit=1)
         other_teams = self.sudo().env['crm.team'].search(
-            [('team_type', '=', 'Insurance Rollover'), ('member_ids', '!=', False), ('user_id', '!=', False)])
+            [('team_type', '=', 'business-center-insurance-rollover'), ('member_ids', '!=', False), ('user_id', '!=', False)])
         self_leads = leads.filtered(lambda l: l.source == 'saboo')
         other_leads = leads.filtered(lambda l: not l.source == 'saboo')
+        print(self_leads,"----------------------------------------self leads")
+        print(other_leads,"---------------------------------------------------other leads")
         for lead in self_leads:
             lead.update({
                 'user_id': self_team.user_id.id,

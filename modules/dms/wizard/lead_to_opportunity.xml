@@ -47,19 +47,37 @@
             <field name="model">dms.lead2opportunity.partner</field>
             <field name="arch" type="xml">
                 <form string="Create an Insurance">
-                    <group>
-                        <field name="name"/>
-                        <field name="mobile"/>
-                        <field name="alternate_no"/>
-                        <field name="due_date"/>
-                        <field name="policy_no"/>
-                        <field name="previous_insurance_company"/>
-                        <field name="rollover_company"/>
-                        <field name="previous_idv"/>
+                    <sheet>
+                       <group>
+                           <group class="top">
+                                <field name="name"/>
+                               <field name="previous_insurance_company" />
+                            <field name="alternate_no"/>
+                            <field name="due_date"/>
+                            <field name="policy_no"/>
+                            <field name="previous_idv"/>
                         <field name="idv"/>
                         <field name="booking_type_insurance"/>
                         <field name="final_premimum"/>
-                    </group>
+                           </group>
+                           <group class="bottom">
+                               <field name="mobile"/>
+                           <field name="rollover_company" string="Current Insurance Company"/>
+                               <field name="booking_type"/>
+                                <field name="dop" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
+                            <field name="pick_up_address" string="Pickup Address" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
+
+                           </group>
+
+
+
+                       </group>
+
+
+
+
+                    </sheet>
+
                     <group name="action" attrs="{'invisible': [('name', '!=', 'convert')]}" string="Customers" col="1">
                         <field name="action" nolabel="1" widget="radio"/>
                         <group col="2">

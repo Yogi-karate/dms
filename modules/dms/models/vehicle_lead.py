@@ -64,8 +64,7 @@ class VehicleLead(models.Model):
             lead.mobile = lead.vehicle_id.partner_id.mobile
             lead.phone = lead.vehicle_id.partner_id.phone
             lead.email_from = lead.vehicle_id.partner_id.email
-
-        print(self.vehicle_id,"oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
+            print(self.vehicle_id,"oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
     @api.model
     def create(self, vals):
         vals['type'] = 'lead'
@@ -146,10 +145,12 @@ class ServiceBooking(models.Model):
     location_id = fields.Many2one('stock.location', string='Preferred location of service')
     remarks = fields.Char('Remarks')
     dop = fields.Datetime('Date and Time of Pick-Up')
+
     booking_type = fields.Selection([
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
     ], string='Booking Type', store=True, default='pickup')
+
     pick_up_address = fields.Char('Pick-up Address')
     due_date = fields.Datetime(string='Service Due Date')
     partner_name = fields.Char('Customer name', compute='_lead_values')
@@ -217,12 +218,20 @@ class Insurance(models.Model):
     rollover_company = fields.Char('Roll Over To')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
-    booking_type = fields.Selection([
+    dip_or_comp = fields.Selection([
         ('nil-dip', 'NIL-DIP'),
         ('comprehensive', 'Comprehensive'),
     ], string='NIL-DIP/Comprehensive', store=True, default='comprehensive')
     final_premimum = fields.Char('Final Premium')
 
+    dop = fields.Datetime('Date and Time of Pick-Up')
+
+    booking_type = fields.Selection([
+        ('pickup', 'Pick-Up'),
+        ('walk', 'Walk-In'),
+    ], string='Booking Type', store=True, default='pickup')
+
+    pick_up_address = fields.Char('Pick-up Address')
 
 
     @api.onchange('id')
