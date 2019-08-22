@@ -23,7 +23,8 @@ class CrmTeam(models.Model):
         string='Managers')
     location_id = fields.Many2one('stock.location', domain=[('usage', '=', 'Sales')], string='Sales Team Location')
     team_type = fields.Selection(
-        [('sales', 'Sales'), ('insurance', 'Insurance'), ('finance', 'Finance'), ('service', 'Service'),
+        [('sales', 'Sales'), ('insurance', 'Insurance'), ('finance', 'Finance'), ('service', 'Service'),('business-center-insurance-rollover','Insurance Rollover'),
+         ('business-center-insurance-renewal','Insurance Renewal'),
          ('business-center', 'Business-Center'),('website', 'Website')], string='Team Type', default='sales',
         required=True,
         help="The type of this channel, it will define the resources this channel uses.")

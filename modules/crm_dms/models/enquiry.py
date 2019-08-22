@@ -23,7 +23,7 @@ class Enquiry(models.Model):
                               default=lambda self: self.env.user)
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
-    custom_id = fields.Char(string='Id',compute='compute_id')
+    custom_id = fields.Char(string='Id', compute='compute_id')
     state = fields.Selection([
         ('open', 'Open'),
         ('done', 'Closed'),
@@ -224,6 +224,7 @@ class Enquiry(models.Model):
         return {
             'name': type.name + '-' + self.product_id.name,
             'partner_name': self.partner_name,
+            'company_id': self.env.user.company_id.id,
             'mobile': self.partner_mobile,
             'enquiry_id': self.id,
             'opportunity_type': type.id,
@@ -298,7 +299,8 @@ class Enquiry(models.Model):
         return {
             'name': name,
             'user_id': self.env.context.get('default_user_id') or self.user_id.id,
-            'partner_name':self.partner_name,
+            'company_id': self.env.user.company_id.id,
+            'partner_name': self.partner_name,
             'comment': self.description,
             'team_id': self.team_id.id,
             'mobile': self.partner_mobile,

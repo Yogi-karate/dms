@@ -26,6 +26,7 @@ class ODVehicle(models.Model):
         ('cancel', 'Cancelled'),
     ], string='Status', copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='draft')
+    ignore_reason = fields.Char('Reason for Cancel')
 
     @api.model
     def create_vehicles(self):
@@ -39,24 +40,47 @@ class ODVehicle(models.Model):
         od_vehicles = self.env['dms.vehicle.import'].search([])
         _logger.info("The number of records to process =>" + str(len(od_vehicles)))
         count = 0
+        ignore_reason = ''
         for vehicle in od_vehicles:
             count = count + 1
             self = self.sudo()
             if not vehicle.model:
-                print("no model",vehicle.model)
+                print("no model", vehicle.model)
+                ignore_reason = 'Vehicle Model not present'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
-            product = self.env['product.product'].search(
-                [('name', 'ilike', vehicle.model), ('fuel_type', 'ilike', vehicle.fuel_type)], limit=1)
-            if not product or not vehicle.vin_no or not vehicle.customer_name or not vehicle.date_of_sale:
-                print("Cannot process vehicle -> ", count)
-                vehicle.state = 'cancel'
+            if not vehicle.fuel_type:
+                print("no fuel type", vehicle.model)
+                ignore_reason = 'Vehicle Fuel Type not present'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
-            print("In Vehicle loop of import ^^^^^^^^", vehicle.customer_name, vehicle.vin_no, vehicle.date_of_sale,
-                  product)
-            duplicate = self.env['vehicle'].search([('name','=',vehicle.vin_no)])
+            name = vehicle.model.strip()
+            fuel = vehicle.fuel_type.strip()
+            # pro = self.env['product.product'].search([('name', 'ilike',vehicle.model)], limit=1)
+            # print(pro,"length of------------------------ ",vehicle.model,"---is---",len(vehicle.model))
+            product = self.env['product.product'].search([('name', 'ilike', name), ('fuel_type', 'ilike', fuel)],
+                                                         limit=1)
+            if not product:
+                ignore_reason = 'Product not present'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
+            if not vehicle.vin_no or not vehicle.date_of_sale:
+                ignore_reason = 'Vin or sale date is null'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
+            if not vehicle.customer_name or not vehicle.mobile:
+                ignore_reason = 'NO Customer details'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
+
+            duplicate = self.env['vehicle'].search(
+                ['|', ('name', '=', vehicle.vin_no), ('chassis_no', '=', vehicle.vin_no)])
             if duplicate:
-                print("Cannot process duplicate vehicle -> ", count)
-                vehicle.state = 'cancel'
+                print(
+                    "Cannot process duplicate vehicle------------------------------------------------------------------------------------ -> ",
+                    count)
+                ignore_reason = 'Duplicate Vehicle'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
 
             _logger.info("-----------Starting creation of partner and vehicle------------")
@@ -66,10 +90,12 @@ class ODVehicle(models.Model):
             if not partner:
                 partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
             source = ''
-            if not self.dealer == 'saboo':
-                    source = 'saboo'
+            if not vehicle.dealer:
+                source = 'od'
+            elif 'saboo' in vehicle.dealer.lower() or 'prashant' in vehicle.dealer.lower():
+                source = 'saboo'
             else:
-                    source = 'od'
+                source = 'od'
             vals = {
                 'name': vehicle.vin_no,
                 'chassis_no': vehicle.chassis_no,

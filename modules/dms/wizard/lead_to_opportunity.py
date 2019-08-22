@@ -73,9 +73,29 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
     ], string='Booking Type', store=True, default='pickup')
     pick_up_address = fields.Char('Pick-up Address')
     remarks = fields.Char('Remarks')
-    location_id = fields.Many2one('stock.location', string='Preferred location of service',required=True)
+    location_id = fields.Many2one('stock.location', string='Preferred location of service')
     due_date = fields.Datetime(string='Service Due Date')
     lead_id = fields.Many2one('dms.vehicle.lead')
+
+
+    alternate_no = fields.Char('Alternate number')
+    due_date = fields.Datetime(string='Insurance Due Date')
+    policy_no = fields.Char(string='Policy No')
+    previous_insurance_company = fields.Char('Previous Insurance Company')
+    rollover_company = fields.Char('Roll Over To')
+    previous_idv = fields.Char('Previous IDV')
+    idv = fields.Char('IDV')
+    booking_type_insurance = fields.Selection([
+        ('nil-dip', 'NIL-DIP'),
+        ('comprehensive', 'Comprehensive'),
+    ], string='NIL-DIP/Comprehensive', store=True, default='comprehensive')
+    final_premimum = fields.Char('Final Premium')
+
+
+
+
+
+
 
     # NOTE JEM : is it the good place to test this ?
     @api.model
@@ -127,6 +147,8 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
             values['partner_id'] = self.partner_id.id
         leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
         leads.write(values)
+        if not self.location_id:
+            raise UserError("Please select a location of service")
         if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
             raise UserError("Please add both pickup date and address")
         else:
@@ -146,5 +168,46 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
 
             }
         bo = self.env['service.booking'].create(booking_values)
+        # return leads[0].redirect_opportunity_view()
+        return
+
+    @api.multi
+    def action_apply_insurance(self):
+        """ Convert lead to opportunity or merge lead and opportunity and open
+            the freshly created opportunity view.
+        """
+        self.ensure_one()
+        values = {
+            'name': self.name,
+            'service_type': self.service_type,
+            'type': 'opportunity',
+            'date_conversion': fields.Datetime.today(),
+            'probability': 100
+        }
+
+        if self.partner_id:
+            values['partner_id'] = self.partner_id.id
+        leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
+        leads.write(values)
+
+
+        booking_values = {
+                'lead_id': self.lead_id.id,
+                'vehicle_id': self.lead_id.vehicle_id.id,
+                'booking_type': self.booking_type_insurance,
+                'alternate_no':self.alternate_no,
+                'service_type': self.service_type,
+                'due_date': self.due_date,
+                'policy_no': self.policy_no,
+                'previous_insurance_company': self.previous_insurance_company,
+                'rollover_company': self.rollover_company,
+                'previous_idv':self.previous_idv,
+                'idv': self.idv,
+                'user_id': self.user_id.id,
+                'team_id': self.team_id.id,
+                'final_premimum':self.final_premimum
+
+            }
+        bo = self.env['insurance.booking'].create(booking_values)
         # return leads[0].redirect_opportunity_view()
         return
