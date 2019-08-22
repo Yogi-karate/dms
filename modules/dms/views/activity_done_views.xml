@@ -92,15 +92,15 @@
 
     <menuitem
             id="crm_activity_report_done_menu_service"
-            name="Activities Completed s"
-            parent="menu_dms_reports_root"
+            name="Activities Completed"
+            parent="menu_dms_service_root"
             action="crm_activity_report_done_action_service"
             sequence="3" groups="group_dms_telecaller"/>
 
     <menuitem
             id="crm_activity_report_done_menu_insurance"
-            name="Activities Completed i"
-            parent="menu_dms_reports_root"
+            name="Activities Completed"
+            parent="menu_dms_insurance_root"
             action="crm_activity_report_done_action_insur"
             sequence="3" groups="group_dms_telecaller_insurance"/>
 

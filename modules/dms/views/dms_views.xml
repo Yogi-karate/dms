@@ -9,6 +9,10 @@
     <menuitem name="Vehicles" id="menu_dms_master_data_root" sequence="40"
               parent="dms.menu_dms_root"
               web_icon="vehicle,static/description/icon.png"/>
+     <menuitem name="Service" id="menu_dms_service_root" sequence="30"
+              parent="dms.menu_dms_root" groups="group_dms_telecaller"/>
+     <menuitem name="Insurance Leads" id="menu_dms_insurance_root" sequence="30"
+              parent="dms.menu_dms_root" groups="group_dms_telecaller_insurance"/>
     <menuitem name="Leads" id="menu_dms_leads_root" sequence="30"
               parent="dms.menu_dms_root" groups="group_dms_telecaller,group_dms_telecaller_insurance"/>
     <menuitem name="Reports" id="menu_dms_reports_root" sequence="60"
