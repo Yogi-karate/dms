@@ -11,6 +11,7 @@
     'depends': ['sale_management'],
     'data': [
         'wizard/sale_booking_views.xml',
+        'wizard/update_booking_details.xml',
         'views/sale_views.xml',
         'views/crm_team_views.xml',
         'views/pricelist_views.xml',
@@ -23,6 +24,7 @@
         'security/ir.model.access.csv',
         'wizard/source_deactivate.xml',
         'views/account_invoice_views.xml',
+        'views/invoice_views.xml',
     ],
     'installable': True,
     'auto_install': True,

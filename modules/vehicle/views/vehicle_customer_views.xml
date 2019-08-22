@@ -68,6 +68,7 @@
             <search string="Vehicle Filter">
                 <field name="name" string="Vehicle" filter_domain="['|',('name','ilike',self),('ref','ilike',self)]"/>
                 <field name="product_id"/>
+                <field name="partner_mobile"/>
                 <group expand="0" string="Group By">
                     <filter name="group_by_product" string="Product" domain="[]" context="{'group_by':'product_id'}"/>
                     <filter name="group_by_sale_date" string="Sale Date" domain="[]" context="{'group_by':'date_order'}"/>

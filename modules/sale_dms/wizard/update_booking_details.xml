@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<odoo>
+        <!-- Merge Opportunities  -->
+        <record id="update_booking_details_popup" model="ir.ui.view">
+            <field name="name">update.booking.details.form</field>
+            <field name="model">update.booking.details</field>
+            <field name="arch" type="xml">
+                <form string="Update Booking Details">
+                    <group string="Update Booking Details">
+                        <field name="finance_type"/>
+                    <field name="financier_name"/>
+                    <field name="payment_date"/>
+                    <field name="delivery_date"/>
+
+                    </group>
+
+                    <footer>
+                        <button name="action_reassign" type="object" string="Assign" class="btn-primary"/>
+                        <button string="Cancel" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+
+        <!--  Update booking lists -->
+        <record id="update_booking_details" model="ir.actions.act_window">
+            <field name="name">Update booking details</field>
+            <field name="res_model">update.booking.details</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="update_booking_details_popup"/>
+            <field name="target">new</field>
+        </record>
+</odoo>
