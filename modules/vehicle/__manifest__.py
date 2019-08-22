@@ -15,7 +15,6 @@
         'views/vehicle_views.xml',
         'views/stock_picking_views.xml',
         'views/vehicle_customer_views.xml',
-
     ],
     'installable': True,
     'auto_install': True,

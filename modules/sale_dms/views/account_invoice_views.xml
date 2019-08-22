@@ -7,10 +7,8 @@
             groups="account.group_account_user,account.group_account_manager,account.group_account_invoice"
             web_icon="account,static/description/icon.png"
             sequence="40"/>
-        <menuitem id="menu_finance_payables" name="Vendors" parent="menu_finance" sequence="3" groups="base.user_admin"/>
-
-        <menuitem id="account.menu_finance_configuration" name="Configuration" parent="menu_finance" sequence="35" groups="base.user_admin"/>
-
+        <menuitem id="account.menu_finance_payables" name="Vendors" parent="account.menu_finance" sequence="3" groups="base.user_admin"/>
+        <menuitem id="account.menu_finance_configuration" name="Configuration" parent="account.menu_finance" sequence="35" groups="base.user_admin"/>
         <record id="account.action_invoice_tree" model="ir.actions.act_window">
             <field name="name">Pre-Invoices</field>
             <field name="res_model">account.invoice</field>
@@ -26,7 +24,7 @@
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,kanban,calendar,graph,pivot</field>
-            <field name="view_id" ref="invoice_tree"/>
+            <field name="view_id" ref="account.invoice_tree"/>
             <field name="domain">[('type','in', ['out_invoice', 'out_refund']), ('state', 'not in', ['draft', 'cancel'])]</field>
             <field name="context">{'default_type':'out_invoice', 'type':'out_invoice', 'journal_type': 'sale'}</field>
             <field name="search_view_id" ref="account.view_account_invoice_filter"/>
@@ -36,7 +34,7 @@
             <field name="res_model">account.invoice</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form,calendar,graph</field>
-            <field name="view_id" ref="invoice_tree"/>
+            <field name="view_id" ref="account.invoice_tree"/>
             <field name="context">{'type':'out_invoice'}</field>
             <field name="domain">[('state','=','draft')]</field>
            <!-- <field name="search_view_id" ref="view_account_invoice_filter"/>-->
@@ -51,7 +49,7 @@
         <record id="action_invoice_tree_view2" model="ir.actions.act_window.view">
             <field eval="2" name="sequence"/>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="invoice_form"/>
+            <field name="view_id" ref="account.invoice_form"/>
             <field name="act_window_id" ref="action_invoice_tree"/>
         </record>
 
@@ -72,7 +70,5 @@
               </p>
             </field>
         </record>
-        <menuitem action="action_invoice_tree1" id="menu_action_invoice_tree1" parent="account.menu_finance_receivables" sequence="1"/>
-
     </data>
 </odoo>
