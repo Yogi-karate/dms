@@ -112,7 +112,7 @@
                            (0, 0, {'view_mode': 'form', 'view_id': ref('form_view_service_booking')})
                            ]"/>
         <field name="context"></field>
-        <field name="domain">[('call_type','=','Service')]</field>
+        <field name="domain"></field>
           <field name="search_view_id" ref="view_dms_booking_filter"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
