@@ -57,13 +57,13 @@ class VehicleLead(models.Model):
 
     @api.onchange('vehicle_id')
     def get_values(self):
-        for item in self.vehicle_id:
-            self.partner_name = item.partner_id.name
-            self.street = item.partner_id.street
-            self.source = item.source
-            self.mobile = item.partner_id.mobile
-            self.phone = item.partner_id.phone
-            self.email_from = item.partner_id.email
+        for lead in self:
+            lead.partner_name = lead.vehicle_id.partner_id.name
+            lead.street = lead.vehicle_id.partner_id.street
+            lead.source = lead.vehicle_id.source
+            lead.mobile = lead.vehicle_id.partner_id.mobile
+            lead.phone = lead.vehicle_id.partner_id.phone
+            lead.email_from = lead.vehicle_id.partner_id.email
 
         print(self.vehicle_id,"oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo")
     @api.model

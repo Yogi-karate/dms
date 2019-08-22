@@ -13,6 +13,7 @@
         'security/dms_groups.xml',
         'security/ir.model.access.csv',
         'views/dms_views.xml',
+        'views/booking_insurance.xml',
         'views/booking_service.xml',
         'views/activity_done_views.xml',
         'data/opportunity_type_data.xml',
@@ -22,8 +23,6 @@
         'data/vehicle_import_cron_data.xml',
         'wizard/dms_vehicle_lead_assign.xml',
         'views/dms_vehicle_lost_views.xml',
-        'views/booking_insurance.xml',
-
     ],
     'installable': True,
     'auto_install': False,
