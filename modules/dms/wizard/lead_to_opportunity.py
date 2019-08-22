@@ -184,7 +184,8 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
             'date_conversion': fields.Datetime.today(),
             'probability': 100
         }
-
+        if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
+            raise UserError("Please add both pickup date and address")
         if self.partner_id:
             values['partner_id'] = self.partner_id.id
         leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
@@ -194,9 +195,12 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         booking_values = {
                 'lead_id': self.lead_id.id,
                 'vehicle_id': self.lead_id.vehicle_id.id,
-                'booking_type': self.booking_type_insurance,
+                'dop': self.dop,
+                'dip_or_comp': self.booking_type_insurance,
+                'booking_type': self.booking_type,
                 'alternate_no':self.alternate_no,
                 'service_type': self.service_type,
+                'pick_up_address': self.pick_up_address,
                 'due_date': self.due_date,
                 'policy_no': self.policy_no,
                 'previous_insurance_company': self.previous_insurance_company,

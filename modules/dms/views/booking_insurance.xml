@@ -31,7 +31,7 @@
         <field name="model">insurance.booking</field>
          <field name="arch" type="xml">
 
-              <form string="Service Bookings">
+              <form string="Insurance Bookings">
                       <header>
                           <button name="%(booking_lost_action_new_insurance)d" string="Mark as Lost"
                                   type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
@@ -43,8 +43,9 @@
                             <div class="badge-pill badge-danger float-right"
                          attrs="{'invisible': [('active', '=', True)]}">Lost
                     </div>
-                            <group string="Service Bookings">
-                            <field name="active" invisible="1"/>
+                            <group string="Insurance Bookings">
+                                <group>
+                                     <field name="active" invisible="1"/>
                             <field name="source"/>
                             <field name="partner_name"/>
                             <field name="mobile"/>
@@ -55,10 +56,29 @@
                             <field name="user_id" string="TC Name"/>
                                 <field name="engine_no"/>
                 <field name="chassis_no"/>
+                                </group>
+                           <group class="right">
+                                    <field name="previous_insurance_company" />
+                               <field name="rollover_company" string="Current Insurance Company"/>
+
+                            <field name="alternate_no"/>
+                            <field name="due_date"/>
+                            <field name="policy_no"/>
+                            <field name="previous_idv"/>
+                        <field name="idv"/>
+                               <field name="dip_or_comp"/>
+                        <field name="booking_type"/>
+                               <field name="dop" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
+                            <field name="pick_up_address" string="Pickup Address" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
+                        <field name="final_premimum"/>
+
+
+
+                            </group>
                              </group>
-                      </sheet>
 
 
+                        </sheet>
 
             </form>
          </field>

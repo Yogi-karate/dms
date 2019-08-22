@@ -10,7 +10,7 @@
               parent="dms.menu_dms_root"
               web_icon="vehicle,static/description/icon.png"/>
     <menuitem name="Leads" id="menu_dms_leads_root" sequence="30"
-              parent="dms.menu_dms_root" groups="group_dms_telecaller"/>
+              parent="dms.menu_dms_root" groups="group_dms_telecaller,group_dms_telecaller_insurance"/>
     <menuitem name="Reports" id="menu_dms_reports_root" sequence="60"
               parent="dms.menu_dms_root"/>
     <menuitem name="Configuration" id="menu_dms_configurations_root" sequence="70"
