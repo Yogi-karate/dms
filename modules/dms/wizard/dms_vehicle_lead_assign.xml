@@ -51,7 +51,7 @@
             view_mode="form"
             target="new"
             view_type="form"
-            groups="group_dms_callcenter_lead"/>
+            groups="group_dms_callcenter_lead,group_dms_callcenter_lead_insurance"/>
 
 
 </odoo>
