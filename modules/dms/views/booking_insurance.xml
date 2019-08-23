@@ -138,4 +138,20 @@
             </p>
         </field>
     </record>
+
+
+    <record id="action_res_partner_insurance_company" model="ir.actions.act_window">
+            <field name="name">Insurance Companies</field>
+            <field name="res_model">res.partner.bank</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create an Insurance Company
+              </p>
+            </field>
+        </record>
+    <menuitem action="action_res_partner_insurance_company" id="create_an_insurance_menu"
+              parent="menu_dms_insurance_root"
+              sequence="1" groups = "group_dms_callcenter_lead_insurance"/>
 </odoo>
