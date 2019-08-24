@@ -92,7 +92,7 @@ class ODVehicle(models.Model):
             source = ''
             if not vehicle.dealer:
                 source = 'od'
-            elif 'saboo' in vehicle.dealer.lower() or 'prashant' in vehicle.dealer.lower():
+            elif 'saboo' in vehicle.dealer.lower():
                 source = 'saboo'
             else:
                 source = 'od'

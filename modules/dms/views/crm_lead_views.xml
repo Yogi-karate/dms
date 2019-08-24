@@ -187,7 +187,7 @@
                 <field name="mobile"/>
                 <field name="activity_date_deadline" string="Followup Date"/>
                 <field name="registration_no"/>
-                <field name="source" groups="dms.group_dms_callcenter_manager"/>
+                <field name="source" groups="dms.group_dms_callcenter_manager,group_dms_callcenter_lead_insurance"/>
                 <field name="user_id" string="Telecaller"/>
                 <field name="activity_summary" string="Summary"/>
                 <field name="contact_name" invisible="1"/>
@@ -440,7 +440,7 @@
                 <field name="mobile"/>
                 <field name="activity_date_deadline" string="Followup Date"/>
                 <field name="registration_no"/>
-                <field name="source" groups="dms.group_dms_callcenter_manager"/>
+                <field name="source" groups="dms.group_dms_callcenter_manager,dms.group_dms_callcenter_lead_insurance"/>
                 <field name="user_id" string="Telecaller"/>
                 <field name="activity_summary" string="Summary"/>
                 <field name="contact_name" invisible="1"/>
