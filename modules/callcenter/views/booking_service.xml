@@ -2,11 +2,11 @@
 <odoo>
          <record id="booking_lost_view_form_new" model="ir.ui.view">
             <field name="name">crm.booking.lost.form.new</field>
-            <field name="model">crm.lead.lost</field>
+            <field name="model">dms.lead.lost</field>
             <field name="arch" type="xml">
                 <form string="Lost Reason">
                     <group class="oe_title">
-                        <field name="dms_lost_reason"/>
+                        <field name="lost_reason"/>
                         <field name="lost_remarks"/>
                     </group>
                     <footer>

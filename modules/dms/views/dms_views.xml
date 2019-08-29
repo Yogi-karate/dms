@@ -1,33 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Top menu item -->
-    <menuitem id="menu_dms_root"
-              name="Dms"
-              web_icon="dms,static/description/icon.png"
-              sequence="1"/>
+
     <menuitem name="Vehicles" id="menu_dms_master_data_root" sequence="40"
-              parent="dms.menu_dms_root"
+              parent="base_dms.menu_dms_root"
               web_icon="vehicle,static/description/icon.png"/>
-     <menuitem name="Service" id="menu_dms_service_root" sequence="30"
-              parent="dms.menu_dms_root" groups="group_dms_telecaller"/>
-     <menuitem name="Insurance Leads" id="menu_dms_insurance_root" sequence="30"
-              parent="dms.menu_dms_root" groups="group_dms_telecaller_insurance"/>
-    <menuitem name="Leads" id="menu_dms_leads_root" sequence="30"
-              parent="dms.menu_dms_root" groups="group_dms_telecaller,group_dms_telecaller_insurance"/>
-    <menuitem name="Reports" id="menu_dms_reports_root" sequence="60"
-              parent="dms.menu_dms_root"/>
-    <menuitem name="Configuration" id="menu_dms_configurations_root" sequence="70"
-              parent="dms.menu_dms_root" groups="base.group_system"
-              />
+
+    <!-- Vehicle Menus -->
     <menuitem action="vehicle.action_vehicle_form" id="menu_action_vehicle_form"
-              parent="dms.menu_dms_master_data_root" groups="stock.group_stock_user"
+              parent="menu_dms_master_data_root" groups="stock.group_stock_user"
               sequence="1"/>
-    <menuitem action="vehicle.action_vehicle_customer_form" id="menu_action_vehicle_customer_form"
-              parent="dms.menu_dms_reports_root" groups="stock.group_stock_user"
+     <menuitem action="vehicle.action_vehicle_customer_form" id="menu_action_vehicle_customer_form"
+              parent="base_dms.menu_dms_reports_root" groups="stock.group_stock_user"
               sequence="1"/>
     <menuitem name="Vehicle Import" id="menu_dms_vehicle_import_root" sequence="30" action="vehicle.action_import_vehicle"
-             parent="dms.menu_dms_configurations_root"/>
+             parent="base_dms.menu_dms_configurations_root"/>
     <menuitem name="Sale Order Cleanup" id="menu_dms_order_cleanup" sequence="30" action="sale_dms.action_clean_sale_orders"
-             parent="dms.menu_dms_configurations_root"/>
+             parent="base_dms.menu_dms_configurations_root"/>
 </odoo>

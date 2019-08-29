@@ -48,7 +48,8 @@ class Vehicle(models.Model):
         ('saboo', 'Saboo'),
     ], string='Source', store=True, default='saboo')
     dealer_name = fields.Char('Dealer', default='saboo')
-
+    company_id = fields.Many2one('res.company', string='Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
     @api.depends('order_id')
     def _on_change_sale_order(self):
         self.partner_id = self.order_id.partner_id

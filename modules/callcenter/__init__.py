@@ -2,5 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 
-from . import order_confirm
-from . import location
+from . import models
+from . import wizard
+
+
+

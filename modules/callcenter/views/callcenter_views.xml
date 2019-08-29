@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+
+    <menuitem name="Leads" id="menu_dms_leads_root" sequence="30"
+              parent="base_dms.menu_dms_root" groups="group_dms_telecaller,group_dms_telecaller_insurance"/>
+     <menuitem action="action_new_lead_form" id="menu_action_vehicle_lead_form_service"
+              parent="menu_dms_leads_root"
+              sequence="1" groups="group_dms_telecaller"/>
+
+    <menuitem action="action_new_lead_form_insurance" id="menu_action_vehicle_lead_form_insurance"
+              parent="menu_dms_leads_root"
+              sequence="1" groups="group_dms_telecaller_insurance"/>
+
+    <menuitem action="action_service_booking" id="menu_action_vehicle_lead_form_oppor_service"
+              parent="base_dms.menu_dms_reports_root"
+              string="Service Bookings"
+              sequence="2" groups="group_dms_telecaller"/>
+    <menuitem action="action_insurance_booking" id="menu_action_vehicle_lead_form_oppor_insurance"
+              parent="base_dms.menu_dms_reports_root"
+              string="Insurance Bookings"
+              sequence="2" groups="group_dms_telecaller_insurance"/>
+     <menuitem
+            id="crm_activity_report_done_menu_service"
+            name="Activities Completed"
+            parent="base_dms.menu_dms_reports_root"
+            action="crm_activity_report_done_action_service"
+            sequence="3" groups="group_dms_telecaller,group_dms_telecaller_insurance"/>
+     <menuitem action="action_lost_reasons_screen_service"
+              id="menu_action_lost_reasons_screen_service"
+              parent="base_dms.menu_dms_configurations_root"
+              string="Lost Reasons Service"
+              groups="group_dms_telecaller"
+              sequence="4"/>
+     <menuitem action="action_dms_vehicle_service_lost" id="menu_action_dms_vehicle_service_lost"
+              parent="base_dms.menu_dms_reports_root"
+              string="Lost Service Leads"
+              groups="group_dms_telecaller"
+              sequence="3"/>
+     <menuitem action="action_dms_vehicle_insurance_lost" id="menu_action_dms_vehicle_insurance_lost"
+              parent="base_dms.menu_dms_reports_root"
+              string="Lost Insurance Leads"
+              groups="group_dms_telecaller_insurance"
+              sequence="3"/>
+
+</odoo>

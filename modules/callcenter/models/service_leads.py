@@ -116,7 +116,7 @@ class ServiceLeads(models.TransientModel):
             return value + 1
 
     @api.model
-    def _prepare_leads(self, vehicle, type, date_follow_up, service_type, call_type, delta):
+    def _prepare_leads(self, vehicle, type, date_follow_up, service_type, delta):
         print("typeeeepeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee", type)
         # customer = self._create_lead_partner()
         return {
@@ -130,8 +130,7 @@ class ServiceLeads(models.TransientModel):
             'service_type': service_type,
             'vin_no': vehicle.chassis_no,
             'registration_no': vehicle.registration_no,
-            'dos': vehicle.date_order,
-            'call_type': call_type
+            'dos': vehicle.date_order
         }
 
     @api.model

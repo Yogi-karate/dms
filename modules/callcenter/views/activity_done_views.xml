@@ -1,0 +1,85 @@
+<?xml version="1.0"?>
+<odoo>
+    <!-- test code -->
+
+    <record id="crm_activity_report_view_done_tree" model="ir.ui.view">
+        <field name="model">crm.activity.done.report</field>
+        <field name="arch" type="xml">
+            <tree string="Activities">
+                <field name="partner_name"/>
+                <field name="mobile"/>
+                <field name="summary" widget="html" string="Summary"/>
+                <field name="date" string="Completed Date"/>
+                <field name="user_id" string="Telecaller"/>
+                <field name="team_id" string="Team"/>
+            </tree>
+        </field>
+    </record>
+    <record id="crm_activity_report_view_done_graph" model="ir.ui.view">
+        <field name="name">crm.activity.report.done.graph</field>
+        <field name="model">crm.activity.done.report</field>
+        <field name="arch" type="xml">
+            <graph string="Activities Analysis" stacked="True">
+                <field name="mail_activity_type_id" type="col"/>
+                <field name="date" interval="month" type="row"/>
+            </graph>
+        </field>
+    </record>
+
+    <record id="crm_activity_report_view_done_pivot" model="ir.ui.view">
+        <field name="name">crm.activity.report.done.pivot</field>
+        <field name="model">crm.activity.done.report</field>
+        <field name="arch" type="xml">
+            <pivot string="Activities Analysis" disable_linking="True">
+                <field name="mail_activity_type_id" type="col"/>
+                <field name="date" interval="month" type="row"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="crm_activity_report_view_done_search" model="ir.ui.view">
+        <field name="name">crm.activity.report.done.search</field>
+        <field name="model">crm.activity.done.report</field>
+        <field name="arch" type="xml">
+            <search string="Activities Analysis">
+                <filter string="My Activities" name="activities_my" domain="[('user_id', '=', uid)]"/>
+                <separator/>
+                <filter name="lead" string="Leads" domain="[('lead_type','=', 'lead')]" help="Show only lead"/>
+                <separator/>
+                <filter string="Won" name="won"
+                        domain="['&amp;', ('stage_id.probability', '=', 100), ('stage_id.on_change', '=', 1)]"/>
+                <separator/>
+                <filter string="Date" name="filter_date" date="date"/>
+                <filter string="Mobile" name="mobile"/>
+                <field name="team_id" string="Service Team"/>
+                <field name="author_id" string="Created By"/>
+                <field name="date" string="Completion Date"/>
+                <field name="mobile"/>
+                <field name="user_id" string="Telecaller name"/>
+                <group expand="1" string="Group By">
+                    <filter string="Created By" name="group_by_salesperson" context="{'group_by':'author_id'}"/>
+                    <filter string="Telecaller" name="group_by_telecaller" context="{'group_by':'user_id'}"/>
+                    <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>
+                    <filter string="Opportunity Type" name="opportunity_type" context="{'group_by':'opportunity_type'}"/>
+                    <filter string="Country" name="country" context="{'group_by':'country_id'}"/>
+                    <filter string="Company" name="company" context="{'group_by':'company_id'}"
+                            groups="base.group_multi_company"/>
+                    <filter string="Stage" name="stage" context="{'group_by':'stage_id'}"/>
+                    <filter string="Date" context="{'group_by':'date:month'}" name="month"/>
+                    <filter string="Leads" name="group_by_opportunity" context="{'group_by':'lead_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="crm_activity_report_done_action_service" model="ir.actions.act_window">
+        <field name="name">Activities Done Analysis Service</field>
+        <field name="res_model">crm.activity.done.report</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,graph,pivot</field>
+        <field name="context">{'search_default_activities_my': True}</field>
+    </record>
+
+
+
+</odoo>

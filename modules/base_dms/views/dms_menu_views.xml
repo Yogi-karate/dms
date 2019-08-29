@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- Top menu item -->
+    <menuitem id="menu_dms_root"
+              name="Dms"
+              web_icon="dms,static/description/icon.png"
+              sequence="1"/>
+    <menuitem name="Reports" id="menu_dms_reports_root" sequence="60"
+              parent="menu_dms_root"/>
+    <menuitem name="Configuration" id="menu_dms_configurations_root" sequence="70"
+              parent="menu_dms_root" groups="base.group_system"
+              />
+
+</odoo>
