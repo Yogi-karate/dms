@@ -48,7 +48,8 @@ class DailyLeads(models.TransientModel):
     def _process_user_leads(self, autocommit=True):
         self._clean_user_leads()
         _logger.info("!!!!!!!!!!!!!!Starting Creation of User report for Enquiries!!!!!!!!!!!!!!!!")
-        self.export_action()
+        #self.export_action()
+        _logger.info(" Disabled for Now")
         _logger.info("****************Finished creating user lead report****************")
         pass
 

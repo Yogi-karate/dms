@@ -10,7 +10,7 @@ access_dms_vehicle_lead_manager_i,dms vehicle lead,model_dms_vehicle_lead,group_
 
 
 access_crm_activity_done_report,dms crm_activity_done_report,model_crm_activity_done_report,group_dms_telecaller,1,1,1,1
-access_crm_activity_done_report,dms crm_activity_done_report,model_crm_activity_done_report,group_dms_telecaller_insurance,1,1,1,1
+access_crm_activity_done_report_insurance,dms crm_activity_done_report,model_crm_activity_done_report,group_dms_telecaller_insurance,1,1,1,1
 
 
 access_service_booking,dms service_booking,model_service_booking,group_dms_telecaller,1,1,1,0
@@ -21,6 +21,9 @@ access_service_booking_manager,dms service_booking,model_service_booking,group_d
 access_insurance_booking_telecaller,dms insurance_booking,model_insurance_booking,group_dms_telecaller_insurance,1,1,0,0
 access_insurance_booking_lead_insurance,dms insurance_booking,model_insurance_booking,group_dms_callcenter_lead_insurance,1,1,1,1
 
-access_dms_vehicle_visibility,dms vehicle,vehicle.model_vehicle,group_dms_telecaller,1,0,0,0
-access_dms_vehicle_visibility_insurance,dms vehicle,vehicle.model_vehicle,group_dms_telecaller_insurance,1,0,0,0
+access_dms_opportunity_type_visibility,dms.opportunity_type_tc_visibility,crm_dms.model_dms_opportunity_type,group_dms_telecaller,1,0,0,0
+access_dms_opportunity_type_visibility_insurance,dms.opportunity_type_tci_visibility,crm_dms.model_dms_opportunity_type,group_dms_telecaller_insurance,1,0,0,0
+
+access_dms_vehicle_visibility,dms vehicle,vehicle.model_vehicle,group_dms_telecaller,1,1,1,0
+access_dms_vehicle_visibility_insurance,dms vehicle,vehicle.model_vehicle,group_dms_telecaller_insurance,1,1,1,0
 

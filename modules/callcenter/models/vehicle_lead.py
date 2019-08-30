@@ -24,6 +24,36 @@ class VehicleLead(models.Model):
     ], string='Service Type', store=True, default='first')
     lost_remarks = fields.Char('Remarks')
     call_type = fields.Char('Call Type')
+    call_state = fields.Selection([
+        ('fresh', 'Fresh'),
+        ('done', 'Completed'),
+        ('progress', 'In-Progress'),
+        ('call-back', 'Callback'),
+    ], string='Call Status', readonly=True, track_visibility='onchange', track_sequence=3,
+        compute='_process_call_status')
+
+    @api.depends('activity_date_deadline')
+    @api.multi
+    def _process_call_status(self):
+        for lead in self:
+            print("Status", lead.activity_ids)
+            print("Status", len(lead.activity_ids))
+            print("Status", lead.activity_state)
+            print("deadline", lead.activity_date_deadline)
+            print("Completed activities", lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id))
+            print("Call back activities", lead.activity_ids.activity_type_id.name)
+            print("Call back activities Name",
+                  lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back'))
+
+            if not len(lead.activity_ids):
+                lead.call_state = 'done'
+            if len(lead.activity_ids) > 0 and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
+                lead.call_state = 'progress'
+            if len(lead.activity_ids) == 1 and len(
+                    lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) == 0:
+                lead.call_state = 'fresh'
+            if len(lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back')) > 0:
+                    lead.call_state = 'call-back'
 
     @api.onchange('vehicle_id')
     def get_values(self):
@@ -54,6 +84,7 @@ class VehicleLead(models.Model):
                 'team_id': team_id
             }
             enquiry.write(vals)
+
 
 class LostReason(models.Model):
     _name = "crm.lost.reason"
@@ -186,4 +217,3 @@ class Insurance(models.Model):
         self.write({'active': True})
         lead = self.sudo().env['dms.vehicle.lead'].browse(self.lead_id.id)
         lead.write({'active': True})
-

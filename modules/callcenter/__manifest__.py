@@ -12,6 +12,7 @@
     'data': [
         'security/callcenter_groups.xml',
         'security/ir.model.access.csv',
+        'data/mail_activity.xml',
         'data/opportunity_type_data.xml',
         'wizard/dms_vehicle_lead_assign.xml',
         'wizard/dms_lead_lost.xml',

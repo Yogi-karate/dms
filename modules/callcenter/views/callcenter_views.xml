@@ -29,7 +29,7 @@
      <menuitem action="action_lost_reasons_screen_service"
               id="menu_action_lost_reasons_screen_service"
               parent="base_dms.menu_dms_configurations_root"
-              string="Lost Reasons Service"
+              string="Lost Reasons"
               groups="group_dms_telecaller"
               sequence="4"/>
      <menuitem action="action_dms_vehicle_service_lost" id="menu_action_dms_vehicle_service_lost"

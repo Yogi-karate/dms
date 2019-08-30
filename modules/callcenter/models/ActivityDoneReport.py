@@ -9,7 +9,7 @@ class ActivityDoneReport(models.Model):
 
     _name = "crm.activity.done.report"
     _auto = False
-    _description = "CRM Activity Analysis"
+    _description = "DMS Vehicle Lead Activity Analysis"
     _rec_name = 'id'
 
     date = fields.Datetime('Date', readonly=True)
