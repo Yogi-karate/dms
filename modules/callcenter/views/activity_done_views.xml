@@ -61,12 +61,11 @@
                     <filter string="Telecaller" name="group_by_telecaller" context="{'group_by':'user_id'}"/>
                     <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>
                     <filter string="Opportunity Type" name="opportunity_type" context="{'group_by':'opportunity_type'}"/>
-                    <filter string="Country" name="country" context="{'group_by':'country_id'}"/>
                     <filter string="Company" name="company" context="{'group_by':'company_id'}"
                             groups="base.group_multi_company"/>
                     <filter string="Stage" name="stage" context="{'group_by':'stage_id'}"/>
                     <filter string="Date" context="{'group_by':'date:month'}" name="month"/>
-                    <filter string="Leads" name="group_by_opportunity" context="{'group_by':'lead_id'}"/>
+
                 </group>
             </search>
         </field>

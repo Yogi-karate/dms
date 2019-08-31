@@ -45,15 +45,15 @@ class VehicleLead(models.Model):
             print("Call back activities Name",
                   lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back'))
 
-            if not len(lead.activity_ids):
+            if not len(lead.activity_ids) and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
                 lead.call_state = 'done'
             if len(lead.activity_ids) > 0 and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
                 lead.call_state = 'progress'
-            if len(lead.activity_ids) == 1 and len(
-                    lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) == 0:
+            if len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) == 0 or len(
+                    lead.activity_ids) == 0:
                 lead.call_state = 'fresh'
             if len(lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back')) > 0:
-                    lead.call_state = 'call-back'
+                lead.call_state = 'call-back'
 
     @api.onchange('vehicle_id')
     def get_values(self):
