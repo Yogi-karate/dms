@@ -183,7 +183,6 @@
                 <group expand="0" string="Group By">
                     <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
                     <filter string="Sales Channel" name="saleschannel" context="{'group_by':'team_id'}"/>
-                    <filter string="Lost Reason" name="lostreason" context="{'group_by':'lost_reason'}"/>
                     <separator orientation="vertical"/>
                     <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
                     <filter string="Conversion Date" name="date_conversion" context="{'group_by':'date_conversion'}"/>
