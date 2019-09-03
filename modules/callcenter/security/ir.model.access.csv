@@ -1,10 +1,10 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 
-access_dms_vehicle_lead,dms vehicle lead,model_dms_vehicle_lead,group_dms_telecaller,1,1,0,0
+access_dms_vehicle_lead,dms vehicle lead,model_dms_vehicle_lead,group_dms_telecaller,1,1,1,0
 access_dms_vehicle_lead_lead,dms vehicle lead,model_dms_vehicle_lead,group_dms_callcenter_lead,1,1,1,1
 access_dms_vehicle_lead_manager,dms vehicle lead,model_dms_vehicle_lead,group_dms_callcenter_manager,1,1,1,1
 
-access_dms_vehicle_lead_i,dms vehicle lead,model_dms_vehicle_lead,group_dms_telecaller_insurance,1,1,0,0
+access_dms_vehicle_lead_i,dms vehicle lead,model_dms_vehicle_lead,group_dms_telecaller_insurance,1,1,1,0
 access_dms_vehicle_lead_lead_i,dms vehicle lead,model_dms_vehicle_lead,group_dms_callcenter_lead_insurance,1,1,1,1
 access_dms_vehicle_lead_manager_i,dms vehicle lead,model_dms_vehicle_lead,group_dms_callcenter_manager_insurance,1,1,1,1
 

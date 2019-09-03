@@ -1,7 +1,5 @@
 <?xml version="1.0"?>
 <odoo>
-    <!-- test code -->
-
     <record id="crm_activity_report_view_done_tree" model="ir.ui.view">
         <field name="model">crm.activity.done.report</field>
         <field name="arch" type="xml">
@@ -65,7 +63,6 @@
                             groups="base.group_multi_company"/>
                     <filter string="Stage" name="stage" context="{'group_by':'stage_id'}"/>
                     <filter string="Date" context="{'group_by':'date:month'}" name="month"/>
-
                 </group>
             </search>
         </field>
@@ -78,7 +75,4 @@
         <field name="view_mode">tree,graph,pivot</field>
         <field name="context">{'search_default_activities_my': True}</field>
     </record>
-
-
-
 </odoo>

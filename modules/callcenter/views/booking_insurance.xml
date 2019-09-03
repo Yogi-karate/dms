@@ -5,17 +5,15 @@
         <field name="name">insurance.booking.form</field>
         <field name="model">insurance.booking</field>
         <field name="arch" type="xml">
-
             <form string="Insurance Bookings">
                 <header>
                     <field name="active" invisible="1"/>
-                    <button name="%(crm_lead_lost_view_form_new)d" string="Mark as Lost"
-                                  context="{'default_lead_id': active_id,'active_type':'service_booking'}"
-                                  type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
+                    <button name="%(dms_vehicle_lead_lost_action)d" string="Mark as Lost"
+                            context="{'default_lead_id': active_id,'active_type':'service_booking'}"
+                            type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
                     <button name="restore_booking_lost_action_new" string="Restore" type="object"
                             class="oe_highlight" attrs="{'invisible': [('active', '=', True)]}"/>
                 </header>
-
                 <sheet>
                     <div class="badge-pill badge-danger float-right"
                          attrs="{'invisible': [('active', '=', True)]}">Lost

@@ -8,11 +8,10 @@ class VehicleLead(models.Model):
 
     vehicle_id = fields.Many2many('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1,
                                   index=True)
-
     registration_no = fields.Char('Registration No.')
     vin_no = fields.Char('Chassis No.')
     dos = fields.Datetime(string='Date of Sale')
-    source = fields.Char('Source', compute='_get_sale_order')
+    source = fields.Char('Source')
     service_type = fields.Selection([
         ('first', 'First Free Service'),
         ('second', 'Second Free Service'),
@@ -23,7 +22,7 @@ class VehicleLead(models.Model):
         ('Insurance', 'Insurance'),
     ], string='Service Type', store=True, default='first')
     lost_remarks = fields.Char('Remarks')
-    call_type = fields.Char('Call Type')
+    call_type = fields.Char('Call Type', compute='_compute_lead_type')
     call_state = fields.Selection([
         ('fresh', 'Fresh'),
         ('done', 'Completed'),
@@ -32,19 +31,25 @@ class VehicleLead(models.Model):
     ], string='Call Status', readonly=True, track_visibility='onchange', track_sequence=3,
         compute='_process_call_status')
 
+    @api.multi
+    def _compute_lead_type(self):
+        for lead in self:
+            lead.call_type = lead.opportunity_type.name
+
+    @api.model
+    def default_get(self, fields):
+        rec = super(VehicleLead, self).default_get(fields)
+        lead_type = self.env.context.get('default_source_type')
+        if lead_type:
+            opportunity = self.env['dms.opportunity.type'].search([('name', '=', lead_type)], limit=1)
+            rec['opportunity_type'] = opportunity.id
+            rec['call_type'] = opportunity.name
+        return rec
+
     @api.depends('activity_date_deadline')
     @api.multi
     def _process_call_status(self):
         for lead in self:
-            print("Status", lead.activity_ids)
-            print("Status", len(lead.activity_ids))
-            print("Status", lead.activity_state)
-            print("deadline", lead.activity_date_deadline)
-            print("Completed activities", lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id))
-            print("Call back activities", lead.activity_ids.activity_type_id.name)
-            print("Call back activities Name",
-                  lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back'))
-
             if not len(lead.activity_ids) and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
                 lead.call_state = 'done'
             if len(lead.activity_ids) > 0 and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
@@ -64,6 +69,8 @@ class VehicleLead(models.Model):
             lead.mobile = lead.vehicle_id.partner_id.mobile
             lead.phone = lead.vehicle_id.partner_id.phone
             lead.email_from = lead.vehicle_id.partner_id.email
+            lead.registration_no = lead.vehicle_id.registration_no
+            lead.vin_no = lead.vehicle_id.chassis_no
 
     @api.model
     def create(self, vals):
@@ -71,19 +78,14 @@ class VehicleLead(models.Model):
         result = super(VehicleLead, self).create(vals)
         return result
 
-    @api.one
-    def _get_sale_order(self):
-        # We only care for the customer if sale order is entered.
-        self.source = self.vehicle_id.source
-
     @api.multi
     def reassign_users(self, user_id, team_id):
-        for enquiry in self:
+        for lead in self:
             vals = {
                 'user_id': user_id,
                 'team_id': team_id
             }
-            enquiry.write(vals)
+            lead.write(vals)
 
 
 class LostReason(models.Model):

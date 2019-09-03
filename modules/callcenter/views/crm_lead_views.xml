@@ -1,35 +1,26 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <record id="crm_lead_lost_action_new" model="ir.actions.act_window">
-        <field name="name">Lost Reason.</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">dms.lead.lost</field>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="crm_lead_lost_view_form_new"/>
-        <field name="target">new</field>
-    </record>
-
     <record id="crm_case_form_view_leads_new" model="ir.ui.view">
         <field name="name">crm.lead.form.lead.new</field>
         <field name="model">dms.vehicle.lead</field>
         <field name="arch" type="xml">
             <form string="Leads Form">
                 <header>
-                    <button name="%(action_dms_lead2opportunity_partner)d" string="Book a Service"
+                    <button name="%(action_dms_lead2opportunity_partner)d" string="Book Service"
                             type="action"
                             help="Book Service Order" class="oe_highlight"
-                            attrs="{'invisible': [('type', '=', 'opportunity'),('opportunity_type','=','Insurance')]}"/>
-                    <button name="%(action_dms_lead2opportunity_partner)d" string="Book a Service"
+                            attrs="{'invisible': [('type', '=', 'opportunity') and ('call_type','=','Insurance')]}"/>
+                    <button name="%(action_dms_lead2opportunity_partner_insurance)d" string="Book Insurance Policy"
                             type="action"
                             help="Book Insurance Policy" class="oe_highlight"
-                            attrs="{'invisible': [('type', '=', 'opportunity'),('opportunity_type','=','Service')]}"/>
+                            attrs="{'invisible': [('type', '=', 'opportunity') and ('call_type','=','Service')]}"/>
                     <button name="toggle_active"
                             string="Restore"
                             type="object"
                             attrs="{'invisible': ['|', ('probability', '&gt;', 0), ('active', '=', True)]}"/>
 
-                    <button name="%(crm_lead_lost_action_new)d" string="Mark as Lost"
+                    <button name="%(dms_vehicle_lead_lost_action)d" string="Mark as Lost"
                             type="action" class="oe_highlight"
                             context="{'default_lead_id': active_id,'active_type':'lead'}"
                             attrs="{'invisible': [('active', '=', False),('probability', '&lt;', 100)]}"/>
@@ -76,8 +67,6 @@
                                 <field name="title" placeholder="Title" domain="[]" options='{"no_open": True}'/>
                             </div>
                             <field name="is_blacklisted" invisible="1"/>
-                            <field name="opportunity_type"
-                                   domain="[('name','ilike',context.get('default_source_type'))]"/>
                             <field name="service_type"/>
                             <field name="source" groups="dms.group_dms_callcenter_manager"/>
                             <label for="email_from" class="oe_inline"/>
@@ -94,6 +83,7 @@
                             <field name="type" invisible="1"/>
                             <field name="probability" invisible="1"/>
                             <field name="opportunity_type" invisible="1"/>
+                            <field name="call_type" invisible="1"/>
                         </group>
                         <group>
                             <field name="priority" widget="priority" invisible="1"/>
@@ -155,36 +145,18 @@
             </tree>
         </field>
     </record>
-    <record id="view_dms_vehicle_lead_filter" model="ir.ui.view">
-        <field name="name">dms.vehicle.lead.search</field>
-        <field name="model">dms.vehicle.lead</field>
-        <field name="arch" type="xml">
-            <search string="Search Partner">
-                <field name="name" string="Lead"
-                       filter_domain="['|','|','|',('partner_name','ilike',self),('name', 'ilike', self),('mobile','ilike',self),('email_from','ilike',self)]"/>
 
-                <filter string="Activities to be done" name="assigned_to_me"
-                        domain="[('activity_ids.user_id', '=', uid)]"
-                        help="Activities to be done"/>
-                <field name="vin_no"/>
-                <field name="registration_no"/>
-                <field name="user_id"/>
-                <separator/>
-            </search>
-        </field>
-    </record>
     <record id="view_dms_vehicle_leads_filter" model="ir.ui.view">
         <field name="name">crm.lead.search.lead</field>
         <field name="model">dms.vehicle.lead</field>
         <field name="arch" type="xml">
             <search string="Search Leads">
                 <field name="name"
-                       filter_domain="['|','|','|',('partner_name', 'ilike', self),('email_from', 'ilike', self),('mobile', 'ilike', self), ('name', 'ilike', self)]"/>
+                       filter_domain="['|','|','|',('partner_name', 'ilike', self),('vin_no', 'ilike', self),('mobile', 'ilike', self), ('name', 'ilike', self)]"/>
                 <field name="user_id"/>
                 <field name="team_id"/>
                 <field name="create_date"/>
                 <field name="lost_reason"/>
-                <field name="vin_no"/>
                 <field name="registration_no"/>
                 <separator/>
                 <filter string="My Leads"
