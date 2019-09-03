@@ -156,7 +156,6 @@
                 <field name="user_id"/>
                 <field name="team_id"/>
                 <field name="create_date"/>
-                <field name="lost_reason"/>
                 <field name="registration_no"/>
                 <separator/>
                 <filter string="My Leads"

@@ -35,7 +35,36 @@
             </tree>
         </field>
     </record>
-
+  <record id="view_dms_vehicle_leads_lost_filter" model="ir.ui.view">
+        <field name="name">crm.lead.search.lead</field>
+        <field name="model">dms.vehicle.lead</field>
+        <field name="arch" type="xml">
+            <search string="Search Leads">
+                <field name="name"
+                       filter_domain="['|','|','|',('partner_name', 'ilike', self),('vin_no', 'ilike', self),('mobile', 'ilike', self), ('name', 'ilike', self)]"/>
+                <field name="user_id"/>
+                <field name="team_id"/>
+                <field name="create_date"/>
+                <field name="registration_no"/>
+                <field name="lost_reason"/>
+                <separator/>
+                <filter string="My Leads"
+                        name="assigned_to_me"
+                        domain="[('user_id', '=', uid)]"
+                        help="Leads that are assigned to me"/>
+                <separator/>
+                <group expand="0" string="Group By">
+                    <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
+                    <filter string="Sales Channel" name="saleschannel" context="{'group_by':'team_id'}"/>
+                    <separator orientation="vertical"/>
+                     <filter string="Lost Reason" name="lostreason" context="{'group_by':'lost_reason'}"/>
+                    <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
+                    <filter string="Expected Closing Date" name="date_deadline" context="{'group_by':'date_deadline'}"/>
+                    <filter string="Closed Date" name="date_closed" context="{'group_by':'date_closed'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
     <record id="action_dms_vehicle_service_lost" model="ir.actions.act_window">
         <field name="name">Lost Service Leads</field>
         <field name="type">ir.actions.act_window</field>
@@ -46,7 +75,7 @@
                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_leads_new')})]"/>
         <field name="context"></field>
         <field name="domain">['&amp;',('active', '=', False),('opportunity_type','=','Service')]</field>
-        <field name="search_view_id" ref="view_dms_vehicle_leads_filter"/>
+        <field name="search_view_id" ref="view_dms_vehicle_leads_lost_filter"/>
     </record>
      <record id="action_dms_vehicle_insurance_lost" model="ir.actions.act_window">
         <field name="name">Lost Insurance Leads</field>
@@ -58,7 +87,7 @@
                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_leads_new')})]"/>
         <field name="context"></field>
         <field name="domain">['&amp;',('active', '=', False),('opportunity_type','=','Insurance')]</field>
-        <field name="search_view_id" ref="view_dms_vehicle_leads_filter"/>
+        <field name="search_view_id" ref="view_dms_vehicle_leads_lost_filter"/>
     </record>
 
 
