@@ -9,7 +9,7 @@ class ActivityDoneReport(models.Model):
 
     _name = "crm.activity.done.report"
     _auto = False
-    _description = "CRM Activity Analysis"
+    _description = "DMS Vehicle Lead Activity Analysis"
     _rec_name = 'id'
 
     date = fields.Datetime('Date', readonly=True)
@@ -23,8 +23,8 @@ class ActivityDoneReport(models.Model):
     country_id = fields.Many2one('res.country', 'Country', readonly=True)
     company_id = fields.Many2one('res.company', 'Company', readonly=True)
     stage_id = fields.Many2one('crm.stage', 'Stage', readonly=True)
-    partner_name = fields.Char('Customer',readonly=True)
-    mobile = fields.Char('Mobile',readonly=True)
+    partner_name = fields.Char('Customer', readonly=True)
+    mobile = fields.Char('Mobile', readonly=True)
     partner_id = fields.Many2one('res.partner', 'Partner/Customer', readonly=True)
     lead_type = fields.Char(
         string='Type',
@@ -33,8 +33,10 @@ class ActivityDoneReport(models.Model):
     active = fields.Boolean('Active', readonly=True)
     probability = fields.Float('Probability', group_operator='avg', readonly=True)
     summary = fields.Char(
-        'Next Activity Summary',)
+        'Next Activity Summary', )
     call_type = fields.Char('Type')
+    opportunity_type = fields.Many2one('dms.opportunity.type', 'Opportunity Type', readonly=True)
+
     def _select(self):
         return """
             SELECT
@@ -57,7 +59,8 @@ class ActivityDoneReport(models.Model):
                 l.type as lead_type,
                 l.active,
                 l.call_type,
-                l.probability
+                l.probability,
+                l.opportunity_type
         """
 
     def _from(self):
@@ -87,4 +90,4 @@ class ActivityDoneReport(models.Model):
                 %s
             )
         """ % (self._table, self._select(), self._from(), self._join(), self._where())
-        )
+                         )

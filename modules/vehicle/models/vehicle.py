@@ -35,8 +35,8 @@ class Vehicle(models.Model):
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], required=True)
     color = fields.Char('Color', readonly=True, compute='_get_color')
-    partner_name = fields.Char('Customer', compute='_get_customer_details',store=True)
-    partner_mobile = fields.Char('Mobile No.', compute='_get_customer_details',store=True)
+    partner_name = fields.Char('Customer', compute='_get_customer_details', store=True)
+    partner_mobile = fields.Char('Mobile No.', compute='_get_customer_details', store=True)
     partner_email = fields.Char('Email', compute='_get_customer_details')
     date_order = fields.Datetime('Sale-Date')
     address = fields.Char('Address', compute='_get_customer_details')
@@ -48,6 +48,8 @@ class Vehicle(models.Model):
         ('saboo', 'Saboo'),
     ], string='Source', store=True, default='saboo')
     dealer_name = fields.Char('Dealer', default='saboo')
+    company_id = fields.Many2one('res.company', string='Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
 
     @api.depends('order_id')
     def _on_change_sale_order(self):
@@ -58,7 +60,7 @@ class Vehicle(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            #if not vals['no_lot']:
+            if not vals['no_lot']:
                 self._create_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
 

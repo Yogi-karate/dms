@@ -11,8 +11,6 @@ class MassConfirm(models.TransientModel):
     order_no = fields.Char("Order No")
     vehicle_no = fields.Char("Vehicle No")
 
-
-
     @api.model
     def confirm_purchase_orders(self, val_list):
         ids = [val['order_no'] for val in val_list]
