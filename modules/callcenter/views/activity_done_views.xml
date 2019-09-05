@@ -69,7 +69,7 @@
     </record>
 
     <record id="crm_activity_report_done_action_service" model="ir.actions.act_window">
-        <field name="name">Activities Done Analysis Service</field>
+        <field name="name">Activities Done Analysis</field>
         <field name="res_model">crm.activity.done.report</field>
         <field name="view_type">form</field>
         <field name="view_mode">tree,graph,pivot</field>

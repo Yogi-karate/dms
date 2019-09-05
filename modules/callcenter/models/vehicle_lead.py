@@ -98,7 +98,7 @@ class ServiceBooking(models.Model):
     _name = "service.booking"
     _description = "Service Booking"
     lead_id = fields.Many2one('dms.vehicle.lead', required=True)
-    vehicle_id = fields.Many2one('vehicle', required=True)
+    vehicle_id = fields.Many2one('vehicle')
     location_id = fields.Many2one('stock.location', string='Preferred location of service')
     remarks = fields.Char('Remarks')
     dop = fields.Datetime('Date and Time of Pick-Up')
@@ -161,7 +161,7 @@ class InsuranceBooking(models.Model):
     _name = "insurance.booking"
     _description = "Insurance Booking"
     lead_id = fields.Many2one('dms.vehicle.lead', required=True)
-    vehicle_id = fields.Many2one('vehicle', required=True)
+    vehicle_id = fields.Many2one('vehicle')
     service_type = fields.Char('Service Type')
     source = fields.Char('Source', compute='_lead_values')
     active = fields.Boolean(default=True)
