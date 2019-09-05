@@ -97,7 +97,8 @@ class LostReason(models.Model):
 class ServiceBooking(models.Model):
     _name = "service.booking"
     _description = "Service Booking"
-    lead_id = fields.Many2one('dms.vehicle.lead')
+    lead_id = fields.Many2one('dms.vehicle.lead', required=True)
+    vehicle_id = fields.Many2one('vehicle', required=True)
     location_id = fields.Many2one('stock.location', string='Preferred location of service')
     remarks = fields.Char('Remarks')
     dop = fields.Datetime('Date and Time of Pick-Up')
@@ -112,9 +113,9 @@ class ServiceBooking(models.Model):
     partner_name = fields.Char('Customer name')
     mobile = fields.Char('Customer number')
     mail = fields.Char('Customer Mail ID')
-    vehicle_id = fields.Many2one('vehicle')
     vehicle_model = fields.Char('Model')
-    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange', default=lambda self: self.env.user)
+    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
+                              default=lambda self: self.env.user)
     team_id = fields.Many2one('crm.team', string='Sales Team',
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid),
@@ -137,6 +138,18 @@ class ServiceBooking(models.Model):
             booking.service_type = booking.lead_id.service_type
             booking.call_type = booking.lead_id.call_type
 
+    @api.model
+    def create(self, vals):
+        result = super(ServiceBooking, self).create(vals)
+        print("---------------the lead in booking is ------------", result.lead_id)
+        values = {
+            'service_type': result.service_type,
+            'type': 'opportunity',
+            'date_conversion': fields.Datetime.today(),
+            'probability': 100
+        }
+        result.lead_id.write(values)
+
     @api.multi
     def restore_booking_lost_action_new(self):
         self.write({'active': True})
@@ -144,11 +157,11 @@ class ServiceBooking(models.Model):
         lead.write({'active': True})
 
 
-class Insurance(models.Model):
+class InsuranceBooking(models.Model):
     _name = "insurance.booking"
     _description = "Insurance Booking"
-    lead_id = fields.Many2one('dms.vehicle.lead')
-    vehicle_id = fields.Many2one('vehicle')
+    lead_id = fields.Many2one('dms.vehicle.lead', required=True)
+    vehicle_id = fields.Many2one('vehicle', required=True)
     service_type = fields.Char('Service Type')
     source = fields.Char('Source', compute='_lead_values')
     active = fields.Boolean(default=True)
@@ -210,6 +223,17 @@ class Insurance(models.Model):
             booking.address = booking.lead_id.street
             booking.reg_no = booking.vehicle_id.registration_no
             booking.sale_date = booking.lead_id.dos
+
+    @api.model
+    def create(self, vals):
+        result = super(InsuranceBooking, self).create(vals)
+        values = {
+            'service_type': result.service_type,
+            'type': 'opportunity',
+            'date_conversion': fields.Datetime.today(),
+            'probability': 100
+        }
+        result.lead_id.write(values)
 
     @api.multi
     def restore_booking_lost_action_new(self):

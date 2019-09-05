@@ -136,19 +136,6 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
-        self.ensure_one()
-        values = {
-            'name': self.name,
-            'service_type': self.service_type,
-            'type': 'opportunity',
-            'date_conversion': fields.Datetime.today(),
-            'probability': 100
-        }
-
-        if self.partner_id:
-            values['partner_id'] = self.partner_id.id
-        leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
-        leads.write(values)
         if not self.location_id:
             raise UserError("Please select a location of service")
         if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
@@ -168,7 +155,8 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 'due_date': self.due_date,
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
-                'vin_no': self.lead_id.vin_no
+                'vin_no': self.lead_id.vin_no,
+                'vehicle_model': self.lead_id.vehicle_id.product_id.name
             }
         bo = self.env['service.booking'].create(booking_values)
         # return leads[0].redirect_opportunity_view()
@@ -179,20 +167,8 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
-        self.ensure_one()
-        values = {
-            'name': self.name,
-            'service_type': self.service_type,
-            'type': 'opportunity',
-            'date_conversion': fields.Datetime.today(),
-            'probability': 100
-        }
         if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
             raise UserError("Please add both pickup date and address")
-        if self.partner_id:
-            values['partner_id'] = self.partner_id.id
-        leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
-        leads.write(values)
         booking_values = {
                 'lead_id': self.lead_id.id,
                 'vehicle_id': self.lead_id.vehicle_id.id,

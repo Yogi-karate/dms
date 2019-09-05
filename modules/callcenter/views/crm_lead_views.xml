@@ -163,11 +163,6 @@
                         domain="[('user_id', '=', uid)]"
                         help="Leads that are assigned to me"/>
                 <separator/>
-                <filter string="Won" name="won"
-                        domain="[('probability', '=', 100)]"/>
-                <filter string="Lost" name="lost"
-                        domain="['&amp;', ('probability', '=', 0), ('active', '=', False)]"/>
-                <separator/>
                 <filter string="Activities Todo" name="activities_my"
                         domain="[('activity_ids.user_id', '=', uid)]"/>
                 <separator/>
@@ -204,7 +199,7 @@
         <field name="context">{
             'default_user_id': uid,
             'default_source_type': 'Service',
-            'search_default_assigned_to_me': 1
+            'search_default_activities_overdue': 1,
             }
         </field>
         <field name="search_view_id" ref="view_dms_vehicle_leads_filter"/>
@@ -228,7 +223,7 @@
         <field name="domain">['&amp;',('type','=','lead'),('opportunity_type','=','Insurance')]</field>
         <field name="context">{
             'default_user_id': uid,
-            'search_default_assigned_to_me': 1,
+            'search_default_activities_overdue': 1,
             'default_source_type': 'Insurance'
             }
         </field>
