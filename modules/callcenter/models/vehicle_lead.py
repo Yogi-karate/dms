@@ -149,6 +149,7 @@ class ServiceBooking(models.Model):
             'probability': 100
         }
         result.lead_id.write(values)
+        return result
 
     @api.multi
     def restore_booking_lost_action_new(self):
@@ -234,6 +235,7 @@ class InsuranceBooking(models.Model):
             'probability': 100
         }
         result.lead_id.write(values)
+        return result
 
     @api.multi
     def restore_booking_lost_action_new(self):

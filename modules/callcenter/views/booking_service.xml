@@ -19,7 +19,7 @@
                     </div>
                     <group string="Service Bookings">
                         <field name="active" invisible="1"/>
-                        <field name="lead_id"/>
+                        <field name="lead_id" domain="[('opportunity_type','=','Service')]"/>
                         <field name="dop" string="Appointment Date"/>
                         <field name="partner_name"/>
                         <field name="mobile"/>
@@ -30,7 +30,6 @@
                         <field name="pick_up_address" string="Address"/>
                         <field name="vehicle_id"/>
                         <field name="location_id" string="Service Location"/>
-                        <field name="user_id" string="TC Name"/>
                     </group>
                 </sheet>
             </form>

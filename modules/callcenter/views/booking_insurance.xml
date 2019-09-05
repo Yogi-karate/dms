@@ -20,7 +20,7 @@
                     </div>
                     <group>
                         <group class="left">
-                            <field name="lead_id"/>
+                            <field name="lead_id" domain="[('opportunity_type','=','Insurance')]"/>
                             <field name="vehicle_id"/>
                             <field name="partner_name"/>
                             <field name="reg_no"/>
