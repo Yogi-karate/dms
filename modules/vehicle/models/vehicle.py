@@ -26,7 +26,7 @@ class Vehicle(models.Model):
         ('cancel', 'Cancelled'),
     ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='transit')
-    chassis_no = fields.Char('Chasis Number', help="Unique Chasis number of the vehicle")
+    chassis_no = fields.Char('Chassis Number', help="Unique Chasis number of the vehicle")
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
                              change_default=True, ondelete='cascade')
@@ -75,10 +75,6 @@ class Vehicle(models.Model):
     @api.multi
     def write(self, vals):
         return super(Vehicle, self).write(vals)
-
-    @api.one
-    def _get_vehicle_details(self):
-        self.fuel_type = self.product_id.fuel_type
 
     @api.multi
     def _get_customer_details(self):

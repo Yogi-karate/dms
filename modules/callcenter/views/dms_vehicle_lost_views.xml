@@ -36,7 +36,7 @@
         </field>
     </record>
   <record id="view_dms_vehicle_leads_lost_filter" model="ir.ui.view">
-        <field name="name">crm.lead.search.lead</field>
+        <field name="name">crm.lead.search.lost.lead</field>
         <field name="model">dms.vehicle.lead</field>
         <field name="arch" type="xml">
             <search string="Search Leads">

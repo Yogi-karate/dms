@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <form string="Service Bookings">
                 <header>
-                    <button name="%(dms_vehicle_lead_lost_action)d" string="Mark as Lost"
+                    <button name="%(crm_dms.dms_vehicle_lead_lost_action)d" string="Mark as Lost"
                             context="{'default_lead_id': active_id,'active_type':'service_booking'}"
                             type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
                     <button name="restore_booking_lost_action_new" string="Restore" type="object"
@@ -19,7 +19,7 @@
                     </div>
                     <group string="Service Bookings">
                         <field name="active" invisible="1"/>
-                        <field name="source"/>
+                        <field name="lead_id"/>
                         <field name="dop" string="Appointment Date"/>
                         <field name="partner_name"/>
                         <field name="mobile"/>
@@ -31,7 +31,6 @@
                         <field name="vehicle_id"/>
                         <field name="location_id" string="Service Location"/>
                         <field name="user_id" string="TC Name"/>
-                        <field name="vin_no"/>
                     </group>
                 </sheet>
             </form>
@@ -44,7 +43,6 @@
         <field name="arch" type="xml">
             <tree string="Service Bookings">
                 <field name="active" invisible="1"/>
-                <field name="source"/>
                 <field name="dop" string="Appointment Date"/>
                 <field name="partner_name"/>
                 <field name="mobile"/>
@@ -56,22 +54,37 @@
                 <field name="vehicle_id"/>
                 <field name="location_id" string="Service Location"/>
                 <field name="user_id" string="TC Name"/>
-                <field name="vin_no"/>
             </tree>
         </field>
     </record>
-
-    <record id="view_dms_booking_filter" model="ir.ui.view">
+    <record id="view_dms_service_booking_filter" model="ir.ui.view">
         <field name="name">service.booking.search</field>
         <field name="model">service.booking</field>
         <field name="arch" type="xml">
-            <search string="Search Activities">
-                <field name="vin_no"/>
+            <search string="Search Leads">
+                <field name="partner_name"
+                       filter_domain="['|','|',('partner_name', 'ilike', self),('vehicle_id', 'ilike', self),('mobile', 'ilike', self)]"/>
+                <field name="user_id"/>
+                <field name="team_id"/>
+                <field name="create_date"/>
+                <field name="mobile"/>
+                <field name="vehicle_id"/>
+                <field name="service_type"/>
+                <field name="dop"/>
                 <separator/>
+                <filter string="My Bookings"
+                        name="assigned_to_me"
+                        domain="[('user_id', '=', uid)]"
+                        help="Leads that are assigned to me"/>
+                <group expand="0" string="Group By">
+                    <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
+                    <filter string="Sales Channel" name="saleschannel" context="{'group_by':'team_id'}"/>
+                    <separator orientation="vertical"/>
+                    <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
+                </group>
             </search>
         </field>
     </record>
-
 
     <record id="action_service_booking" model="ir.actions.act_window">
         <field name="name">Service Bookings</field>
@@ -84,7 +97,7 @@
                            ]"/>
         <field name="context"></field>
         <field name="domain"></field>
-        <field name="search_view_id" ref="view_dms_booking_filter"/>
+        <field name="search_view_id" ref="view_dms_service_booking_filter"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Add a Booking

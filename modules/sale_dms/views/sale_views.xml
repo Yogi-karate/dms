@@ -368,7 +368,10 @@
                 </form>
             </field>
         </record>
-
+ <menuitem id="res_partner_menu"
+            parent="sale.sale_order_menu"
+            action="base.action_partner_form"
+            sequence="4"  groups="base.user_admin"/>
     <menuitem id="sale.sales_team_config"
             name="Sales Teams"
             parent="sale.menu_sale_config"

@@ -109,33 +109,33 @@ class ServiceBooking(models.Model):
 
     pick_up_address = fields.Char('Pick-up Address')
     due_date = fields.Datetime(string='Service Due Date')
-    partner_name = fields.Char('Customer name', compute='_lead_values')
-    mobile = fields.Char('Customer number', compute='_lead_values')
-    mail = fields.Char('Customer Mail ID', compute='_lead_values')
+    partner_name = fields.Char('Customer name')
+    mobile = fields.Char('Customer number')
+    mail = fields.Char('Customer Mail ID')
     vehicle_id = fields.Many2one('vehicle')
-    vin_no = fields.Char('Chassis Number')
-    vehicle_model = fields.Char('Model', compute='_lead_values')
-    user_id = fields.Many2one('res.users', compute='_lead_values', store=True)
-    team_id = fields.Many2one('crm.team', compute='_lead_values', store=True)
-    service_type = fields.Char('Service Type', compute='_lead_values', store=True)
-    source = fields.Char('Source', compute='_lead_values')
+    vehicle_model = fields.Char('Model')
+    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange', default=lambda self: self.env.user)
+    team_id = fields.Many2one('crm.team', string='Sales Team',
+                              default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
+                                  user_id=self.env.uid),
+                              index=True, track_visibility='onchange')
+    service_type = fields.Char('Service Type')
     active = fields.Boolean(default=True)
-    call_type = fields.Char('Call Type', compute='_lead_values', store=True)
+    call_type = fields.Char('Call Type')
 
     @api.onchange('lead_id')
     def _lead_values(self):
         for booking in self:
             booking.partner_name = booking.lead_id.partner_name
+            booking.vehicle_id = booking.lead_id.vehicle_id
             booking.mobile = booking.lead_id.mobile
             booking.mail = booking.lead_id.email_from
-            booking.vehicle_model = booking.vehicle_id.product_id.name
+            booking.vehicle_model = booking.lead_id.vehicle_id.product_id.name
             booking.source = booking.lead_id.source
             booking.user_id = booking.lead_id.user_id
             booking.team_id = booking.lead_id.team_id
             booking.service_type = booking.lead_id.service_type
             booking.call_type = booking.lead_id.call_type
-            print(booking.lead_id.call_type,
-                  "..................................................................................................")
 
     @api.multi
     def restore_booking_lost_action_new(self):
@@ -149,23 +149,25 @@ class Insurance(models.Model):
     _description = "Insurance Booking"
     lead_id = fields.Many2one('dms.vehicle.lead')
     vehicle_id = fields.Many2one('vehicle')
-    service_type = fields.Char('Service Type', compute='_lead_values', store=True)
+    service_type = fields.Char('Service Type')
     source = fields.Char('Source', compute='_lead_values')
     active = fields.Boolean(default=True)
-    partner_name = fields.Char('Customer name', compute='_lead_values')
-    mobile = fields.Char('Customer number', compute='_lead_values')
+    partner_name = fields.Char('Customer name')
+    mobile = fields.Char('Customer number')
     alternate_no = fields.Char('Alternate number')
-    mail = fields.Char('E-Mail ID', compute='_lead_values')
-    address = fields.Char('Address', compute='_lead_values')
-    vehicle_model = fields.Char('Model', compute='_lead_values')
-    reg_no = fields.Char('Reg no', compute='_lead_values')
-    engine_no = fields.Char('Engine No', compute='_lead_values')
-    chassis_no = fields.Char('VIN No', compute='_lead_values')
+    mail = fields.Char('E-Mail ID')
+    address = fields.Char('Address')
+    vehicle_model = fields.Char('Model')
+    reg_no = fields.Char('Reg no')
     sale_date = fields.Char('Sale Date', compute='_lead_values')
     policy_no = fields.Char(string='Policy No')
     previous_insurance_company = fields.Many2one('res.bank', string='Previous Insurance Company')
-    user_id = fields.Many2one('res.users', compute='_lead_values', store=True)
-    team_id = fields.Many2one('crm.team', compute='_lead_values', store=True)
+    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
+                              default=lambda self: self.env.user)
+    team_id = fields.Many2one('crm.team', string='Sales Team',
+                              default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
+                                  user_id=self.env.uid),
+                              index=True, track_visibility='onchange')
     rollover_company = fields.Many2one('res.bank', string='Current Insurance Company')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
@@ -193,26 +195,21 @@ class Insurance(models.Model):
 
     pick_up_address = fields.Char('Pick-up Address')
 
-    @api.onchange('id')
+    @api.onchange('lead_id')
     def _lead_values(self):
         for booking in self:
+            booking.vehicle_id = booking.lead_id.vehicle_id.id
             booking.partner_name = booking.lead_id.partner_name
             booking.mobile = booking.lead_id.mobile
             booking.mail = booking.lead_id.email_from
             booking.vehicle_model = booking.vehicle_id.product_id.name
             booking.source = booking.lead_id.source
-            booking.user_id = booking.lead_id.user_id
-            booking.team_id = booking.lead_id.team_id
+            booking.user_id = booking.lead_id.user_id.id
+            booking.team_id = booking.lead_id.team_id.id
             booking.service_type = booking.lead_id.service_type
             booking.address = booking.lead_id.street
             booking.reg_no = booking.vehicle_id.registration_no
             booking.sale_date = booking.lead_id.dos
-            if not booking.vehicle_id.chassis_no:
-                booking.chassis_no = booking.vehicle_id.name
-                booking.engine_no = None
-            else:
-                booking.engine_no = booking.vehicle_id.name
-                booking.chassis_no = booking.vehicle_id.chassis_no
 
     @api.multi
     def restore_booking_lost_action_new(self):
