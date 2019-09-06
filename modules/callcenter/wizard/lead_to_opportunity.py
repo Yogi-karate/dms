@@ -102,12 +102,6 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         ('comprehensive', 'Comprehensive'),
     ], string='Cur NIL-DIP/Comprehensive', store=True, default='comprehensive')
 
-
-
-
-
-
-    # NOTE JEM : is it the good place to test this ?
     @api.model
     def view_init(self, fields):
         """ Check some preconditions before the wizard executes. """
@@ -119,9 +113,7 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
     @api.multi
     def _convert_opportunity(self, vals):
         self.ensure_one()
-
         res = False
-
         leads = self.env['dms.vehicle.lead'].browse(vals.get('lead_ids'))
         for lead in leads:
             self_def_user = self.with_context(default_user_id=self.user_id.id)
@@ -144,25 +136,14 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
-        self.ensure_one()
-        values = {
-            'name': self.name,
-            'service_type': self.service_type,
-            'type': 'opportunity',
-            'date_conversion': fields.Datetime.today(),
-            'probability': 100
-        }
-
-        if self.partner_id:
-            values['partner_id'] = self.partner_id.id
-        leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
-        leads.write(values)
         if not self.location_id:
             raise UserError("Please select a location of service")
         if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
-            raise UserError("Please add both pickup date and address")
+            raise UserError("Please add pickup date and address")
         else:
             booking_values = {
+                'partner_name':self.lead_id.partner_name,
+                'mobile': self.lead_id.mobile,
                 'lead_id': self.lead_id.id,
                 'vehicle_id': self.lead_id.vehicle_id.id,
                 'location_id': self.location_id.id,
@@ -174,8 +155,8 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 'due_date': self.due_date,
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
-                'vin_no': self.lead_id.vin_no
-
+                'vin_no': self.lead_id.vin_no,
+                'vehicle_model': self.lead_id.vehicle_id.product_id.name
             }
         bo = self.env['service.booking'].create(booking_values)
         # return leads[0].redirect_opportunity_view()
@@ -186,25 +167,13 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
-        self.ensure_one()
-        values = {
-            'name': self.name,
-            'service_type': self.service_type,
-            'type': 'opportunity',
-            'date_conversion': fields.Datetime.today(),
-            'probability': 100
-        }
         if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
             raise UserError("Please add both pickup date and address")
-        if self.partner_id:
-            values['partner_id'] = self.partner_id.id
-        leads = self.env['dms.vehicle.lead'].browse(self._context.get('active_ids', []))
-        leads.write(values)
-
-
         booking_values = {
                 'lead_id': self.lead_id.id,
                 'vehicle_id': self.lead_id.vehicle_id.id,
+                'partner_name': self.lead_id.partner_name,
+                'mobile': self.lead_id.mobile,
                 'dop': self.dop,
                 'pre_dip_or_comp': self.prev_booking_type_insurance,
                 'cur_dip_or_comp': self.cur_booking_type_insurance,
@@ -224,8 +193,8 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 'prev_final_premium':self.prev_final_premium,
                 'cur_final_premium':self.cur_final_premium,
                 'pre_ncb': self.prev_ncb,
-                'cur_ncb': self.cur_ncb
-
+                'cur_ncb': self.cur_ncb,
+                'vehicle_model':self.lead_id.vehicle_id.product_id.name
             }
         bo = self.env['insurance.booking'].create(booking_values)
         # return leads[0].redirect_opportunity_view()

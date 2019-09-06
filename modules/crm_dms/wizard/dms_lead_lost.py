@@ -15,7 +15,7 @@ class CrmLeadLost(models.TransientModel):
         ('ServiceBooking', 'Insurance'),
         ('InsuranceBooking', 'InsuranceBooking'),
     ], string='Lost Model Type', store=True, default='Service')
-    model = fields.Char('Model', default='dms.vehicle.lead')
+    model = fields.Char('Model', default='dms.vehicle.lead') 
 
     @api.model
     def default_get(self, fields):

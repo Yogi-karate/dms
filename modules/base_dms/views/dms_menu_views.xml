@@ -9,7 +9,7 @@
     <menuitem name="Reports" id="menu_dms_reports_root" sequence="60"
               parent="menu_dms_root"/>
     <menuitem name="Configuration" id="menu_dms_configurations_root" sequence="70"
-              parent="menu_dms_root" groups="base.group_system"
+              parent="menu_dms_root"
               />
 
 </odoo>

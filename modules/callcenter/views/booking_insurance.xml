@@ -8,8 +8,8 @@
             <form string="Insurance Bookings">
                 <header>
                     <field name="active" invisible="1"/>
-                    <button name="%(dms_vehicle_lead_lost_action)d" string="Mark as Lost"
-                            context="{'default_lead_id': active_id,'active_type':'service_booking'}"
+                    <button name="%(crm_dms.dms_vehicle_lead_lost_action)d" string="Mark as Lost"
+                            context="{'default_lead_id': active_id,'active_type':'insurance_booking'}"
                             type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
                     <button name="restore_booking_lost_action_new" string="Restore" type="object"
                             class="oe_highlight" attrs="{'invisible': [('active', '=', True)]}"/>
@@ -20,9 +20,9 @@
                     </div>
                     <group>
                         <group class="left">
-                            <field name="partner_name"/>
+                            <field name="lead_id" domain="[('opportunity_type','=','Insurance')]"/>
                             <field name="vehicle_id"/>
-                            <field name="engine_no"/>
+                            <field name="partner_name"/>
                             <field name="reg_no"/>
                             <field name="idv"/>
                             <field name="prev_ncb"/>
@@ -35,7 +35,6 @@
                         </group>
                         <group class="right">
                             <field name="mobile"/>
-                            <field name="chassis_no"/>
                             <field name="sale_date"/>
                             <field name="mail"/>
                             <field name="previous_idv"/>
@@ -68,23 +67,35 @@
                 <field name="vehicle_model"/>
                 <field name="vehicle_id"/>
                 <field name="user_id" string="TC Name"/>
-                <field name="engine_no"/>
-                <field name="chassis_no"/>
             </tree>
         </field>
     </record>
-
-    <record id="view_dms_booking_insurance_filter" model="ir.ui.view">
+   <record id="view_dms_insurance_booking_filter" model="ir.ui.view">
         <field name="name">insurance.booking.search</field>
         <field name="model">insurance.booking</field>
         <field name="arch" type="xml">
-            <search string="Search Activities">
+            <search string="Search Leads">
+                <field name="partner_name"
+                       filter_domain="['|','|',('partner_name', 'ilike', self),('vehicle_id', 'ilike', self),('mobile', 'ilike', self)]"/>
+                <field name="user_id"/>
+                <field name="team_id"/>
+                <field name="create_date"/>
                 <field name="mobile"/>
+                <field name="vehicle_id"/>
                 <separator/>
+                <filter string="My Bookings"
+                        name="assigned_to_me"
+                        domain="[('user_id', '=', uid)]"
+                        help="Leads that are assigned to me"/>
+                <group expand="0" string="Group By">
+                    <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
+                    <filter string="Sales Channel" name="saleschannel" context="{'group_by':'team_id'}"/>
+                    <separator orientation="vertical"/>
+                    <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
+                </group>
             </search>
         </field>
     </record>
-
 
     <record id="action_insurance_booking" model="ir.actions.act_window">
         <field name="name">Insurance Policy bookings</field>
@@ -97,7 +108,7 @@
                            ]"/>
         <field name="context"></field>
         <field name="domain"></field>
-        <field name="search_view_id" ref="view_dms_booking_insurance_filter"/>
+        <field name="search_view_id" ref="view_dms_insurance_booking_filter"/>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
                 Add an Insurance Policy

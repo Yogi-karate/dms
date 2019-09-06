@@ -57,10 +57,9 @@
                                   'default_team_id': team_id,
                                   'default_origin': name,
                                   'default_source_id': source_id}"/>
-
-                        <button name="%(crm.crm_lead_lost_action)d" string="Mark Lost"
+                        <button name="%(dms_vehicle_lead_lost_action)d" string="Mark Lost"
                                 type="action" class="oe_highlight"
-                                context="{'default_lead_id': active_id}"
+                                context="{'default_lead_id': active_id,'active_type':'lead'}"
                                 attrs="{'invisible': [('active', '=', False),('probability', '&lt;', 100)]}"/>
                         <button name="toggle_active"
                             string="Restore"

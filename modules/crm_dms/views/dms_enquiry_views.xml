@@ -307,11 +307,11 @@
             <search string="Search Enquiries">
                 <field name="id"/>
                 <field name="name" string="Enquiry"
-                       filter_domain="['|',('partner_name','ilike',self),('name', 'ilike', self),('id','ilike',self)]"/>
+                       filter_domain="['|','|',('partner_name','ilike',self),('name', 'ilike', self),('id','ilike',self)]"/>
                 <field name="state" domain="[]"/>
                 <field name="user_id"/>
                 <field name="team_id"/>
-                <field name="partner_id" operator="child_of" string="Customer"/>
+                <field name="partner_name" string="Customer"/>
                 <separator/>
                 <filter string="My Enquiries" name="assigned_to_me"
                         domain="[('user_id', '=', uid)]"

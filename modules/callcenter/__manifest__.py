@@ -15,7 +15,6 @@
         'data/mail_activity.xml',
         'data/opportunity_type_data.xml',
         'wizard/dms_vehicle_lead_assign.xml',
-        'wizard/dms_lead_lost.xml',
         'wizard/lead_to_opportunity.xml',
         'views/booking_insurance.xml',
         'views/booking_service.xml',

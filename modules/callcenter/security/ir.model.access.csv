@@ -18,7 +18,7 @@ access_service_booking_lead,dms service_booking,model_service_booking,group_dms_
 access_service_booking_manager,dms service_booking,model_service_booking,group_dms_callcenter_manager,1,1,1,1
 
 
-access_insurance_booking_telecaller,dms insurance_booking,model_insurance_booking,group_dms_telecaller_insurance,1,1,0,0
+access_insurance_booking_telecaller,dms insurance_booking,model_insurance_booking,group_dms_telecaller_insurance,1,1,1,0
 access_insurance_booking_lead_insurance,dms insurance_booking,model_insurance_booking,group_dms_callcenter_lead_insurance,1,1,1,1
 
 access_dms_opportunity_type_visibility,dms.opportunity_type_tc_visibility,crm_dms.model_dms_opportunity_type,group_dms_telecaller,1,0,0,0

@@ -21,6 +21,7 @@
         'data/lead_cron_data.xml',
         'wizard/dms_enquiry_to_quotation_views.xml',
         'wizard/dms_enquiry_assign_views.xml',
+        'wizard/dms_lead_lost.xml',
         'views/crm_lead_views.xml',
         'views/dms_partner_views.xml',
     ],
