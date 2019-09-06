@@ -98,7 +98,7 @@ class ServiceBooking(models.Model):
     _name = "service.booking"
     _description = "Service Booking"
     lead_id = fields.Many2one('dms.vehicle.lead', required=True)
-    vehicle_id = fields.Many2one('vehicle')
+    vehicle_id = fields.Many2one('vehicle', compute='_get_lead_values', store=True)
     location_id = fields.Many2one('stock.location', string='Preferred location of service')
     remarks = fields.Char('Remarks')
     dop = fields.Datetime('Date and Time of Pick-Up')
@@ -110,10 +110,10 @@ class ServiceBooking(models.Model):
 
     pick_up_address = fields.Char('Pick-up Address')
     due_date = fields.Datetime(string='Service Due Date')
-    partner_name = fields.Char('Customer name')
-    mobile = fields.Char('Customer number')
-    mail = fields.Char('Customer Mail ID')
-    vehicle_model = fields.Char('Model')
+    partner_name = fields.Char('Customer name', compute='_get_lead_values', store=True)
+    mobile = fields.Char('Customer number', compute='_get_lead_values', store=True)
+    mail = fields.Char('Customer Mail ID', compute='_get_lead_values', store=True)
+    vehicle_model = fields.Char('Model', compute='_get_lead_values', store=True)
     user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
                               default=lambda self: self.env.user)
     team_id = fields.Many2one('crm.team', string='Sales Team',
@@ -122,7 +122,10 @@ class ServiceBooking(models.Model):
                               index=True, track_visibility='onchange')
     service_type = fields.Char('Service Type')
     active = fields.Boolean(default=True)
-    call_type = fields.Char('Call Type')
+
+    @api.depends('lead_id')
+    def _get_lead_values(self):
+        self._lead_values()
 
     @api.onchange('lead_id')
     def _lead_values(self):
@@ -132,11 +135,8 @@ class ServiceBooking(models.Model):
             booking.mobile = booking.lead_id.mobile
             booking.mail = booking.lead_id.email_from
             booking.vehicle_model = booking.lead_id.vehicle_id.product_id.name
-            booking.source = booking.lead_id.source
-            booking.user_id = booking.lead_id.user_id
-            booking.team_id = booking.lead_id.team_id
-            booking.service_type = booking.lead_id.service_type
-            booking.call_type = booking.lead_id.call_type
+            if not booking.service_type:
+                booking.service_type = booking.lead_id.service_type
 
     @api.model
     def create(self, vals):
@@ -162,18 +162,17 @@ class InsuranceBooking(models.Model):
     _name = "insurance.booking"
     _description = "Insurance Booking"
     lead_id = fields.Many2one('dms.vehicle.lead', required=True)
-    vehicle_id = fields.Many2one('vehicle')
+    vehicle_id = fields.Many2one('vehicle', compute='_get_lead_values', store=True)
     service_type = fields.Char('Service Type')
-    source = fields.Char('Source', compute='_lead_values')
     active = fields.Boolean(default=True)
-    partner_name = fields.Char('Customer name')
-    mobile = fields.Char('Customer number')
+    partner_name = fields.Char('Customer name', compute='_update_booking_values', store=True)
+    mobile = fields.Char('Customer number', compute='_update_booking_values', store=True)
     alternate_no = fields.Char('Alternate number')
-    mail = fields.Char('E-Mail ID')
-    address = fields.Char('Address')
-    vehicle_model = fields.Char('Model')
-    reg_no = fields.Char('Reg no')
-    sale_date = fields.Char('Sale Date', compute='_lead_values')
+    mail = fields.Char('E-Mail ID', compute='_update_booking_values', store=True)
+    address = fields.Char('Address', compute='_update_booking_values', store=True)
+    vehicle_model = fields.Char('Model', compute='_update_booking_values', store=True)
+    reg_no = fields.Char('Reg no', compute='_update_booking_values', store=True)
+    sale_date = fields.Char('Sale Date', compute='_update_booking_values', store=True)
     policy_no = fields.Char(string='Policy No')
     previous_insurance_company = fields.Many2one('res.bank', string='Previous Insurance Company')
     user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
@@ -209,21 +208,23 @@ class InsuranceBooking(models.Model):
 
     pick_up_address = fields.Char('Pick-up Address')
 
+    @api.depends('lead_id')
+    def _update_booking_values(self):
+        self._lead_values()
+
     @api.onchange('lead_id')
     def _lead_values(self):
         for booking in self:
-            booking.vehicle_id = booking.lead_id.vehicle_id.id
+            booking.vehicle_id = booking.lead_id.vehicle_id
             booking.partner_name = booking.lead_id.partner_name
             booking.mobile = booking.lead_id.mobile
             booking.mail = booking.lead_id.email_from
             booking.vehicle_model = booking.vehicle_id.product_id.name
-            booking.source = booking.lead_id.source
-            booking.user_id = booking.lead_id.user_id.id
-            booking.team_id = booking.lead_id.team_id.id
-            booking.service_type = booking.lead_id.service_type
             booking.address = booking.lead_id.street
             booking.reg_no = booking.vehicle_id.registration_no
             booking.sale_date = booking.lead_id.dos
+            if not booking.service_type:
+                booking.service_type = booking.lead_id.service_type
 
     @api.model
     def create(self, vals):
