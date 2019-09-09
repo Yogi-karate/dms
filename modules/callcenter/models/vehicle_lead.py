@@ -29,7 +29,8 @@ class VehicleLead(models.Model):
         ('progress', 'In-Progress'),
         ('call-back', 'Callback'),
     ], string='Call Status', readonly=True, track_visibility='onchange', track_sequence=3,
-        compute='_process_call_status')
+        compute='_process_call_status', store=True)
+    current_due_date = fields.Date(string='Current Due Date', compute='_process_call_status', store=True)
 
     @api.multi
     def _compute_lead_type(self):
@@ -50,6 +51,7 @@ class VehicleLead(models.Model):
     @api.multi
     def _process_call_status(self):
         for lead in self:
+            lead.current_due_date = lead.activity_date_deadline
             if not len(lead.activity_ids) and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
                 lead.call_state = 'done'
             if len(lead.activity_ids) > 0 and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
