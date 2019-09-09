@@ -124,7 +124,7 @@
                 <field name="mobile"/>
                 <field name="activity_date_deadline" string="Followup Date"/>
                 <field name="registration_no"/>
-                <field name="source" groups="dms.group_dms_callcenter_manager"/>
+                <field name="source"/>
                 <field name="user_id" string="Telecaller"/>
                 <field name="activity_summary" string="Summary"/>
                 <field name="call_state" string="Call Status"/>
