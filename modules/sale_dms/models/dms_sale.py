@@ -45,7 +45,15 @@ class DmsSaleOrder(models.Model):
     product_name = fields.Char('Model',compute='_calculate_product')
     product_variant = fields.Char('Variant',compute='_calculate_product')
     product_color = fields.Char('Color',compute='_calculate_product')
-    blnc_amt = fields.Float('Balance Amount',compute='_calculate_product')
+    balance_amount = fields.Float('Balance Amount',compute='_calculate_residual_amount')
+
+
+    def _calculate_residual_amount(self):
+        for order in self:
+            balance = 0
+            for invoice in order.invoice_ids:
+                balance += invoice.residual
+            order.balance_amount = balance
 
     def _calculate_product(self):
         for order in self:
