@@ -136,9 +136,11 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
+        if not self.dop:
+            raise UserError("Please select Appointment Date")
         if not self.location_id:
             raise UserError("Please select a location of service")
-        if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
+        if self.booking_type == 'pickup' and (not self.pick_up_address):
             raise UserError("Please add pickup date and address")
         else:
             booking_values = {
@@ -167,7 +169,9 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
         """ Convert lead to opportunity or merge lead and opportunity and open
             the freshly created opportunity view.
         """
-        if self.booking_type == 'pickup' and (not self.dop or  not self.pick_up_address):
+        if not self.dop:
+            raise UserError("Please select Appointment Date")
+        if self.booking_type == 'pickup' and (not self.pick_up_address):
             raise UserError("Please add both pickup date and address")
         booking_values = {
                 'lead_id': self.lead_id.id,

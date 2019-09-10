@@ -11,8 +11,8 @@
                     <field name="service_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
                     <field name="mobile"/>
                     <field name="booking_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
-                    <field name="dop"
-                           attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
+                    <field name="dop" string = "Appointment Date"
+                           />
                     <field name="pick_up_address" string="Pickup Address"
                            attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
                     <field name="location_id" string="Preferred Service Location"
