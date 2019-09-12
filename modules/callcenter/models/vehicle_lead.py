@@ -47,7 +47,7 @@ class VehicleLead(models.Model):
             rec['call_type'] = opportunity.name
         return rec
 
-    @api.depends('activity_date_deadline')
+    @api.depends('activity_ids.date_deadline')
     @api.multi
     def _process_call_status(self):
         for lead in self:

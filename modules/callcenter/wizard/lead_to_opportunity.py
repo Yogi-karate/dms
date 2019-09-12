@@ -44,7 +44,6 @@ class Lead2OpportunityPartnerNew(models.TransientModel):
                 result['name'] = lead.partner_name
             if lead.mobile:
                 result['mobile'] = lead.mobile
-
             if lead.team_id:
                 result['team_id'] = lead.team_id.id
             if not partner_id and not lead.contact_name:
