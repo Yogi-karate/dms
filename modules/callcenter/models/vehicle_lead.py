@@ -31,6 +31,19 @@ class VehicleLead(models.Model):
     ], string='Call Status', readonly=True, track_visibility='onchange', track_sequence=3,
         compute='_process_call_status', store=True)
     current_due_date = fields.Date(string='Current Due Date', compute='_process_call_status', store=True)
+    insurance_history = fields.One2many('vehicle.insurance', string='Current Insurance Data',
+                                        compute='_process_insurance_data')
+    model = fields.Char(string='Vehicle Model', compute='_process_vehicle_model')
+
+    @api.multi
+    def _process_insurance_data(self):
+        for lead in self:
+            lead.insurance_history = lead.vehicle_id.insurance_history
+
+    @api.multi
+    def _process_vehicle_model(self):
+        for lead in self:
+            lead.model = lead.vehicle_id.product_id.name
 
     @api.multi
     def _compute_lead_type(self):
@@ -176,14 +189,14 @@ class InsuranceBooking(models.Model):
     reg_no = fields.Char('Reg no', compute='_update_booking_values', store=True)
     sale_date = fields.Char('Sale Date', compute='_update_booking_values', store=True)
     policy_no = fields.Char(string='Policy No')
-    previous_insurance_company = fields.Many2one('res.bank', string='Previous Insurance Company')
+    previous_insurance_company = fields.Many2one('res.insurance.company', string='Previous Insurance Company')
     user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
                               default=lambda self: self.env.user)
     team_id = fields.Many2one('crm.team', string='Sales Team',
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid),
                               index=True, track_visibility='onchange')
-    rollover_company = fields.Many2one('res.bank', string='Current Insurance Company')
+    rollover_company = fields.Many2one('res.insurance.company', string='Current Insurance Company')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
     prev_final_premium = fields.Char('Prev Final Premium')
