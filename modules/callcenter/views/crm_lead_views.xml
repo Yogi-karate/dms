@@ -96,6 +96,9 @@
                             <field name="vehicle_id"/>
 
                         </page>
+                          <page name="Insurance" string="Insurance History">
+                            <field name="insurance_history"/>
+                        </page>
                         <page string="Internal Notes">
                             <field name="description"/>
                         </page>
