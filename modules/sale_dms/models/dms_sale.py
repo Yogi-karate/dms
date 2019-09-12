@@ -45,7 +45,15 @@ class DmsSaleOrder(models.Model):
     product_name = fields.Char('Model',compute='_calculate_product')
     product_variant = fields.Char('Variant',compute='_calculate_product')
     product_color = fields.Char('Color',compute='_calculate_product')
-    blnc_amt = fields.Float('Balance Amount',compute='_calculate_product')
+    balance_amount = fields.Float('Balance Amount',compute='_calculate_residual_amount')
+
+
+    def _calculate_residual_amount(self):
+        for order in self:
+            balance = 0
+            for invoice in order.invoice_ids:
+                balance += invoice.residual
+            order.balance_amount = balance
 
     @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state')
     def _get_to_invoice_qty(self):
@@ -54,6 +62,7 @@ class DmsSaleOrder(models.Model):
         calculated from the ordered quantity. Otherwise, the quantity delivered is used.
         """
         for line in self:
+            print(line.qty_invoiced, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>", line.product_uom_qty)
             if line.order_id.state in ['sale','booked' ,'done']:
                 if line.product_id.invoice_policy == 'order':
                     line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
@@ -85,7 +94,8 @@ class DmsSaleOrder(models.Model):
     @api.multi
     def _force_lines_to_invoice_policy_order(self):
         for line in self.order_line:
-            if self.state in ['sale', 'done']:
+            if self.state in ['sale','booked', 'done']:
+                print(line.qty_invoiced,">>>>>>>>>>>>>>>>>>>>>>>>>>>>",line.product_uom_qty)
                 line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
             else:
                 line.qty_to_invoice = 0
@@ -164,11 +174,14 @@ class DmsSaleOrder(models.Model):
             pending_section = None
 
             for line in order.order_line:
-                print(line.qty_to_invoice,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",line.name)
+                print(line.is_downpayment,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",line.name)
                 if line.display_type == 'line_section':
                     pending_section = line
                     continue
-                if float_is_zero(line.qty_to_invoice, precision_digits=precision):
+                if float_is_zero(line.qty_to_invoice, precision_digits=precision) and not line.is_downpayment:
+                    print(line.is_downpayment,
+                          "",
+                          line.name)
                     continue
                 if group_key not in invoices:
                     inv_data = order._prepare_invoice()
@@ -178,17 +191,19 @@ class DmsSaleOrder(models.Model):
                     invoices_origin[group_key] = [invoice.origin]
                     invoices_name[group_key] = [invoice.name]
                 elif group_key in invoices:
+                    print(group_key, "-------------------------------------------group key","-----------",line.name)
                     if order.name not in invoices_origin[group_key]:
                         invoices_origin[group_key].append(order.name)
                     if order.client_order_ref and order.client_order_ref not in invoices_name[group_key]:
                         invoices_name[group_key].append(order.client_order_ref)
                 if line.is_downpayment:
-                    print(line,"wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww")
+                    print(line.name,"")
                     if pending_section:
                         pending_section.invoice_line_create(invoices[group_key].id, -1)
                         pending_section = None
                     line.invoice_line_create(invoices[group_key].id, -1)
-                if line.qty_to_invoice > 0 or (line.qty_to_invoice < 0 and final):
+                if (line.qty_to_invoice > 0 or (line.qty_to_invoice < 0 and final)) and (not line.is_downpayment):
+                    print(line.name,"-----------------oooooooo----",line.qty_to_invoice)
                     if pending_section:
                         pending_section.invoice_line_create(invoices[group_key].id, pending_section.qty_to_invoice)
                         pending_section = None
@@ -210,7 +225,7 @@ class DmsSaleOrder(models.Model):
                 'There is no invoiceable line. If a product has a Delivered quantities invoicing policy, please make sure that a quantity has been delivered.'))
 
         for invoice in invoices.values():
-            print(invoice, "sssssssssssssssssssssssssssssssssssssssssssssssssssooooooooooooo-----")
+            print(invoice, "-----")
             invoice.compute_taxes()
             if not invoice.invoice_line_ids:
                 raise UserError(_(
@@ -222,7 +237,7 @@ class DmsSaleOrder(models.Model):
                     line.quantity = -line.quantity
             # Use additional field helper function (for account extensions)
             for line in invoice.invoice_line_ids:
-                print(line, "ssssssssssssssssssssssssssssssssssssssssssssssssssspppppppppppppp-----")
+                print(line.name, "-----",line.quantity)
                 line._set_additional_fields(invoice)
             # Necessary to force computation of taxes. In account_invoice, they are triggered
             # by onchanges, which are not triggered when doing a create.
@@ -258,21 +273,6 @@ class DmsSaleOrderLine(models.Model):
                 'price_total': taxes['total_included'],
                 'price_subtotal': taxes['total_excluded'],
             })
-
-    @api.depends('qty_invoiced', 'qty_delivered', 'product_uom_qty', 'order_id.state')
-    def _get_to_invoice_qty(self):
-        """
-        Compute the quantity to invoice. If the invoice policy is order, the quantity to invoice is
-        calculated from the ordered quantity. Otherwise, the quantity delivered is used.
-        """
-        for line in self:
-            if line.order_id.state in ['sale','booked', 'done']:
-                if line.product_id.invoice_policy == 'order':
-                    line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
-                else:
-                    line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
-            else:
-                line.qty_to_invoice = 0
 
     @api.depends('price_unit', 'discount_price')
     def _get_price_reduce(self):
