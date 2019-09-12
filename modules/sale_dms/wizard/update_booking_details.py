@@ -33,9 +33,11 @@ class UpdateBookingDetails(models.TransientModel):
             print(
                 "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee")
             if order.finance_type:
+
+
                 result['finance_type'] = order.finance_type
             if order.financier_name:
-                result['financier_name'] = order.financier_name
+                result['financier_name'] = order.financier_name.id
             if order.payment_date:
                 result['payment_date'] = order.payment_date
             if order.delivery_date:

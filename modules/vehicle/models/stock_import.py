@@ -38,11 +38,13 @@ class StockImport(models.Model):
 
     @api.model
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.vehicle.import'].search([('state', '!=', 'cancel')], limit=10000)
+        od_vehicles = self.env['dms.stock.import'].search([], limit=10000)
         _logger.info("The number of records to process =>" + str(len(od_vehicles)))
         count = 0
+
         ignore_reason = ''
         for vehicle in od_vehicles:
+            print("oooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo----------", count)
             count = count + 1
             self = self.sudo()
             if not vehicle.model:
@@ -50,29 +52,40 @@ class StockImport(models.Model):
                 ignore_reason = 'Vehicle Model not present'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
-            if not vehicle.fuel_type:
-                print("no fuel type", vehicle.model)
-                ignore_reason = 'Vehicle Fuel Type not present'
+            if not vehicle.variant:
+                print("no Variant", vehicle)
+                ignore_reason = 'Vehicle Variant' \
+                                ' Type not present'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
-            name = vehicle.model.strip()
-            fuel = vehicle.fuel_type.strip()
+            if not vehicle.color:
+                print("no Color", vehicle)
+                ignore_reason = 'Vehicle Color' \
+                                ' Type not present'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
+
+            name = vehicle.model.strip().lower()
+            variant = vehicle.variant.strip().lower()
+            color = vehicle.color.strip().lower()
             # pro = self.env['product.product'].search([('name', 'ilike',vehicle.model)], limit=1)
             # print(pro,"length of------------------------ ",vehicle.model,"---is---",len(vehicle.model))
-            product = self.env['product.product'].search([('name', 'ilike', name), ('fuel_type', 'ilike', fuel)],
-                                                         limit=1)
+            product = self.env['product.product'].search([('name', 'ilike', name), ('variant_value', 'ilike', variant), ('color_value', 'ilike', color)],
+                                                     limit=1)
+            print(product)
+            print(color,"---",variant,"-----",name)
             if not product:
                 ignore_reason = 'Product not present'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
-            if not vehicle.vin_no or not vehicle.date_of_sale:
-                ignore_reason = 'Vin or sale date is null'
+            if not vehicle.vin_no:
+                ignore_reason = 'Vin is null'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
-            if not vehicle.customer_name or not vehicle.mobile:
-                ignore_reason = 'NO Customer details'
-                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
-                continue
+            # if not vehicle.customer_name :
+            #     ignore_reason = 'NO Customer details'
+            #     vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+            #     continue
 
             duplicate = self.env['vehicle'].search(
                 ['|', ('name', '=', vehicle.vin_no), ('chassis_no', '=', vehicle.vin_no)])
@@ -85,45 +98,42 @@ class StockImport(models.Model):
                 continue
 
             _logger.info("-----------Starting creation of partner and vehicle------------")
-            Partner = self.env['res.partner']
-            partner = Partner.search([('name', 'ilike', '%' + vehicle.customer_name + '%'),
-                                      ('mobile', 'ilike', '%' + vehicle.mobile + '%')], limit=1)
-            if not partner:
-                partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
-            source = ''
-            if not vehicle.dealer:
-                source = 'od'
-            elif 'saboo' in vehicle.dealer.lower() or 'prashant' in vehicle.dealer.lower():
-                source = 'saboo'
-            else:
-                source = 'od'
+            # Partner = self.env['res.partner']
+            # partner = Partner.search([('name', 'ilike', '%' + vehicle.customer_name + '%'),
+            #                           ('mobile', 'ilike', '%' + vehicle.mobile + '%')], limit=1)
+            # if not partner:
+            #     partner = self.env['res.partner'].create(vehicle.create_partner(vehicle))
+            # source = ''
+            # if not vehicle.dealer:
+            #     source = 'od'
+            # elif 'saboo' in vehicle.dealer.lower():
+            #     source = 'saboo'
+            # else:
+            #     source = 'od'
             vals = {
-                'name': vehicle.vin_no,
-                'chassis_no': vehicle.chassis_no,
+                'name': vehicle.engine_no,
+                'chassis_no': vehicle.vin_no,
                 'registration_no': vehicle.reg_no,
-                'date_order': vehicle.date_of_sale,
-                'dealer_name': vehicle.dealer,
-                'partner_id': partner.id,
                 'product_id': product.id,
-                'source': source,
-                'no_lot': True
+                'source': 'saboo',
+
             }
             self.env['vehicle'].create(vals)
             vehicle.status = True
 
-    @api.model
-    def update_vehicle_from_ref(self):
-        vehicles = self.env['vehicle'].search([('ref', '!=', False)])
-        for vehicle in vehicles:
-            order_id = self.env['sale.order'].search([('name', '=', vehicle.ref)])
-            if order_id:
-                vehicle.order_id = order_id
-                vehicle.partner_id = order_id.partner_id
-                vehicle.date_order = order_id.date_order
-
-    def create_partner(self, vehicle):
-        return {
-            'name': vehicle.customer_name,
-            'mobile': vehicle.mobile,
-            'street': vehicle.address,
-            'customer': True}
+    # @api.model
+    # def update_vehicle_from_ref(self):
+    #     vehicles = self.env['vehicle'].search([('ref', '!=', False)])
+    #     for vehicle in vehicles:
+    #         order_id = self.env['sale.order'].search([('name', '=', vehicle.ref)])
+    #         if order_id:
+    #             vehicle.order_id = order_id
+    #             vehicle.partner_id = order_id.partner_id
+    #             vehicle.date_order = order_id.date_order
+    #
+    # def create_partner(self, vehicle):
+    #     return {
+    #         'name': vehicle.customer_name,
+    #         'mobile': vehicle.mobile,
+    #         'street': vehicle.address,
+    #         'customer': True}

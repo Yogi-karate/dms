@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_vehicle_user,vehicle user,model_vehicle,group_vehicle_user,1,1,1,1
 access_vehicle_user,vehicle manager,model_vehicle,group_vehicle_manager,1,1,1,1
 access_dms_vehicle_import,dms.dms_vehicle_import,vehicle.model_dms_vehicle_import,group_vehicle_manager,1,1,1,1
+access_dms_stock_import,dms.dms_stock_import,vehicle.model_dms_stock_import,group_vehicle_manager,1,1,1,1

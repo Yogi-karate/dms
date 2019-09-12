@@ -7,7 +7,7 @@
         <field name="arch" type="xml">
             <form string="Service Bookings">
                 <header>
-                    <button name="%(crm_dms.dms_vehicle_lead_lost_action)d" string="Mark as Lost"
+                    <button name="%(crm.crm_lead_lost_action)d" string="Mark as Lost"
                             context="{'default_lead_id': active_id,'active_type':'service_booking'}"
                             type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
                     <button name="restore_booking_lost_action_new" string="Restore" type="object"
