@@ -99,3 +99,13 @@ class Vehicle(models.Model):
     @api.multi
     def action_in_stock(self):
         return self.write({'state': 'in-stock'})
+
+class VehicleInsurance(models.Model):
+    _name = 'vehicle.insurance'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = 'Vehicle Insurance Details'
+
+    policy_date = fields.Date('Policy Due Date')
+    insurance_company = fields.Many2one('res.insurance.company')
+    policy_number = fields.Char('Policy Number')
+    policy_idv = fields.Monetary('IDV value')
