@@ -60,7 +60,7 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def _process_insurance_leads_oct(self):
-        vehicles = self.env['vehicle'].search([], limit=3000)
+        vehicles = self.env['vehicle'].search([])
         insurance_type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Insurance')])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
