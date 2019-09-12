@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_res_insurance_company_form" model="ir.ui.view">
+            <field name="name">res.insurance.company.form</field>
+            <field name="model">res.insurance.company</field>
+            <field name="arch" type="xml">
+                <form string="Insurance Company">
+                    <group col="4">
+                        <field name="name"/>
+                        <field name="bic"/>
+                    </group>
+                    <group>
+                        <group string="Address">
+                            <label for="street" string="Address"/>
+                            <div class="o_address_format">
+                                <field name="street" placeholder="Street..." class="o_address_street"/>
+                                <field name="street2" placeholder="Street 2..." class="o_address_street"/>
+                                <field name="city" placeholder="City" class="o_address_city"/>
+                                <field name="state" class="o_address_state" placeholder="State" options='{"no_open": True}'/>
+                                <field name="zip" placeholder="ZIP" class="o_address_zip"/>
+                                <field name="country" placeholder="Country" class="o_address_country" options='{"no_open": True, "no_create": True}'/>
+                            </div>
+                        </group>
+                        <group string="Communication">
+                            <field name="phone"/>
+                            <field name="email" widget="email"/>
+                            <field name="active"/>
+                        </group>
+                    </group>
+                </form>
+            </field>
+        </record>
+        <record id="view_res_insurance_company_tree" model="ir.ui.view">
+            <field name="name">res.insurance.company.tree</field>
+            <field name="model">res.insurance.company</field>
+            <field name="arch" type="xml">
+                <tree string="Insurance companies">
+                    <field name="name"/>
+                    <field name="bic"/>
+                    <field name="country"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_res_view_res_insurance_company" model="ir.actions.act_window">
+            <field name="name">Insurance companies</field>
+            <field name="res_model">res.insurance.company</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new bank
+              </p><p>
+                Manage bank records you want to be used in the system.
+              </p>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

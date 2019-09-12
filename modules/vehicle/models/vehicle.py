@@ -108,6 +108,6 @@ class VehicleInsurance(models.Model):
     policy_date = fields.Date('Policy Due Date')
     insurance_company = fields.Many2one('res.insurance.company')
     policy_number = fields.Char('Policy Number')
-    policy_idv = fields.Monetary('IDV value')
+    policy_idv = fields.Char('IDV value')
     vehicle_id = fields.Many2one('vehicle', string='Vehicle Reference', required=True, ondelete='cascade', index=True,
-                                 copy=False, readonly=True)
+                                 copy=False)

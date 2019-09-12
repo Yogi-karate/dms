@@ -15,6 +15,8 @@
         'views/vehicle_views.xml',
         'views/stock_picking_views.xml',
         'views/vehicle_customer_views.xml',
+        'views/res_bank_views.xml',
+        'views/vehicle_insurance_views.xml',
 
     ],
     'installable': True,

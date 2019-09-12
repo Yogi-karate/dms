@@ -20,6 +20,7 @@
                 <group name="main_group">
                     <group>
                         <field name="product_id" help="Product this vehicle belongs to. You cannot change it anymore if it has already been moved."/>
+                        <field name="partner_id"/>
                         <field name="ref"/>
                         <field name="chassis_no"/>
                          <field name="battery_no"/>
@@ -27,6 +28,18 @@
                         <field name="fuel_type"/>
                     </group>
                 </group>
+
+                    <notebook colspan="4">
+                        <page string="Insurance History">
+                            <group>
+                                <group string="Insurance History">
+
+                                    <field name="insurance_history"/>
+
+                                </group>
+                            </group>
+                        </page>
+                    </notebook>
                 </sheet>
                 <div class="oe_chatter">
                     <field name="message_follower_ids" widget="mail_followers"/>
