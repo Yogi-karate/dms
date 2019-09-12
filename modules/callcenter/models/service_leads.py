@@ -263,13 +263,11 @@ class ServiceLeads(models.TransientModel):
         dict = None
         if vehicle.date_order:
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
-            print(sale_date.month)
         else:
             return
         if sale_date.month == 10 or sale_date.month == 9:
             dat = sale_date.replace(2019, int(sale_date.month), int(sale_date.day), 00, 00, 00, 00)
             delta = (dat - today).days
-            print(dat, "=================================")
             service_type = 'Insurance'
             dict = self._prepare_leads(vehicle, type, dat - timedelta(7), service_type, delta)
         return dict
