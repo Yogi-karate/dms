@@ -9,10 +9,15 @@
                 <group>
                     <field name="feedback"/>
                     <field name="feedback_type"/>
-                    <field name="activity"/>
                 </group>
+                <group>
+                    <field name="date_deadline"/>
+                    <field name="summary"/>
+                </group>
+                <field name="note"/>
                 <footer>
-                    <button name="action_apply" string="Confirm Booking" type="object" class="btn-primary"/>
+                    <button name="action_apply" string="Feedback" type="object" class="btn-primary"/>
+
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>

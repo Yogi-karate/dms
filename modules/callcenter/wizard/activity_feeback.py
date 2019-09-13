@@ -19,19 +19,32 @@ class ActivityFeedback(models.TransientModel):
             if lead.id:
                 result['lead_id'] = lead.id
             if lead.activity_ids:
-                result['activity_id'] = lead.activity_ids[:1]
-
+                activity = lead.activity_ids[:1]
+                result['activity_id'] = activity.id
+                result['summary'] = activity.summary
+                result['date_deadline'] = activity.date_deadline
+                result['note'] = activity.note
         return result
 
     feedback = fields.Char('Call Feedback')
     feedback_type = fields.Selection([
         ('no_response', 'Not Responding'),
         ('sold_out', 'Vehicle Sold Out'),
-    ], string='Service Type', store=True, default='no_response')
+    ], string='Feedback Type', store=True, default='no_response')
     lead_id = fields.Many2one('dms.vehicle.lead')
-    activity = fields.Many2one('mail.activity', string="Activity")
+    activity_id = fields.Many2one('mail.activity', string="Activity")
+    summary = fields.Char('Summary')
+    date_deadline = fields.Date('Follow-Up Date')
+    note = fields.Html('Note')
 
     @api.multi
     def action_apply(self):
         print("Applying Action")
+        self.activity_id.action_feedback(self.feedback)
+        return
+
+    @api.multi
+    def action_reschedule(self):
+        print("Applying Rescedule")
+        self.activity_id.action_feedback(self.feedback)
         return
