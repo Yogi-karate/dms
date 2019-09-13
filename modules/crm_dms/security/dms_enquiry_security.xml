@@ -84,13 +84,13 @@
    <record id="res_partner_lead_customers" model="ir.rule">
        <field name="name">Team Lead Customers</field>
        <field ref="base.model_res_partner" name="model_id"/>
-       <field name="domain_force">[('team_id.user_id','=',user.id)]</field>
+       <field name="domain_force">['|',('team_id','=',False),('team_id.user_id','=',user.id)]</field>
        <field name="groups" eval="[(4, ref('sales_team.group_sale_salesman_all_leads'))]"/>
    </record>
    <record id="res_partner_manager_customer" model="ir.rule">
        <field name="name">Manager's Customers</field>
        <field ref="base.model_res_partner" name="model_id"/>
-       <field name="domain_force">[('team_id.manager_user_ids','in',user.id)]</field>
+       <field name="domain_force">['|',('team_id','=',False),('team_id.manager_user_ids','in',user.id)]</field>
        <field name="groups" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
    </record>
 
