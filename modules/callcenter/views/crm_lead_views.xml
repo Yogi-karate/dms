@@ -1,5 +1,14 @@
 <?xml version="1.0"?>
 <odoo>
+    <record id="action_dms_schedule_Activity" model="ir.actions.act_window">
+        <field name="name">Activity Schedule</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">mail.activity</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="mail.mail_activity_view_form_popup"/>
+        <field name="context">{'default_res_model':'dms.vehicle.lead','default_res_id':active_id}</field>
+        <field name="target">new</field>
+    </record>
 
     <record id="crm_case_form_view_leads_new" model="ir.ui.view">
         <field name="name">crm.lead.form.lead.new</field>
@@ -28,6 +37,12 @@
                             type="action"
                             help="Call Feedback" class="oe_highlight"
                             attrs="{'invisible': [('type', '=', 'opportunity') and ('current_due_date','=',False)]}"/>
+
+                    <button name="%(action_dms_schedule_Activity)d" string="Schedule Activity"
+                            type="action"
+                            help="Schedule Activity" class="oe_highlight"
+                            attrs="{'invisible': [('type', '=', 'opportunity')]}"/>
+
                 </header>
                 <sheet>
                     <field name="active" invisible="1"/>
@@ -130,7 +145,8 @@
                 <field name="name" string="Lead"/>
                 <field name="service_type"/>
                 <field name="mobile"/>
-                <field name="activity_date_deadline" string="Followup Date"/>
+                <field name="activity_date_deadline" invisible="1"/>
+                <field name="current_due_date" string="FollowUp Date"/>
                 <field name="registration_no"/>
                 <field name="source"/>
                 <field name="user_id" string="Telecaller"/>
@@ -163,6 +179,7 @@
                        filter_domain="['|','|','|',('partner_name', 'ilike', self),('vin_no', 'ilike', self),('mobile', 'ilike', self), ('name', 'ilike', self)]"/>
                 <field name="user_id"/>
                 <field name="team_id"/>
+                <field name="current_due_date"/>
                 <field name="create_date"/>
                 <field name="registration_no"/>
                 <separator/>
@@ -183,11 +200,14 @@
                         domain="[('activity_ids.date_deadline', '&gt;', context_today().strftime('%Y-%m-%d'))
                         ]"/>
                 <group expand="0" string="Group By">
+                    <field string="Follow Up Date" name="current_due_date" context="{'group_by':'current_due_date'}"/>
                     <filter string="Salesperson" name="salesperson" context="{'group_by':'user_id'}"/>
                     <filter string="Sales Channel" name="saleschannel" context="{'group_by':'team_id'}"/>
                     <separator orientation="vertical"/>
                     <filter string="Creation Date" context="{'group_by':'create_date:month'}" name="month"/>
                     <filter string="Conversion Date" name="date_conversion" context="{'group_by':'date_conversion'}"/>
+
+
                     <filter string="Expected Closing Date" name="date_deadline" context="{'group_by':'date_deadline'}"/>
                     <filter string="Closed Date" name="date_closed" context="{'group_by':'date_closed'}"/>
                 </group>
