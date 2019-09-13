@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_dms_activity_feedback" model="ir.ui.view">
+        <field name="name">dms.activity.feedback.form</field>
+        <field name="model">dms.activity.feedback</field>
+        <field name="arch" type="xml">
+            <form string="Convert to Booking">
+                <group>
+                    <field name="feedback"/>
+                    <field name="feedback_type"/>
+                    <field name="activity"/>
+                </group>
+                <footer>
+                    <button name="action_apply" string="Confirm Booking" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_dms_activity_feedback" model="ir.actions.act_window">
+        <field name="name">Activity Feedback</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.activity.feedback</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_dms_activity_feedback"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

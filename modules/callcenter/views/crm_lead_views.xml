@@ -24,6 +24,10 @@
                             type="action" class="oe_highlight"
                             context="{'default_lead_id': active_id,'active_type':'vehicle_lead'}"
                             attrs="{'invisible': [('active', '=', False),('probability', '&lt;', 100)]}"/>
+                     <button name="%(action_dms_activity_feedback)d" string="Feedback"
+                            type="action"
+                            help="Call Feedback" class="oe_highlight"
+                            attrs="{'invisible': [('type', '=', 'opportunity') and ('current_due_date','=',False)]}"/>
                 </header>
                 <sheet>
                     <field name="active" invisible="1"/>
@@ -45,6 +49,7 @@
                         <group>
                             <!-- Preload all the partner's information -->
                             <field name="partner_name" string="Customer"/>
+                            <field name="current_due_date" string="FollowUp Date"/>
                             <label for="street" string="Address"/>
                             <div class="o_address_format">
                                 <field name="street" placeholder="Street..." class="o_address_street"/>
