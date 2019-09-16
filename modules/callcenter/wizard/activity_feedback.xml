@@ -12,8 +12,8 @@
                     <field name="note" readonly="1"/>
                 </group>
                 <group>
-                    <field name="feedback"/>
-                    <field name="disposition"/>
+                    <field name="feedback" />
+                    <field name="disposition" options="{'no_create': True,'no_create_edit':True}" />
                 </group>
                 <footer>
                     <button name="action_apply" string="Feedback" type="object" class="btn-primary"/>
