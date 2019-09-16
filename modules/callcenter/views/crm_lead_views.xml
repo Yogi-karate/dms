@@ -16,11 +16,11 @@
         <field name="arch" type="xml">
             <form string="Leads Form">
                 <header>
-                    <button name="%(action_dms_lead2opportunity_partner)d" string="Book Service"
+                    <button name="%(action_dms_lead2booking_partner)d" string="Book Service"
                             type="action"
                             help="Book Service Order" class="oe_highlight"
                             attrs="{'invisible': [('type', '=', 'opportunity') and ('call_type','=','Insurance')]}"/>
-                    <button name="%(action_dms_lead2opportunity_partner_insurance)d" string="Book Insurance Policy"
+                    <button name="%(action_dms_lead2insurance_partner)d" string="Book Insurance Policy"
                             type="action"
                             help="Book Insurance Policy" class="oe_highlight"
                             attrs="{'invisible': [('type', '=', 'opportunity') and ('call_type','=','Service')]}"/>
@@ -155,6 +155,7 @@
                 <field name="user_id" string="Telecaller"/>
                 <field name="activity_summary" string="Summary"/>
                 <field name="call_state" string="Call Status"/>
+                <field name="disposition"/>
                 <field name="contact_name" invisible="1"/>
                 <field name="city" invisible="1"/>
                 <field name="opportunity_type" invisible="1"/>
