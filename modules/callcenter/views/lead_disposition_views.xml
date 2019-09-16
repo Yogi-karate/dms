@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<odoo>
+<record id="dms_lead_disposition_view_form" model="ir.ui.view">
+        <field name="name">dms.lead.disposition.form</field>
+        <field name="model">dms.lead.disposition</field>
+        <field name="arch" type="xml">
+            <form string="Lead Disposition">
+                <group string="">
+                    <field name="name"/>
+                    <field name="active"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
+<record id="dms_lead_disposition_view_tree" model="ir.ui.view">
+        <field name="name">dms.lead.disposition.tree</field>
+        <field name="model">dms.lead.disposition</field>
+        <field name="arch" type="xml">
+            <tree string="Lead Disposition">
+                    <field name="name"/>
+                    <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+
+    <record id="action_dms_lead_disposition_view" model="ir.actions.act_window">
+        <field name="name">Lead Disposition</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.lead.disposition</field>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('dms_lead_disposition_view_tree')}),
+                           (0, 0, {'view_mode': 'form', 'view_id': ref('dms_lead_disposition_view_form')})
+                           ]"/>
+        <field name="context"></field>
+        <field name="domain"></field>
+
+    </record>
+</odoo>

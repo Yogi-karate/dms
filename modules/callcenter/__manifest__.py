@@ -22,7 +22,9 @@
         'views/activity_done_views.xml',
         'views/crm_lead_views.xml',
         'views/dms_vehicle_lost_views.xml',
+        'views/lead_disposition_views.xml',
         'views/callcenter_views.xml',
+
         'data/service_lead_cron_data.xml',
         'data/vehicle_import_cron_data.xml',
     ],

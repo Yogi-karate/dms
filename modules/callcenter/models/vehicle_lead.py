@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _
+from datetime import datetime, timedelta
 
 
 class VehicleLead(models.Model):
@@ -30,10 +31,11 @@ class VehicleLead(models.Model):
         ('call-back', 'Callback'),
     ], string='Call Status', readonly=True, track_visibility='onchange', track_sequence=3,
         compute='_process_call_status', store=True)
-    current_due_date = fields.Date(string='Current Due Date', compute='_process_call_status', store=True)
+    current_due_date = fields.Date(string='Current Due-Date', compute='_process_call_status', store=True)
     insurance_history = fields.One2many('vehicle.insurance', string='Current Insurance Data',
                                         compute='_process_insurance_data')
     model = fields.Char(string='Vehicle Model', compute='_process_vehicle_model')
+    disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
 
     @api.multi
     def _process_insurance_data(self):
@@ -86,6 +88,12 @@ class VehicleLead(models.Model):
             lead.email_from = lead.vehicle_id.partner_id.email
             lead.registration_no = lead.vehicle_id.registration_no
             lead.vin_no = lead.vehicle_id.chassis_no
+            lead.dos = lead.vehicle_id.date_order
+            sale_date = lead.vehicle_id.date_order
+            if sale_date:
+                today = fields.Datetime.now()
+                lead.date_deadline = sale_date.date().replace(year=today.year)
+
 
     @api.model
     def create(self, vals):

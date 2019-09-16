@@ -27,10 +27,7 @@ class ActivityFeedback(models.TransientModel):
         return result
 
     feedback = fields.Char('Call Feedback')
-    feedback_type = fields.Selection([
-        ('no_response', 'Not Responding'),
-        ('sold_out', 'Vehicle Sold Out'),
-    ], string='Feedback Type', store=True, default='no_response')
+    disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
     lead_id = fields.Many2one('dms.vehicle.lead')
     activity_id = fields.Many2one('mail.activity', string="Activity")
     summary = fields.Char('Summary')
@@ -40,7 +37,9 @@ class ActivityFeedback(models.TransientModel):
     @api.multi
     def action_apply(self):
         print("Applying Action")
-        self.activity_id.action_feedback(self.feedback)
+        message = self.activity_id.action_feedback(self.feedback)
+        if message:
+            self.lead_id.write({'disposition': self.disposition.id})
         return
 
     @api.multi

@@ -31,6 +31,12 @@
               string="Lost Reasons"
               groups="group_dms_callcenter_manager,group_dms_callcenter_manager_insurance"
               sequence="4"/>
+    <menuitem action="action_dms_lead_disposition_view"
+              id="menu_action_dms_lead_disposition_view"
+              parent="base_dms.menu_dms_configurations_root"
+              string="Lead Disposition"
+              groups="group_dms_callcenter_lead,group_dms_callcenter_lead_insurance"
+              sequence="5"/>
     <menuitem action="action_dms_vehicle_service_lost" id="menu_action_dms_vehicle_service_lost"
               parent="base_dms.menu_dms_reports_root"
               string="Lost Service Leads"

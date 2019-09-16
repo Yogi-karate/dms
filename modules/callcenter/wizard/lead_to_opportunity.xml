@@ -73,7 +73,7 @@
                             <field name="cur_due_date"/>
                             <field name="cur_final_premium"/>
                             <field name="booking_type"/>
-                            <field name="dop" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
+                            <field name="dop"/>
                             <field name="pick_up_address" string="Pickup Address"
                                    attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
                         </group>
