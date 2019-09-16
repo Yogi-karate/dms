@@ -129,6 +129,7 @@ class ServiceBooking(models.Model):
     booking_type = fields.Selection([
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
+        ('online_payment', 'Online Payment'),
     ], string='Booking Type', store=True, default='pickup')
 
     pick_up_address = fields.Char('Pick-up Address')
