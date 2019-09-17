@@ -3,5 +3,6 @@
 from . import dms_partner_binding
 from . import lead_to_opportunity
 from . import dms_vehicle_reassign
+from . import activity_feeback
 
 

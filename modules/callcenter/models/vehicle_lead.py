@@ -1,4 +1,5 @@
 from odoo import api, fields, models, _
+from datetime import datetime, timedelta
 
 
 class VehicleLead(models.Model):
@@ -29,7 +30,22 @@ class VehicleLead(models.Model):
         ('progress', 'In-Progress'),
         ('call-back', 'Callback'),
     ], string='Call Status', readonly=True, track_visibility='onchange', track_sequence=3,
-        compute='_process_call_status')
+        compute='_process_call_status', store=True)
+    current_due_date = fields.Date(string='Current Due-Date', compute='_process_call_status', store=True)
+    insurance_history = fields.One2many('vehicle.insurance', string='Current Insurance Data',
+                                        compute='_process_insurance_data')
+    model = fields.Char(string='Vehicle Model', compute='_process_vehicle_model')
+    disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
+
+    @api.multi
+    def _process_insurance_data(self):
+        for lead in self:
+            lead.insurance_history = lead.vehicle_id.insurance_history
+
+    @api.multi
+    def _process_vehicle_model(self):
+        for lead in self:
+            lead.model = lead.vehicle_id.product_id.name
 
     @api.multi
     def _compute_lead_type(self):
@@ -46,10 +62,11 @@ class VehicleLead(models.Model):
             rec['call_type'] = opportunity.name
         return rec
 
-    @api.depends('activity_date_deadline')
+    @api.depends('activity_ids.date_deadline')
     @api.multi
     def _process_call_status(self):
         for lead in self:
+            lead.current_due_date = lead.activity_date_deadline
             if not len(lead.activity_ids) and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
                 lead.call_state = 'done'
             if len(lead.activity_ids) > 0 and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
@@ -71,6 +88,12 @@ class VehicleLead(models.Model):
             lead.email_from = lead.vehicle_id.partner_id.email
             lead.registration_no = lead.vehicle_id.registration_no
             lead.vin_no = lead.vehicle_id.chassis_no
+            lead.dos = lead.vehicle_id.date_order
+            sale_date = lead.vehicle_id.date_order
+            if sale_date:
+                today = fields.Datetime.now()
+                lead.date_deadline = sale_date.date().replace(year=today.year)
+
 
     @api.model
     def create(self, vals):
@@ -106,6 +129,7 @@ class ServiceBooking(models.Model):
     booking_type = fields.Selection([
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
+        ('online_payment', 'Online Payment'),
     ], string='Booking Type', store=True, default='pickup')
 
     pick_up_address = fields.Char('Pick-up Address')
@@ -174,14 +198,14 @@ class InsuranceBooking(models.Model):
     reg_no = fields.Char('Reg no', compute='_update_booking_values', store=True)
     sale_date = fields.Char('Sale Date', compute='_update_booking_values', store=True)
     policy_no = fields.Char(string='Policy No')
-    previous_insurance_company = fields.Many2one('res.bank', string='Previous Insurance Company')
+    previous_insurance_company = fields.Many2one('res.insurance.company', string='Previous Insurance Company')
     user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
                               default=lambda self: self.env.user)
     team_id = fields.Many2one('crm.team', string='Sales Team',
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid),
                               index=True, track_visibility='onchange')
-    rollover_company = fields.Many2one('res.bank', string='Current Insurance Company')
+    rollover_company = fields.Many2one('res.insurance.company', string='Current Insurance Company')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
     prev_final_premium = fields.Char('Prev Final Premium')

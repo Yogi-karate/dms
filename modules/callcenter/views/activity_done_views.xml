@@ -7,6 +7,7 @@
                 <field name="partner_name"/>
                 <field name="mobile"/>
                 <field name="summary" widget="html" string="Summary"/>
+                <field name="disposition" string="Disposition"/>
                 <field name="date" string="Completed Date"/>
                 <field name="user_id" string="Telecaller"/>
                 <field name="team_id" string="Team"/>
@@ -57,6 +58,7 @@
                 <group expand="1" string="Group By">
                     <filter string="Created By" name="group_by_salesperson" context="{'group_by':'author_id'}"/>
                     <filter string="Telecaller" name="group_by_telecaller" context="{'group_by':'user_id'}"/>
+                    <filter string="Disposition" name="group_by_disposition" context="{'group_by':'disposition'}"/>
                     <filter string="Sales Team" name="saleschannel" context="{'group_by':'team_id'}"/>
                     <filter string="Opportunity Type" name="opportunity_type" context="{'group_by':'opportunity_type'}"/>
                     <filter string="Company" name="company" context="{'group_by':'company_id'}"

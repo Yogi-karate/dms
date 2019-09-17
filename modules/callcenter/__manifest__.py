@@ -16,16 +16,17 @@
         'data/opportunity_type_data.xml',
         'wizard/dms_vehicle_lead_assign.xml',
         'wizard/lead_to_opportunity.xml',
+        'wizard/activity_feedback.xml',
         'views/booking_insurance.xml',
         'views/booking_service.xml',
         'views/activity_done_views.xml',
         'views/crm_lead_views.xml',
         'views/dms_vehicle_lost_views.xml',
+        'views/lead_disposition_views.xml',
         'views/callcenter_views.xml',
+
         'data/service_lead_cron_data.xml',
         'data/vehicle_import_cron_data.xml',
-
-
     ],
     'installable': True,
     'auto_install': False,

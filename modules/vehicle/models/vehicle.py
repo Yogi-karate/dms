@@ -2,9 +2,6 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-from datetime import datetime
-
-from odoo.addons import decimal_precision as dp
 
 
 class Vehicle(models.Model):
@@ -50,6 +47,8 @@ class Vehicle(models.Model):
     dealer_name = fields.Char('Dealer', default='saboo')
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
+    insurance_history = fields.One2many('vehicle.insurance', 'vehicle_id', string='Vehicle Insurance', copy=True,
+                                        auto_join=True)
 
     @api.depends('order_id')
     def _on_change_sale_order(self):
@@ -99,3 +98,16 @@ class Vehicle(models.Model):
     @api.multi
     def action_in_stock(self):
         return self.write({'state': 'in-stock'})
+
+
+class VehicleInsurance(models.Model):
+    _name = 'vehicle.insurance'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = 'Vehicle Insurance Details'
+
+    policy_date = fields.Date('Policy Due Date')
+    insurance_company = fields.Many2one('res.insurance.company')
+    policy_number = fields.Char('Policy Number')
+    policy_idv = fields.Char('IDV value')
+    vehicle_id = fields.Many2one('vehicle', string='Vehicle Reference', required=True, ondelete='cascade', index=True,
+                                 copy=False)

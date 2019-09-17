@@ -8,7 +8,7 @@
     'sequence': 60,
     'summary': 'Handle Sales customization for DMS',
     'description': "Vehicle Dealership Business Domain",
-    'depends': ['sale_management'],
+    'depends': ['base_dms', 'sale_management'],
     'data': [
         'wizard/sale_booking_views.xml',
         'wizard/update_booking_details.xml',

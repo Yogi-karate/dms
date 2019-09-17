@@ -36,6 +36,7 @@ class ActivityDoneReport(models.Model):
         'Next Activity Summary', )
     call_type = fields.Char('Type')
     opportunity_type = fields.Many2one('dms.opportunity.type', 'Opportunity Type', readonly=True)
+    disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
 
     def _select(self):
         return """
@@ -60,7 +61,8 @@ class ActivityDoneReport(models.Model):
                 l.active,
                 l.call_type,
                 l.probability,
-                l.opportunity_type
+                l.opportunity_type,
+                l.disposition
         """
 
     def _from(self):

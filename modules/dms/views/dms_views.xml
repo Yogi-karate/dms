@@ -19,4 +19,13 @@
 
     <menuitem name="Sale Order Cleanup" id="menu_dms_order_cleanup" sequence="30" action="sale_dms.action_clean_sale_orders"
              parent="base_dms.menu_dms_configurations_root" groups="stock.group_stock_manager"/>
+
+     <menuitem name="Insurance Companies" id="menu_insurance_companies" sequence="30" action="vehicle.action_res_view_res_insurance_company"
+             parent="base_dms.menu_dms_configurations_root"
+                  groups="callcenter.group_dms_callcenter_lead_insurance,callcenter.group_dms_callcenter_manager_insurance"/>
+
+      <menuitem name="Insurance History" id="menu_vehicle_insurance_history" sequence="30" action="vehicle.action_vehicle_insurance_history"
+             parent="base_dms.menu_dms_configurations_root"
+                  groups="callcenter.group_dms_callcenter_lead_insurance,callcenter.group_dms_callcenter_manager_insurance"/>
+
 </odoo>

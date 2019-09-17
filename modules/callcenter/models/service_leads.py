@@ -59,6 +59,65 @@ class ServiceLeads(models.TransientModel):
         _logger.info("Created %s Insurance Leads for %s", len(created_leads), str(today))
 
     @api.model
+    def _process_insurance_leads_oct(self):
+        vehicles = self.env['vehicle'].search([])
+        insurance_type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Insurance')])
+        today = fields.Datetime.now()
+        today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
+        leads = []
+        for vehicle in vehicles:
+            insurance_lead_dict = self._create_october_leads(vehicle, insurance_type, today)
+            if insurance_lead_dict:
+                leads.append(insurance_lead_dict)
+        self._allocate_insurance_user(leads)
+        created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
+        for lead in created_leads:
+          self._schedule_follow_up(lead, today)
+        _logger.info("Created %s Insurance Leads for %s", len(created_leads), str(today))
+
+    @api.model
+    def _process_follow_up(self):
+        print("!!!!!!!!!!!!!!!!!!!! Hello DMS!!!!!!!!!!!!!!!!!!!!")
+        leads = self.sudo().env['dms.vehicle.lead'].search([('current_due_date', '=', False)], limit=10)
+        today = fields.Datetime.now()
+        for lead in leads:
+            print("Activity Details ------", lead, lead.activity_ids, lead.activity_date_deadline)
+            # latest_activity = lead.activity_ids[:1]
+            # print("Latest Activity Details ------", latest_activity)
+            # latest_activity.write({'date_deadline': today})
+            activity_type = self.env['mail.activity.type'].search([('name', 'like', 'Call')], limit=1)
+            model_id = self.env['ir.model']._get('dms.vehicle.lead').id
+            sample_vals = {
+                'res_model_id': 351,
+                'res_id': lead.id,
+                'date_deadline': '2019-09-14',
+                'user_id': 2,
+                'activity_category': 'default',
+                'force_next': False,
+                'previous_activity_type_id': False,
+                'recommended_activity_type_id': False,
+                'activity_type_id': 8, 'summary': False,
+                'note': '<p>HALLLLO</p>'
+            }
+            create_vals = {
+                'activity_type_id': activity_type.id,
+                'summary': "Hello Test" or activity_type.summary,
+                'automated': True,
+                'note': 'Sample Note',
+                'date_deadline': today,
+                'res_model_id': model_id,
+                'res_id': lead.id,
+            }
+            _logger.info("Before Create %s Insurance Leads for %s and activity - %s", lead.name, len(leads),
+                         len(lead.activity_ids))
+            activities = self.env['mail.activity'].with_context(default_res_id=lead.id,
+                                                                default_res_model=model_id).create(sample_vals)
+            # activities = self.env['mail.activity'].create(create_vals)
+            # self._schedule_follow_up(lead, today)
+            _logger.info("Created %s Insurance Leads for %sand activity - %s", lead.name, len(leads),
+                         len(lead.activity_ids))
+
+    @api.model
     def _total_users(self, teams):
         users = []
         for team in teams:
@@ -200,6 +259,27 @@ class ServiceLeads(models.TransientModel):
             dict = self._prepare_leads(vehicle, type, today, service_type, 90)
         return dict
 
+    def _create_october_leads(self, vehicle, type, today):
+        dict = None
+        if vehicle.date_order:
+            sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
+        else:
+            return
+        if sale_date.month == 10 or sale_date.month == 9:
+            dat = sale_date.replace(2019, int(sale_date.month), int(sale_date.day), 00, 00, 00, 00)
+            delta = (dat - today).days
+            service_type = 'Insurance'
+            dict = self._prepare_leads(vehicle, type, dat - timedelta(7), service_type, delta)
+        return dict
+
+    @api.model
+    def _process_lead_due_date(self):
+        leads = self.env['dms.vehicle.lead'].search([('current_due_date', '=', False)])
+        for lead in leads:
+            _logger.info("Checking current due date for  %s  Lead  with date %s", lead, lead.current_due_date)
+            lead.current_due_date = lead.activity_date_deadline
+        _logger.info("Updated current due date for  %s  Leads ", len(leads))
+
     @api.model
     def create_service_leads(self, autocommit=True):
         self._clean_service_leads()
@@ -214,6 +294,21 @@ class ServiceLeads(models.TransientModel):
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Insurance Leads!!!!!!!!!!!!!!!!")
         self._process_insurance_leads()
         _logger.info("****************Finished creating Insurance Leads****************")
+        pass
+
+    @api.model
+    def create_insurance_leads_oct(self, autocommit=True):
+        self._clean_insurance_leads()
+        _logger.info("!!!!!!!!!!!!!!Starting Creation of Insurance Leads Oct!!!!!!!!!!!!!!!!")
+        self._process_insurance_leads_oct()
+        _logger.info("****************Finished creating Insurance Leads oct****************")
+        pass
+
+    @api.model
+    def update_current_due_date(self, autocommit=True):
+        _logger.info("!!!!!!!!!!!!!!Starting Updation of Current Due date!!!!!!!!!!!!!!!!")
+        self._process_lead_due_date()
+        _logger.info("****************Finished Updation of Current Due date****************")
         pass
 
     @api.model

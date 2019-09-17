@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <odoo>
 
-    <record id="view_dms_lead2opportunity_partner" model="ir.ui.view">
-        <field name="name">dms.lead2opportunity.partner.form</field>
-        <field name="model">dms.lead2opportunity.partner</field>
+    <record id="view_dms_lead2booking_partner" model="ir.ui.view">
+        <field name="name">dms.lead2service.booking.form</field>
+        <field name="model">dms.lead2service.booking</field>
         <field name="arch" type="xml">
             <form string="Convert to Booking">
                 <group>
@@ -11,22 +11,22 @@
                     <field name="service_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
                     <field name="mobile"/>
                     <field name="booking_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
-                    <field name="dop"
-                           attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
+                    <field name="dop" string = "Appointment Date"
+                           />
                     <field name="pick_up_address" string="Pickup Address"
                            attrs="{'invisible': ['|',('booking_type', '!=', 'pickup'),('service_type', '=', 'Insurance')]}"/>
                     <field name="location_id" string="Preferred Service Location"
                            options="{'no_create':True,'no_open':True}"/>
                     <field name="remarks"/>
                 </group>
-                <group name="action" attrs="{'invisible': [('name', '!=', 'convert')]}" string="Customers" col="1">
+              <!--  <group name="action" attrs="{'invisible': [('name', '!=', 'convert')]}" string="Customers" col="1">
                     <field name="action" nolabel="1" widget="radio"/>
                     <group col="2">
                         <field name="partner_id" widget="res_partner_many2one" domain="[('customer', '=', True)]"
                                context="{'search_default_customer': 1, 'show_vat': True}"
                                attrs="{'required': [('action', '=', 'exist')], 'invisible':[('action','!=','exist')]}"/>
                     </group>
-                </group>
+                </group> -->
                 <footer>
                     <button name="action_apply" string="Confirm Booking" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
@@ -36,18 +36,18 @@
     </record>
 
 
-    <record id="action_dms_lead2opportunity_partner" model="ir.actions.act_window">
+    <record id="action_dms_lead2booking_partner" model="ir.actions.act_window">
         <field name="name">Service Booking</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">dms.lead2opportunity.partner</field>
+        <field name="res_model">dms.lead2service.booking</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_dms_lead2opportunity_partner"/>
+        <field name="view_id" ref="view_dms_lead2booking_partner"/>
         <field name="target">new</field>
     </record>
 
-    <record id="view_dms_lead2opportunity_partner_insurance" model="ir.ui.view">
-        <field name="name">dms.lead2opportunity.partner.form</field>
-        <field name="model">dms.lead2opportunity.partner</field>
+    <record id="view_dms_lead2insurance_partner" model="ir.ui.view">
+        <field name="name">dms.lead2insurance.booking.form</field>
+        <field name="model">dms.lead2insurance.booking</field>
         <field name="arch" type="xml">
             <form string="Create an Insurance">
                 <sheet>
@@ -73,33 +73,33 @@
                             <field name="cur_due_date"/>
                             <field name="cur_final_premium"/>
                             <field name="booking_type"/>
-                            <field name="dop" attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
+                            <field name="dop"/>
                             <field name="pick_up_address" string="Pickup Address"
                                    attrs="{'invisible': [('booking_type', '!=', 'pickup')]}"/>
                         </group>
                     </group>
                 </sheet>
-                <group name="action" attrs="{'invisible': [('name', '!=', 'convert')]}" string="Customers" col="1">
+             <!--   <group name="action" attrs="{'invisible': [('name', '!=', 'convert')]}" string="Customers" col="1">
                     <field name="action" nolabel="1" widget="radio"/>
                     <group col="2">
                         <field name="partner_id" widget="res_partner_many2one" domain="[('customer', '=', True)]"
                                context="{'search_default_customer': 1, 'show_vat': True}"
                                attrs="{'required': [('action', '=', 'exist')], 'invisible':[('action','!=','exist')]}"/>
                     </group>
-                </group>
+                </group> -->
                 <footer>
-                    <button name="action_apply_insurance" string="Confirm Booking" type="object" class="btn-primary"/>
+                    <button name="action_apply" string="Confirm Booking" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
                 </footer>
             </form>
         </field>
     </record>
-    <record id="action_dms_lead2opportunity_partner_insurance" model="ir.actions.act_window">
+    <record id="action_dms_lead2insurance_partner" model="ir.actions.act_window">
         <field name="name">Insurance Booking</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">dms.lead2opportunity.partner</field>
+        <field name="res_model">dms.lead2insurance.booking</field>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="view_dms_lead2opportunity_partner_insurance"/>
+        <field name="view_id" ref="view_dms_lead2insurance_partner"/>
         <field name="target">new</field>
     </record>
 </odoo>
