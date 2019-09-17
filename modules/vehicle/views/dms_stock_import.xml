@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+      <record id="form_view_dms_stock" model="ir.ui.view">
+       <field name="name">dms.stock.import.form</field>
+       <field name="model">dms.stock.import</field>
+       <field name="arch" type="xml">
+           <form string="Vehicles">
+              <header>
+                  <field name="state" widget="statusbar" statusbar_visible="draft,cancel" options="{'clickable': 1}"/>
+              </header>
+               <group string="Details" class="left">
+                <field name="hyundai_invoice_no"/>
+               <field name="import_date" />
+               <field name="model"/>
+               <field name="variant"/>
+               <field name="color"/>
+               <field name="color_code"/>
+               <field name="engine_no"/>
+               <field name="location"/>
+               <field name="remarks"/>
+               <field name="gdms_bill_date" />
+               <field name="vin_no"/>
+               <field name="reg_no"/>
+               <field name="status"/>
+                   <field name="ignore_reason"/>
+               </group>
+
+           </form>
+       </field>
+   </record>
+     <record id="tree_view_dms_stock" model="ir.ui.view">
+       <field name="name">dms.stock.import.tree</field>
+       <field name="model">dms.stock.import</field>
+       <field name="arch" type="xml">
+           <tree string="Vehicles">
+               <field name="hyundai_invoice_no"/>
+               <field name="import_date" />
+               <field name="model"/>
+               <field name="variant"/>
+               <field name="color"/>
+               <field name="color_code"/>
+               <field name="engine_no"/>
+               <field name="location"/>
+               <field name="remarks"/>
+               <field name="gdms_bill_date" />
+               <field name="vin_no"/>
+               <field name="reg_no"/>
+               <field name="status"/>
+               <field name="ignore_reason"/>
+           </tree>
+       </field>
+   </record>
+
+     <record id="action_stock_vehicle" model="ir.actions.act_window">
+       <field name="name">Upload Vehicle for Stock</field>
+       <field name="type">ir.actions.act_window</field>
+       <field name="res_model">dms.stock.import</field>
+       <field name="view_ids"
+              eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('tree_view_dms_stock')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('form_view_dms_stock')})
+                          ]"/>
+       <field name="context"></field>
+       <field name="domain"></field>
+       <field name="help" type="html">
+           <p class="o_view_nocontent_smiling_face">
+               Add a Vehicle
+           </p>
+           <p>
+               create Vehicle
+           </p>
+       </field>
+   </record>
+
+      <menuitem name="Stock Import" id="menu_dms_stock_import_root_new" sequence="30" action="action_stock_vehicle"
+             parent="base_dms.menu_dms_configurations_root"/>
+</odoo>
