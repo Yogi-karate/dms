@@ -71,7 +71,7 @@ class VehicleLead(models.Model):
                 lead.call_state = 'done'
             if len(lead.activity_ids) > 0 and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
                 lead.call_state = 'progress'
-            if len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) == 0 or len(
+            if len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) == 0 and len(
                     lead.activity_ids) == 0:
                 lead.call_state = 'fresh'
             if len(lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back')) > 0:
