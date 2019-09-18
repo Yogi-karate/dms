@@ -174,14 +174,27 @@ class DmsSaleOrder(models.Model):
             pending_section = None
 
             for line in order.order_line:
+
+                if line.order_id.state in ['sale', 'booked', 'done']:
+                    print(line.qty_to_invoice,
+                          "------------------------------------------------------------------------------------------if case")
+                    if line.product_id.invoice_policy == 'order':
+                        line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
+                    else:
+                        line.qty_to_invoice = line.qty_delivered - line.qty_invoiced
+                    if line.is_downpayment:
+                        line.qty_to_invoice = -1
+
+                else:
+                    print(line.qty_to_invoice,"------------------------------------------------------------------------------------------else case")
+                    line.qty_to_invoice = 0
+
+
                 print(line.is_downpayment,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT",line.name)
                 if line.display_type == 'line_section':
                     pending_section = line
                     continue
-                if float_is_zero(line.qty_to_invoice, precision_digits=precision) and not line.is_downpayment:
-                    print(line.is_downpayment,
-                          "",
-                          line.name)
+                if float_is_zero(line.qty_to_invoice, precision_digits=precision):
                     continue
                 if group_key not in invoices:
                     inv_data = order._prepare_invoice()
@@ -196,13 +209,13 @@ class DmsSaleOrder(models.Model):
                         invoices_origin[group_key].append(order.name)
                     if order.client_order_ref and order.client_order_ref not in invoices_name[group_key]:
                         invoices_name[group_key].append(order.client_order_ref)
-                if line.is_downpayment:
-                    print(line.name,"")
-                    if pending_section:
-                        pending_section.invoice_line_create(invoices[group_key].id, -1)
-                        pending_section = None
-                    line.invoice_line_create(invoices[group_key].id, -1)
-                if (line.qty_to_invoice > 0 or (line.qty_to_invoice < 0 and final)) and (not line.is_downpayment):
+                # if line.is_downpayment:
+                #     print(line.name,"")
+                #     if pending_section:
+                #         pending_section.invoice_line_create(invoices[group_key].id, -1)
+                #         pending_section = None
+                #     line.invoice_line_create(invoices[group_key].id, -1)
+                if line.qty_to_invoice > 0 or (line.qty_to_invoice < 0 and final):
                     print(line.name,"-----------------oooooooo----",line.qty_to_invoice)
                     if pending_section:
                         pending_section.invoice_line_create(invoices[group_key].id, pending_section.qty_to_invoice)
