@@ -10,8 +10,10 @@
     'description': "Auto Dealership Business Domain",
     'depends': ['base','l10n_in'],
     'data': [
+        'security/ir.model.access.csv',
         'views/res_partner_views.xml',
-        'views/dms_menu_views.xml'
+        'views/dms_menu_views.xml',
+
     ],
     'installable': True,
     'auto_install': True,
