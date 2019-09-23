@@ -55,6 +55,7 @@
             name="Create Product Variant"
             parent="sale.menu_sale_config"
             action="dms_product_action"
+               groups="base.group_system"
             sequence="1"/>
 
 

@@ -75,7 +75,7 @@ class VehicleLead(models.Model):
                 lead.call_state = 'done'
             if len(lead.activity_ids) > 0 and len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) > 0:
                 lead.call_state = 'progress'
-            if len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) == 0 or len(
+            if len(lead.message_ids.filtered(lambda rec: rec.mail_activity_type_id)) == 0 and len(
                     lead.activity_ids) == 0:
                 lead.call_state = 'fresh'
             if len(lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back')) > 0:
@@ -133,7 +133,6 @@ class ServiceBooking(models.Model):
     booking_type = fields.Selection([
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
-        ('online_payment', 'Online Payment'),
     ], string='Booking Type', store=True, default='pickup')
 
     pick_up_address = fields.Char('Pick-up Address')
@@ -232,6 +231,7 @@ class InsuranceBooking(models.Model):
     booking_type = fields.Selection([
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
+        ('online_payment', 'Online Payment'),
     ], string='Cur Booking Type', store=True, default='pickup')
 
     pick_up_address = fields.Char('Pick-up Address')
