@@ -9,7 +9,7 @@ class MailActivity(models.Model):
     _name = 'mail.activity'
     _inherit = 'mail.activity'
 
-    def action_apply_disposition(self, feedback, disposition_id):
+    def action_feedback_disposition(self, feedback, disposition_id):
         lead = self.env['dms.vehicle.lead'].search([('id', '=', self.res_id)])
         print(self)
         print(
