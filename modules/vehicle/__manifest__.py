@@ -18,6 +18,7 @@
         'views/dms_stock_import.xml',
         'views/res_bank_views.xml',
         'views/vehicle_insurance_views.xml',
+        'views/vehicle_finance_views.xml',
     ],
     'installable': True,
     'auto_install': True,

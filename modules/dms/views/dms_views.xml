@@ -27,5 +27,8 @@
       <menuitem name="Insurance History" id="menu_vehicle_insurance_history" sequence="30" action="vehicle.action_vehicle_insurance_history"
              parent="base_dms.menu_dms_configurations_root"
                   groups="callcenter.group_dms_callcenter_lead_insurance,callcenter.group_dms_callcenter_manager_insurance"/>
+    <menuitem name="Finance History" id="menu_vehicle_finance_history" sequence="30" action="vehicle.action_vehicle_finance_history"
+             parent="base_dms.menu_dms_configurations_root"
+                  groups="callcenter.group_dms_callcenter_lead_insurance,callcenter.group_dms_callcenter_manager_insurance"/>
 
 </odoo>

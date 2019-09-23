@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-
+from odoo.addons import  decimal_precision as dp
 
 class Vehicle(models.Model):
     _name = 'vehicle'
@@ -48,6 +48,8 @@ class Vehicle(models.Model):
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
     insurance_history = fields.One2many('vehicle.insurance', 'vehicle_id', string='Vehicle Insurance', copy=True,
+                                        auto_join=True)
+    finance_history = fields.One2many('vehicle.finance', 'vehicle_id', string='Vehicle Finance', copy=True,
                                         auto_join=True)
 
     @api.depends('order_id')
@@ -111,3 +113,24 @@ class VehicleInsurance(models.Model):
     policy_idv = fields.Char('IDV value')
     vehicle_id = fields.Many2one('vehicle', string='Vehicle Reference', required=True, ondelete='cascade', index=True,
                                  copy=False)
+class VehicleFinance(models.Model):
+    _name = 'vehicle.finance'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _description = 'Vehicle Finance Details'
+
+    financier_name = fields.Many2one('res.bank', string='Financier', help="Bank for finance")
+    finance_amount = fields.Float('Amount', digits=dp.get_precision('Product Price'), default=0.0)
+    finance_agreement_date = date_order = fields.Datetime(string='Finance Agreement Date', default=fields.Datetime.now)
+    loan_tenure = fields.Char('Tenure', help="Loan Tenure")
+    loan_amount = fields.Float('Loan Amount', digits=dp.get_precision('Product Price'), default=0.0)
+    loan_approved_amount = fields.Float('Approved Amount', digits=dp.get_precision('Product Price'), default=0.0)
+    loan_rate = fields.Float("Rate of Interest", digits=(2, 2), help='The rate of interest for loan')
+    loan_emi = fields.Float('EMI', digits=dp.get_precision('Product Price'), default=0.0)
+    loan_commission = fields.Float('Commission ', digits=dp.get_precision('Product Price'), default=0.0)
+    finance_type = fields.Selection([
+        ('in', 'in-house'),
+        ('out', 'out-house'),
+    ], string='Finance Type', store=True, default='in')
+    vehicle_id = fields.Many2one('vehicle', string='Vehicle Reference', required=True, ondelete='cascade', index=True,
+                                 copy=False)
+
