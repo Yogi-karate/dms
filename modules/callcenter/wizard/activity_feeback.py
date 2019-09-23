@@ -37,9 +37,10 @@ class ActivityFeedback(models.TransientModel):
     @api.multi
     def action_apply(self):
         print("Applying Action")
-        message = self.activity_id.action_feedback(self.feedback)
-        if message:
-            self.lead_id.write({'disposition': self.disposition.id})
+        #message =
+        self.activity_id.action_apply_disposition(self.feedback,self.disposition.id)
+        print(self.activity_id.res_id,"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
+            # self.lead_id.write({'disposition': self.disposition.id})
         return
 
     @api.multi
@@ -47,3 +48,5 @@ class ActivityFeedback(models.TransientModel):
         print("Applying Rescedule")
         self.activity_id.action_feedback(self.feedback)
         return
+
+

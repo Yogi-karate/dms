@@ -4,4 +4,5 @@
 from . import vehicle_lead
 from . import service_leads
 from . import ActivityDoneReport
+from . import mail_activity
 from . import lead_disposition
