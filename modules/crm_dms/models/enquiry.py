@@ -274,14 +274,15 @@ class Enquiry(models.Model):
             res.update({'source_id': vals['source_id']})
         if 'product_id' in vals:
             product_template = self.env['product.template'].browse(vals['product_id'])
-        leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self.id)])
-        print(product_template.name, "(((((((((((((((((((((())))))))))))))))))))))))))))")
-        vals['name'] = product_template.name + "-" + partner_name
-        print(vals)
-        for lead in leads:
-            res.update({'name': lead.opportunity_type.name + "-" + product_template.name})
-            lead.write(res)
-            print(lead.partner_name)
+        if 'product_id' in vals and 'partner_name' in vals:
+                leads = self.sudo().env['crm.lead'].search([('enquiry_id', '=', self.id)])
+                print(product_template.name, "(((((((((((((((((((((())))))))))))))))))))))))))))")
+                vals['name'] = product_template.name + "-" + partner_name
+                print(vals)
+                for lead in leads:
+                    res.update({'name': lead.opportunity_type.name + "-" + product_template.name})
+                    lead.write(res)
+                    print(lead.partner_name)
         return super(Enquiry, self).write(vals)
 
     def action_create_opportunities(self):

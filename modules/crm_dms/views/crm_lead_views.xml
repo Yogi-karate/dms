@@ -109,7 +109,7 @@
                                     }"
                                 />
                                 <field name="partner_name"/>
-                                <field name="enquiry_id" />
+                                <field name="enquiry_id" readonly="1"/>
                                 <field name="campaign_id" invisible="1"/>
                                 <field name="source_id"  invisible="1"/>
                                 <field name="medium_id"  invisible="1"/>

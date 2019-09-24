@@ -33,6 +33,9 @@
                         <page name="Insurance" string="Insurance History">
                             <field name="insurance_history"/>
                         </page>
+                        <page name="Finance" string="Finance History">
+                            <field name="finance_history"/>
+                        </page>
                     </notebook>
                 </sheet>
                 <div class="oe_chatter">

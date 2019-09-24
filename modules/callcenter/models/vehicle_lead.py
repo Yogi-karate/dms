@@ -34,6 +34,8 @@ class VehicleLead(models.Model):
     current_due_date = fields.Date(string='Current Due-Date', compute='_process_call_status', store=True)
     insurance_history = fields.One2many('vehicle.insurance', string='Current Insurance Data',
                                         compute='_process_insurance_data')
+    finance_history = fields.One2many('vehicle.finance', string='Current Finance Data',
+                                        compute='_process_insurance_data')
     model = fields.Char(string='Vehicle Model', compute='_process_vehicle_model')
     disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
 
@@ -41,6 +43,8 @@ class VehicleLead(models.Model):
     def _process_insurance_data(self):
         for lead in self:
             lead.insurance_history = lead.vehicle_id.insurance_history
+            lead.finance_history = lead.vehicle_id.finance_history
+
 
     @api.multi
     def _process_vehicle_model(self):

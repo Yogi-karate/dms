@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="vehicle_finance_history_form" model="ir.ui.view">
+            <field name="name">vehicle.finance.form</field>
+            <field name="model">vehicle.finance</field>
+            <field name="arch" type="xml">
+                <form string="Vehicle Finance History">
+                    <group col="4">
+                        <field name="financier_name"/>
+                    <field name="finance_amount"/>
+                    <field name="finance_agreement_date"/>
+                    <field name="loan_tenure"/>
+                    <field name="loan_amount"/>
+                    <field name="loan_approved_amount"/>
+                    <field name="loan_rate"/>
+                    <field name="loan_emi"/>
+                    <field name="loan_commission"/>
+                    <field name="finance_type"/>
+                    <field name="vehicle_id"/>
+                    </group>
+
+                </form>
+            </field>
+        </record>
+        <record id="vehicle_finance_history_tree" model="ir.ui.view">
+            <field name="name">vehicle.finance.tree</field>
+            <field name="model">vehicle.finance</field>
+            <field name="arch" type="xml">
+                <tree string="Vehicle Finance History">
+                    <field name="financier_name"/>
+                    <field name="finance_amount"/>
+                    <field name="finance_agreement_date"/>
+                    <field name="loan_tenure"/>
+                    <field name="loan_amount"/>
+                    <field name="loan_approved_amount"/>
+                    <field name="loan_rate"/>
+                    <field name="loan_emi"/>
+                    <field name="loan_commission"/>
+                    <field name="finance_type"/>
+                    <field name="vehicle_id"/>
+                </tree>
+            </field>
+        </record>
+        <record id="action_vehicle_finance_history" model="ir.actions.act_window">
+            <field name="name">Vehicle Finance History</field>
+            <field name="res_model">vehicle.finance</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new bank
+              </p><p>
+                Manage bank records you want to be used in the system.
+              </p>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>
