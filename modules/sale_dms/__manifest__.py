@@ -22,7 +22,6 @@
         'report/pdf_report_templates.xml',
         'security/sale_security.xml',
         'security/ir.model.access.csv',
-        'wizard/source_deactivate.xml',
         'views/account_invoice_views.xml',
     ],
     'installable': True,

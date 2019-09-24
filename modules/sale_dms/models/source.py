@@ -9,12 +9,12 @@ from odoo.tools.float_utils import float_round
 class Source(models.Model):
     _name = 'utm.source'
     _inherit = 'utm.source'
-    active = fields.Boolean(string='Active',default=True)
-    medium = fields.Many2one('utm.medium',string='Medium',required=True)
-    campaign = fields.Many2one('utm.campaign',string='Campaign')
+    active = fields.Boolean(string='Active', default=True)
+    medium = fields.Many2one('utm.medium', string='Medium', required=True)
+    campaign = fields.Many2one('utm.campaign', string='Campaign')
 
     @api.model
-    def create(self,vals):
+    def create(self, vals):
         print(vals)
         medium_name = self.env['utm.medium'].browse(vals['medium']).name
         campaign_name = self.env['utm.campaign'].browse(vals['campaign']).name
@@ -60,7 +60,3 @@ class Source(models.Model):
             }
         res = super(Source, self).write(vals2)
         return res
-
-
-
-

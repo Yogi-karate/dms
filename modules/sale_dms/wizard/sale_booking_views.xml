@@ -10,27 +10,9 @@
                         them before validation.
                     </p>
                     <group>
-                        <field name="count" invisible="[('count','=',1)]" readonly="True"/>
-                        <field name="advance_payment_method" class="oe_inline" widget="radio"
-                            invisible="1"/>
-                        <field name="product_id"
-                            context="{'search_default_services': 1, 'default_type': 'service', 'default_invoice_policy': 'order'}" class="oe_inline"
-                            invisible="1"/>
-                        <label for="amount" attrs="{'invisible': [('advance_payment_method', 'not in', ('fixed','percentage'))]}"/>
-                        <div attrs="{'invisible': [('advance_payment_method', 'not in', ('fixed','percentage'))]}">
-                            <field name="amount"
-                                attrs="{'required': [('advance_payment_method', 'in', ('fixed','percentage'))]}" class="oe_inline" widget="monetary"/>
-                        </div>
-                        <field name="deposit_account_id" class="oe_inline"
-                            invisible="1" groups="account.group_account_manager"/>
-                        <field name="deposit_taxes_id" class="oe_inline" widget="many2many_tags"
-                            domain="[('type_tax_use','=','sale')]"
-                            invisible="1" />
+                        <field name="amount" widget="monetary"/>
                         <field name="dob"/>
-
                         <field name="priority" widget="priority" groups="base.group_user"/>
-
-
                     </group>
                     <footer>
                         <button name="create_invoices" string="Book" type="object"
