@@ -71,5 +71,6 @@
         <menuitem id="account.product_product_menu_sellable" name="Products"
                   action="account.product_product_action_sellable" parent="account.menu_finance_receivables"
                   sequence="100" groups="base.group_system"/>
+        <menuitem id="account.menu_finance_entries" name="Accounting" parent="account.menu_finance" sequence="4" groups="base.group_system"/>
     </data>
 </odoo>
