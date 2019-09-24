@@ -64,7 +64,7 @@
                 </p>
             </field>
         </record>
-        <menuitem id="account.menu_account_customer" name="Customers" parent="account.menu_finance" sequence="2"
+        <menuitem id="account.menu_account_customer" name="Customers" parent="account.menu_finance_receivables" sequence="2"
                   groups="base.group_system"/>
         <menuitem id="account.menu_finance_payables" name="Vendors" parent="account.menu_finance" sequence="3"
                   groups="base.group_system"/>
