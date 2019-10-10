@@ -12,21 +12,27 @@ class CrmLeadLost(models.TransientModel):
     type = fields.Selection([
         ('Service', 'Service'),
         ('Insurance', 'Insurance'),
-        ('ServiceBooking', 'Insurance'),
-        ('InsuranceBooking', 'InsuranceBooking'),
-    ], string='Lost Model Type', store=True, default='Service')
-    model = fields.Char('Model', default='dms.vehicle.lead') 
+        ('Vehicle', 'Vehicle'),
+        ('Finance', 'Finance'),
+    ], string='Lost Model Type', store=True, default='Vehicle')
+    model = fields.Char('Model', default='crm.lead')
 
     @api.model
     def default_get(self, fields):
         result = super(CrmLeadLost, self).default_get(fields)
         print("The context in pop up is ", self._context)
         if self._context.get('active_id') and self._context.get('active_type') == 'lead':
+            lead = self.env['crm.lead'].browse(self._context['active_id'])
+            result['model'] = 'crm.lead'
+            result['type'] = 'Vehicle'
+        if self._context.get('active_id') and self._context.get('active_type') == 'vehicle_lead':
             lead = self.env['dms.vehicle.lead'].browse(self._context['active_id'])
+
             if lead and lead.opportunity_type.name == 'Service':
                 result['type'] = 'Service'
             else:
                 result['type'] = 'Insurance'
+
         if self._context.get('active_id') and self._context.get('active_type') == 'service_booking':
             result['type'] = 'Service'
             result['model'] = 'service.booking'
@@ -47,6 +53,7 @@ class CrmLeadLost(models.TransientModel):
             booking.write({'active': False})
             lead = booking.lead_id
         else:
+            print("in dms vehicle read ----------")
             lead = self.env['dms.vehicle.lead'].browse(self.env.context.get('active_ids'))
         if not lead:
             return
