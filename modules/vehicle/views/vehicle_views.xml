@@ -23,6 +23,7 @@
                                    help="Product this vehicle belongs to. You cannot change it anymore if it has already been moved."/>
                             <field name="partner_id"/>
                             <field name="ref"/>
+                            <field name="source"/>
                             <field name="chassis_no"/>
                             <field name="battery_no"/>
                             <field name="registration_no"/>
@@ -54,6 +55,7 @@
             <tree string="vehicles">
                 <field name="name"/>
                 <field name="ref"/>
+                <field name="source"/>
                 <field name="product_id"/>
                 <field name="create_date"/>
                 <field name="chassis_no"/>
