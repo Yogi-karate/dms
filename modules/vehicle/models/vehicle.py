@@ -77,9 +77,10 @@ class Vehicle(models.Model):
     def write(self, vals):
         return super(Vehicle, self).write(vals)
 
-    @api.multi
+    @api.depends('partner_id')
     def _get_customer_details(self):
         for vehicle in self:
+            print("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
             vehicle.partner_name = vehicle.partner_id.name
             vehicle.partner_mobile = vehicle.partner_id.mobile
             vehicle.partner_email = vehicle.partner_id.email
