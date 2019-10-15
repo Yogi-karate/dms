@@ -12,7 +12,7 @@ class VehicleLead(models.Model):
     registration_no = fields.Char('Registration No.')
     vin_no = fields.Char('Chassis No.')
     dos = fields.Datetime(string='Date of Sale')
-    source = fields.Char('Source')
+    source = fields.Char('Dealer')
     service_type = fields.Selection([
         ('first', 'First Free Service'),
         ('second', 'Second Free Service'),
@@ -98,6 +98,10 @@ class VehicleLead(models.Model):
     @api.model
     def create(self, vals):
         vals['type'] = 'lead'
+        ser_type = self.sudo().env['dms.opportunity.type'].search([('id','=',vals['opportunity_type'])])
+        print(vals)
+        if ser_type.name == 'Insurance':
+            vals['service_type'] = 'Insurance'
         result = super(VehicleLead, self).create(vals)
         return result
 

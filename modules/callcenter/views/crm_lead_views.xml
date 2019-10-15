@@ -146,7 +146,8 @@
 
                 <field name="create_date" invisible="1"/>
                 <field name="name" string="Lead"/>
-                <field name="service_type"/>
+                <field name="service_type" attrs="{'invisible': [('service_type', '=', 'Insurance')]}"/>
+                <field name="dos" attrs="{'invisible': [('service_type', '!=', 'Insurance')]}"/>
                 <field name="mobile"/>
                 <field name="activity_date_deadline" invisible="1"/>
                 <field name="current_due_date" string="FollowUp Date"/>
@@ -214,6 +215,8 @@
                     <filter string="Conversion Date" name="date_conversion" context="{'group_by':'date_conversion'}"/>
                     <filter string="Expected Closing Date" name="date_deadline" context="{'group_by':'date_deadline'}"/>
                     <filter string="Closed Date" name="date_closed" context="{'group_by':'date_closed'}"/>
+                    <filter string="Due Date" name="date_deadline" context="{'group_by':'date_deadline'}"/>
+
                 </group>
             </search>
         </field>

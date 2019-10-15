@@ -17,6 +17,18 @@
                 </form>
             </field>
         </record>
+         <record model="ir.ui.view" id="search_vehicle_insurance_filter">
+        <field name="name">Vehicle Insurance Filter</field>
+        <field name="model">vehicle.insurance</field>
+        <field name="arch" type="xml">
+            <search string="Vehicle Insurance Filter">
+                <field name="engine_no"/>
+                <field name="chassis_no"/>
+                <group expand="0" string="Group By">
+                </group>
+            </search>
+        </field>
+    </record>
         <record id="vehicle_insurance_history_tree" model="ir.ui.view">
             <field name="name">vehicle.insurance.tree</field>
             <field name="model">vehicle.insurance</field>
@@ -26,14 +38,19 @@
                     <field name="insurance_company"/>
                     <field name="policy_idv"/>
                     <field name="vehicle_id"/>
+                    <field name="engine_no" invisible="1"/>
+                    <field name="chassis_no"/>
                 </tree>
             </field>
         </record>
         <record id="action_vehicle_insurance_history" model="ir.actions.act_window">
             <field name="name">Vehicle Insurance History</field>
             <field name="res_model">vehicle.insurance</field>
-            <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_ids"
+               eval="[(5, 0, 0),
+                          (0, 0, {'view_mode': 'tree', 'view_id': ref('vehicle_insurance_history_tree')}),
+                          (0, 0, {'view_mode': 'form', 'view_id': ref('vehicle_insurance_history_form')})]"/>
+            <field name="search_view_id" ref="search_vehicle_insurance_filter"/>
             <field name="help" type="html">
               <p class="o_view_nocontent_smiling_face">
                 Create a new bank

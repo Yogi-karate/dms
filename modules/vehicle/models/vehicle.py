@@ -59,7 +59,7 @@ class Vehicle(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if not vals['no_lot']:
+            if 'no_lot' not in vals:
                 self._create_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
 
@@ -109,5 +109,15 @@ class VehicleInsurance(models.Model):
     insurance_company = fields.Many2one('res.insurance.company')
     policy_number = fields.Char('Policy Number')
     policy_idv = fields.Char('IDV value')
-    vehicle_id = fields.Many2one('vehicle', string='Vehicle Reference', required=True, ondelete='cascade', index=True,
+    vehicle_id = fields.Many2one('vehicle', string='Engine No.', required=True, ondelete='cascade', index=True,
                                  copy=False)
+    engine_no = fields.Char('Engine No', compute='_get_vehicle_details',store=True)
+    chassis_no = fields.Char('Chassis No', compute='_get_vehicle_details',store=True)
+
+    @api.multi
+    def _get_vehicle_details(self):
+            for hist in self:
+                print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+                hist.engine_no = hist.vehicle_id.name
+                hist.chassis_no = hist.vehicle_id.chassis_no
+                print(hist)
