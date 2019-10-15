@@ -30,10 +30,9 @@ class CrmLeadLost(models.TransientModel):
 
             if lead and lead.opportunity_type.name == 'Service':
                 result['type'] = 'Service'
-                result['model'] = 'dms.vehicle.lead'
             else:
                 result['type'] = 'Insurance'
-                result['model'] = 'dms.vehicle.lead'
+
         if self._context.get('active_id') and self._context.get('active_type') == 'service_booking':
             result['type'] = 'Service'
             result['model'] = 'service.booking'
@@ -53,10 +52,9 @@ class CrmLeadLost(models.TransientModel):
         if booking:
             booking.write({'active': False})
             lead = booking.lead_id
-        elif self.model == 'dms.vehicle.lead':
-            lead = self.env['dms.vehicle.lead'].browse(self.env.context.get('active_ids'))
         else:
-            lead = self.env['crm.lead'].browse(self.env.context.get('active_ids'))
+            print("in dms vehicle read ----------")
+            lead = self.env['dms.vehicle.lead'].browse(self.env.context.get('active_ids'))
         if not lead:
             return
         lead.write({'lost_reason': self.lost_reason.id, 'lost_remarks': self.lost_remarks})

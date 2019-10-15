@@ -32,6 +32,11 @@
         <field name="model_id" ref="model_dms_opportunity_type"/>
         <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
     </record>
+    <record id="dms_lost_reason_company_rule" model="ir.rule">
+        <field name="name">DMS Lost reason Multi-Company</field>
+        <field name="model_id" ref="crm.model_crm_lost_reason"/>
+        <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]</field>
+    </record>
     <record id="dms_rule_personal_enquiry" model="ir.rule">
         <field name="name">Personal Enquiries</field>
         <field ref="model_dms_enquiry" name="model_id"/>

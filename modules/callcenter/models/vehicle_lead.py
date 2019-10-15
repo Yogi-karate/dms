@@ -119,6 +119,7 @@ class LostReason(models.Model):
     _name = "crm.lost.reason"
     _inherit = "crm.lost.reason"
     type = fields.Many2one('dms.opportunity.type', string='Reason Type')
+    company_id = fields.Many2one('res.company',string='Company')
 
 
 class ServiceBooking(models.Model):
