@@ -111,13 +111,4 @@ class VehicleInsurance(models.Model):
     policy_idv = fields.Char('IDV value')
     vehicle_id = fields.Many2one('vehicle', string='Engine No.', required=True, ondelete='cascade', index=True,
                                  copy=False)
-    engine_no = fields.Char('Engine No', compute='_get_vehicle_details',store=True)
-    chassis_no = fields.Char('Chassis No', compute='_get_vehicle_details',store=True)
 
-    @api.multi
-    def _get_vehicle_details(self):
-            for hist in self:
-                print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
-                hist.engine_no = hist.vehicle_id.name
-                hist.chassis_no = hist.vehicle_id.chassis_no
-                print(hist)

@@ -22,8 +22,7 @@
         <field name="model">vehicle.insurance</field>
         <field name="arch" type="xml">
             <search string="Vehicle Insurance Filter">
-                <field name="engine_no"/>
-                <field name="chassis_no"/>
+                <field name="vehicle_id"/>
                 <group expand="0" string="Group By">
                 </group>
             </search>
@@ -38,8 +37,6 @@
                     <field name="insurance_company"/>
                     <field name="policy_idv"/>
                     <field name="vehicle_id"/>
-                    <field name="engine_no" invisible="1"/>
-                    <field name="chassis_no"/>
                 </tree>
             </field>
         </record>
