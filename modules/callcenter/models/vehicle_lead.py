@@ -7,7 +7,7 @@ class VehicleLead(models.Model):
     _description = "Vehicle Lead"
     _inherit = ['crm.lead']
 
-    vehicle_id = fields.Many2many('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1,
+    vehicle_id = fields.Many2one('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1,
                                   index=True)
     registration_no = fields.Char('Registration No.')
     vin_no = fields.Char('Chassis No.')
