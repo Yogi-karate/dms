@@ -98,7 +98,9 @@ class VehicleLead(models.Model):
     @api.model
     def create(self, vals):
         vals['type'] = 'lead'
-        if vals['call_type'] == 'Insurance':
+        ser_type = self.sudo().env['dms.opportunity.type'].search([('id','=',vals['opportunity_type'])])
+        print(vals)
+        if ser_type.name == 'Insurance':
             vals['service_type'] = 'Insurance'
         result = super(VehicleLead, self).create(vals)
         return result
