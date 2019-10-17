@@ -82,7 +82,6 @@
                             <field name="phone" string="Alternate Number"/>
                             <field name="email_from" widget="email"/>
 
-                            <field name="dos" invisible="1"/>
                         </group>
                         <group>
                             <label for="contact_name" invisible="1"/>
@@ -92,11 +91,11 @@
                             </div>
                             <field name="is_blacklisted" invisible="1"/>
                                 <field name="vehicle_id"/>
-                            <field name="model" readonly="1" />
-                                <field name="registration_no" readonly="1" />
-                                <field name="vin_no" readonly="1" />
-                                <field name="dos" readonly="1" />
-                                <field name="source" readonly="1" />
+                            <field name="model"/>
+                                <field name="registration_no" readonly="1"/>
+                                <field name="vin_no" readonly="1"/>
+                                <field name="dos" readonly="1"/>
+                                <field name="source" readonly="1"/>
                             <div class="o_row o_row_readonly">
                                 <i class="fa fa-ban" style="color: red;" role="img"
                                    title="This email is blacklisted for mass mailing"

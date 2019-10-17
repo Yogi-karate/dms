@@ -100,7 +100,12 @@ class VehicleLead(models.Model):
             vals['service_type'] = 'Insurance'
         result = super(VehicleLead, self).create(vals)
         return result
-
+    def write(self,vals):
+        if 'source' not in vals:
+            vals['source'] = self.vehicle_id.source
+        if 'dos' not in vals:
+            vals['dos'] = self.vehicle_id.date_order
+        return super(VehicleLead, self).write(vals)
     @api.multi
     def reassign_users(self, user_id, team_id):
         for lead in self:
@@ -109,6 +114,7 @@ class VehicleLead(models.Model):
                 'team_id': team_id
             }
             lead.write(vals)
+
 
 
 class LostReason(models.Model):
