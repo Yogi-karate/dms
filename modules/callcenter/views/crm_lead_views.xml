@@ -256,7 +256,7 @@
         <field name="res_model">dms.vehicle.lead</field>
         <field name="view_ids"
                eval="[(5, 0, 0),
-                           (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_leads_new_insur')}),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('crm_case_tree_view_leads_new')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm_case_form_view_leads_new')})]"/>
         <field name="domain">['&amp;',('type','=','lead'),('opportunity_type','=','Insurance')]</field>
         <field name="context">{
