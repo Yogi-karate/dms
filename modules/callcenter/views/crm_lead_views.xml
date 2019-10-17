@@ -148,45 +148,7 @@
 
                 <field name="create_date" invisible="1"/>
                 <field name="name" string="Lead"/>
-                <field name="service_type"/>
-                <field name="dos" invisible="1"/>
-                <field name="mobile"/>
-                <field name="activity_date_deadline" invisible="1"/>
-                <field name="current_due_date" string="FollowUp Date"/>
-                <field name="registration_no"/>
-                <field name="source"/>
-                <field name="user_id" string="Telecaller"/>
-                <field name="activity_summary" string="Summary"/>
-                <field name="call_state" string="Call Status"/>
-                <field name="disposition"/>
-                <field name="contact_name" invisible="1"/>
-                <field name="city" invisible="1"/>
-                <field name="opportunity_type" invisible="1"/>
-                <field name="email_from" invisible="1"/>
-                <field name="date_deadline" string="Due Date"/>
-                <field name="user_id" invisible="1"/>
-                <field name="partner_id" invisible="1"/>
-                <field name="team_id" invisible="1"/>
-                <field name="active" invisible="1"/>
-                <field name="probability" invisible="1"/>
-                <field name="campaign_id" invisible="1"/>
-                <field name="referred" invisible="1"/>
-                <field name="medium_id" invisible="1"/>
-                <field name="message_needaction" invisible="1"/>
-            </tree>
-        </field>
-    </record>
-
-    <record id="crm_case_tree_view_leads_new_insur" model="ir.ui.view">
-        <field name="name">crm.lead.tree.lead.new.insur</field>
-        <field name="model">dms.vehicle.lead</field>
-        <field name="arch" type="xml">
-            <tree string="Leads" decoration-bf="message_needaction==True" decoration-muted="probability == 100"
-                  decoration-danger="activity_date_deadline and (activity_date_deadline &lt; current_date)">
-
-                <field name="create_date" invisible="1"/>
-                <field name="name" string="Lead"/>
-                <field name="service_type" invisible="1"/>
+                <field name="service_type" invisible="context.get('insurance',True)"/>
                 <field name="dos" />
                 <field name="mobile"/>
                 <field name="activity_date_deadline" invisible="1"/>
@@ -275,6 +237,7 @@
             'default_user_id': uid,
             'default_source_type': 'Service',
             'search_default_activities_overdue': 1,
+            'insurance':False
             }
         </field>
         <field name="search_view_id" ref="view_dms_vehicle_leads_filter"/>
@@ -300,6 +263,7 @@
             'default_user_id': uid,
             'search_default_activities_overdue': 1,
             'default_source_type': 'Insurance'
+            'insurance':True
             }
         </field>
         <field name="search_view_id" ref="view_dms_vehicle_leads_filter"/>

@@ -8,7 +8,7 @@ class VehicleLead(models.Model):
     _inherit = ['crm.lead']
 
     vehicle_id = fields.Many2one('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1,
-                                  index=True)
+                                 index=True)
     registration_no = fields.Char('Registration No.')
     vin_no = fields.Char('Chassis No.')
     dos = fields.Datetime(string='Date of Sale')
@@ -90,22 +90,23 @@ class VehicleLead(models.Model):
                 today = fields.Datetime.now()
                 lead.date_deadline = sale_date.date().replace(year=today.year)
 
-
     @api.model
     def create(self, vals):
         vals['type'] = 'lead'
-        ser_type = self.sudo().env['dms.opportunity.type'].search([('id','=',vals['opportunity_type'])])
+        ser_type = self.sudo().env['dms.opportunity.type'].search([('id', '=', vals['opportunity_type'])])
         print(vals)
         if ser_type.name == 'Insurance':
             vals['service_type'] = 'Insurance'
         result = super(VehicleLead, self).create(vals)
         return result
-    def write(self,vals):
+
+    def write(self, vals):
         if 'source' not in vals:
             vals['source'] = self.vehicle_id.source
         if 'dos' not in vals:
             vals['dos'] = self.vehicle_id.date_order
         return super(VehicleLead, self).write(vals)
+
     @api.multi
     def reassign_users(self, user_id, team_id):
         for lead in self:
@@ -114,7 +115,6 @@ class VehicleLead(models.Model):
                 'team_id': team_id
             }
             lead.write(vals)
-
 
 
 class LostReason(models.Model):
