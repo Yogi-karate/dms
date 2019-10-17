@@ -34,18 +34,13 @@ class VehicleLead(models.Model):
     current_due_date = fields.Date(string='Current Due-Date', compute='_process_call_status', store=True)
     insurance_history = fields.One2many('vehicle.insurance', string='Current Insurance Data',
                                         compute='_process_insurance_data')
-    model = fields.Char(string='Vehicle Model', compute='_process_vehicle_model')
+    model = fields.Char(string='Vehicle Model', compute='get_values')
     disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
 
     @api.multi
     def _process_insurance_data(self):
         for lead in self:
             lead.insurance_history = lead.vehicle_id.insurance_history
-
-    @api.multi
-    def _process_vehicle_model(self):
-        for lead in self:
-            lead.model = lead.vehicle_id.product_id.name
 
     @api.multi
     def _compute_lead_type(self):
@@ -89,6 +84,7 @@ class VehicleLead(models.Model):
             lead.registration_no = lead.vehicle_id.registration_no
             lead.vin_no = lead.vehicle_id.chassis_no
             lead.dos = lead.vehicle_id.date_order
+            lead.model = lead.vehicle_id.product_id.name
             sale_date = lead.vehicle_id.date_order
             if sale_date:
                 today = fields.Datetime.now()
