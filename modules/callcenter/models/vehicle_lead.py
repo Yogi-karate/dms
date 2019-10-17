@@ -37,7 +37,7 @@ class VehicleLead(models.Model):
     model = fields.Char(string='Vehicle Model', compute='get_values')
     disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
 
-    @api.multi
+    @api.onchange('vehicle_id')
     def _process_insurance_data(self):
         for lead in self:
             lead.insurance_history = lead.vehicle_id.insurance_history
