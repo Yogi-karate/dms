@@ -262,7 +262,7 @@
         <field name="context">{
             'default_user_id': uid,
             'search_default_activities_overdue': 1,
-            'default_source_type': 'Insurance'
+            'default_source_type': 'Insurance',
             'insurance':True
             }
         </field>
