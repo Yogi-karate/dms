@@ -1,6 +1,6 @@
 from odoo import api, fields, models, _
 from datetime import datetime, timedelta
-
+from odoo.exceptions import UserError
 
 class VehicleLead(models.Model):
     _name = "dms.vehicle.lead"
@@ -55,6 +55,8 @@ class VehicleLead(models.Model):
             opportunity = self.env['dms.opportunity.type'].search([('name', '=', lead_type)], limit=1)
             rec['opportunity_type'] = opportunity.id
             rec['call_type'] = opportunity.name
+            if opportunity.name == 'Insurance':
+                    rec['service_type'] = 'Insurance'
         return rec
 
     @api.depends('activity_ids.date_deadline')
@@ -101,11 +103,10 @@ class VehicleLead(models.Model):
         return result
 
     def write(self, vals):
-        if 'source' not in vals:
-            vals['source'] = self.vehicle_id.source
-        if 'dos' not in vals:
-            vals['dos'] = self.vehicle_id.date_order
-        return super(VehicleLead, self).write(vals)
+            if 'vehicle_id' in vals:
+                raise UserError(_("Vehicle can't changed for an existing Lead. Please create a New Lead."))
+
+            return super(VehicleLead, self).write(vals)
 
     @api.multi
     def reassign_users(self, user_id, team_id):
