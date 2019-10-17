@@ -172,7 +172,7 @@ class ServiceLeads(models.TransientModel):
             'mobile': vehicle.partner_mobile,
             'opportunity_type': type.id,
             'date_deadline': date_follow_up + timedelta(delta),
-            'vehicle_id': [(6, 0, [vehicle.id])],
+            'vehicle_id': vehicle.id,
             'type': 'lead',
             'service_type': service_type,
             'vin_no': vehicle.chassis_no,
