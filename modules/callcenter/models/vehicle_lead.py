@@ -103,8 +103,9 @@ class VehicleLead(models.Model):
         return result
 
     def write(self, vals):
-            if 'vehicle_id' in vals:
-                raise UserError(_("Vehicle can't changed for an existing Lead. Please create a New Lead."))
+            if 'vehicle_id' in vals or 'dos' in vals or 'source' in vals or 'registration_no' in vals or 'chassis_no' in vals:
+                raise UserError(_("Vehicle related fields can't be changed for an existing Lead. Please create a New Lead."))
+
 
             return super(VehicleLead, self).write(vals)
 
