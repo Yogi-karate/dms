@@ -96,14 +96,14 @@ class VehicleLead(models.Model):
     def create(self, vals):
         vals['type'] = 'lead'
         ser_type = self.sudo().env['dms.opportunity.type'].search([('id', '=', vals['opportunity_type'])])
-        print(vals)
         if ser_type.name == 'Insurance':
             vals['service_type'] = 'Insurance'
+
         result = super(VehicleLead, self).create(vals)
         return result
 
     def write(self, vals):
-            if 'vehicle_id' in vals or 'dos' in vals or 'source' in vals or 'registration_no' in vals or 'chassis_no' in vals:
+            if 'vehicle_id' in vals:
                 raise UserError(_("Vehicle related fields can't be changed for an existing Lead. Please create a New Lead."))
 
 

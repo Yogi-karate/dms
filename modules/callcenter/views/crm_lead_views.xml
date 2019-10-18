@@ -92,10 +92,10 @@
                             <field name="is_blacklisted" invisible="1"/>
                                 <field name="vehicle_id"/>
                             <field name="model"/>
-                                <field name="registration_no" />
-                                <field name="vin_no"/>
-                                <field name="dos" />
-                                <field name="source" />
+                                <field name="registration_no" readonly="1"/>
+                                <field name="vin_no" readonly="1"/>
+                                <field name="dos" readonly="1" force_save="1"/>
+                                <field name="source" readonly="1" force_save="1"/>
                             <div class="o_row o_row_readonly">
                                 <i class="fa fa-ban" style="color: red;" role="img"
                                    title="This email is blacklisted for mass mailing"
