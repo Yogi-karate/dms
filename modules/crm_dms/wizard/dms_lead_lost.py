@@ -44,6 +44,8 @@ class CrmLeadLost(models.TransientModel):
             booking = self.env[model].browse(self.env.context.get('active_ids'))
             booking.write({'active': False})
             lead = booking.lead_id
+            lead.write({'type':'lead'})
+            return
         if not lead:
             return
         lead.write({'lost_reason': self.lost_reason.id, 'lost_remarks': self.lost_remarks})

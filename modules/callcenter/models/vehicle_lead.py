@@ -96,6 +96,7 @@ class VehicleLead(models.Model):
     def create(self, vals):
         vals['type'] = 'lead'
         ser_type = self.sudo().env['dms.opportunity.type'].search([('id', '=', vals['opportunity_type'])])
+
         if ser_type.name == 'Insurance':
             vals['service_type'] = 'Insurance'
 
@@ -171,22 +172,26 @@ class ServiceBooking(models.Model):
 
     @api.model
     def create(self, vals):
-        result = super(ServiceBooking, self).create(vals)
-        print("---------------the lead in booking is ------------", result.lead_id)
-        values = {
-            'service_type': result.service_type,
-            'type': 'opportunity',
-            'date_conversion': fields.Datetime.today(),
-            'probability': 100
-        }
-        result.lead_id.write(values)
-        return result
+        duplicate_booking = self.env['service.booking'].search([('lead_id','=',vals['lead_id'])])
+        if not duplicate_booking:
+            result = super(ServiceBooking, self).create(vals)
+            print("---------------the lead in booking is ------------", result.lead_id)
+            values = {
+                'service_type': result.service_type,
+                'type': 'opportunity',
+                'date_conversion': fields.Datetime.today(),
+                'probability': 100
+            }
+            result.lead_id.write(values)
+            return result
+        else:
+            raise UserError(_("Service booking already existed for this lead. Please go back to that Booking and restore."))
 
     @api.multi
     def restore_booking_lost_action_new(self):
         self.write({'active': True})
         lead = self.sudo().env['dms.vehicle.lead'].browse(self.lead_id.id)
-        lead.write({'active': True})
+        lead.write({'active': True,'type':'lead'})
 
 
 class InsuranceBooking(models.Model):
@@ -260,15 +265,19 @@ class InsuranceBooking(models.Model):
 
     @api.model
     def create(self, vals):
-        result = super(InsuranceBooking, self).create(vals)
-        values = {
-            'service_type': result.service_type,
-            'type': 'opportunity',
-            'date_conversion': fields.Datetime.today(),
-            'probability': 100
-        }
-        result.lead_id.write(values)
-        return result
+        duplicate_booking = self.env['insurance.booking'].search([('lead_id', '=', vals['lead_id'])])
+        if not duplicate_booking:
+            result = super(InsuranceBooking, self).create(vals)
+            values = {
+                'service_type': result.service_type,
+                'type': 'opportunity',
+                'date_conversion': fields.Datetime.today(),
+                'probability': 100
+            }
+            result.lead_id.write(values)
+            return result
+        else:
+            raise UserError(_("Insurance booking already existed for this lead. Please go back to that Booking and restore."))
 
     @api.multi
     def restore_booking_lost_action_new(self):
