@@ -40,6 +40,7 @@ class DmsSaleOrder(models.Model):
         ('3', 'High'),
     ])
     stock_status = fields.Selection([
+        ('delivered','Delivered'),
         ('allotted', 'Allotted'),
         ('not-allotted', 'Not-Allotted'),
     ], string='Status', compute='_calculate_product', default='not-allotted')
@@ -59,10 +60,12 @@ class DmsSaleOrder(models.Model):
     def _calculate_product(self):
         for order in self:
             for pick in order.picking_ids:
-                if pick.state == 'draft' or pick.state == 'confirmed' or pick.state == 'waiting':
+                if pick.state == 'draft' or pick.state == 'confirmed':
                     order.stock_status = 'not-allotted'
-                else:
+                elif  pick.state == 'waiting':
                     order.stock_status = 'allotted'
+                else:
+                    order.stock_status = 'delivered'
                 first_order_line = order.order_line[0]
                 if first_order_line:
                     order.product_name = first_order_line.product_id.name
