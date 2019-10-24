@@ -154,6 +154,11 @@ class ServiceBooking(models.Model):
                               index=True, track_visibility='onchange')
     service_type = fields.Char('Service Type')
     active = fields.Boolean(default=True)
+    status = fields.Selection([
+        ('lost', 'Lost'),
+        ('new','New'),
+        ('won', 'Won'),
+    ], string='Status', store=True, default='new')
 
     @api.depends('lead_id')
     def _get_lead_values(self):
@@ -186,12 +191,15 @@ class ServiceBooking(models.Model):
             return result
         else:
             raise UserError(_("Service booking already existed for this lead. Please go back to that Booking and restore."))
-
     @api.multi
-    def restore_booking_lost_action_new(self):
-        self.write({'active': True})
-        lead = self.sudo().env['dms.vehicle.lead'].browse(self.lead_id.id)
-        lead.write({'active': True,'type':'lead'})
+    def mark_won(self):
+        self.write({'status':'won','active':True})
+
+    # @api.multi
+    # def restore_booking_lost_action_new(self):
+    #     self.write({'active': True})
+    #     lead = self.sudo().env['dms.vehicle.lead'].browse(self.lead_id.id)
+    #     lead.write({'active': True,'type':'lead'})
 
 
 class InsuranceBooking(models.Model):
@@ -244,6 +252,11 @@ class InsuranceBooking(models.Model):
     ], string='Cur Booking Type', store=True, default='pickup')
 
     pick_up_address = fields.Char('Pick-up Address')
+    status = fields.Selection([
+        ('lost', 'Lost'),
+        ('new', 'New'),
+        ('won', 'Won'),
+    ], string='Status', store=True, default='new')
 
     @api.depends('lead_id')
     def _update_booking_values(self):
@@ -280,7 +293,11 @@ class InsuranceBooking(models.Model):
             raise UserError(_("Insurance booking already existed for this lead. Please go back to that Booking and restore."))
 
     @api.multi
-    def restore_booking_lost_action_new(self):
-        self.write({'active': True})
-        lead = self.sudo().env['dms.vehicle.lead'].browse(self.lead_id.id)
-        lead.write({'active': True})
+    def mark_won(self):
+        self.write({'status': 'won', 'active': True})
+
+    # @api.multi
+    # def restore_booking_lost_action_new(self):
+    #     self.write({'active': True})
+    #     lead = self.sudo().env['dms.vehicle.lead'].browse(self.lead_id.id)
+    #     lead.write({'active': True})

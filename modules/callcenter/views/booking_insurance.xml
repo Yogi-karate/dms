@@ -11,16 +11,21 @@
                     <button name="%(crm_dms.dms_vehicle_lead_lost_action)d" string="Mark as Lost"
                             context="{'default_lead_id': active_id,'active_type':'insurance_booking'}"
                             type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
-                    <button name="restore_booking_lost_action_new" string="Restore" type="object"
-                            class="oe_highlight" attrs="{'invisible': [('active', '=', True)]}"/>
+                    <button name="mark_won" string="Mark as Won" type="object"
+                            class="oe_highlight" attrs="{'invisible': [('status', '=', 'won')]}"/>
                 </header>
                 <sheet>
                     <div class="badge-pill badge-danger float-right"
                          attrs="{'invisible': [('active', '=', True)]}">Lost
                     </div>
+                    <div class="badge-pill badge-success float-right"
+                         attrs="{'invisible': [('status', '!=', 'won')]}">Won
+                    </div>
                     <group>
                         <group class="left">
                             <field name="lead_id" domain="[('opportunity_type','=','Insurance')]"/>
+                            <field name="status" invisible="1"/>
+                            <field name="active" invisible="1"/>
                             <field name="vehicle_id"/>
                             <field name="partner_name"/>
                             <field name="reg_no"/>
