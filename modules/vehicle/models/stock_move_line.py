@@ -51,8 +51,6 @@ class StockMoveLine(models.Model):
         quantity has been reserved for this move line, we impact the reservation directly to free
         the old quants and allocate the new ones.
         """
-        print(vals,"TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT")
-        print(self.lots_visible)
         # if 'vehicle_id' in vals:
         #     vehicle = self.env['vehicle'].browse(vals['vehicle_id'])
         #     vals['lot_id'] = vehicle.lot_id.id
