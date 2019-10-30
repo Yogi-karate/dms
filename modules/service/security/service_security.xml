@@ -7,7 +7,7 @@
             <field name="description">Helps you handle your Service Booking Operations.</field>
             <field name="sequence">3</field>
         </record>
-    <record id="group_dms_service_corordinator" model="res.groups">
+    <record id="group_dms_service_coordinator" model="res.groups">
             <field name="name">Service Co-Ordinator</field>
             <field name="category_id" ref="module_category_service_coordinators"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>

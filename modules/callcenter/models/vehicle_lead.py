@@ -156,9 +156,9 @@ class ServiceBooking(models.Model):
     active = fields.Boolean(default=True)
     reg_no = fields.Char('Registration Number')
     status = fields.Selection([
-        ('lost', 'Not Reported'),
         ('new','Pending'),
         ('won', 'Reported'),
+        ('lost', 'Not Reported'),
     ], string='Status', store=True, default='new')
 
     @api.depends('lead_id')

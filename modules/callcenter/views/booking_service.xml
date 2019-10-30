@@ -9,10 +9,10 @@
                 <header>
                     <button name="mark_lost" string="Not Reported"
                             context="{'default_lead_id': active_id,'active_type':'service_booking'}"
-                            type="object" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}" groups="service.group_dms_service_corordinator"/>
+                            type="object" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}" groups="service.group_dms_service_coordinator"/>
                     <button name="mark_won" string="Reported" type="object"
-                            class="oe_highlight" attrs="{'invisible': [('status', '=', 'won')]}" groups="service.group_dms_service_corordinator"/>
-                    <field name="status" widget="statusbar" statusbar_visible="lost,new,won"/>
+                            class="oe_highlight" attrs="{'invisible': [('status', '=', 'won')]}" groups="service.group_dms_service_coordinator"/>
+                    <field name="status" widget="statusbar" statusbar_visible="new,won,lost"/>
 
                 </header>
                 <sheet>
