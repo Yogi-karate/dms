@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_service_booking_cord,dms service_booking_cord,callcenter.model_service_booking,group_dms_service_corordinator,1,1,0,0

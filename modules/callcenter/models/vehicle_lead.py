@@ -152,12 +152,13 @@ class ServiceBooking(models.Model):
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid),
                               index=True, track_visibility='onchange')
-    service_type = fields.Char('Service Type')
+    service_type = fields.Char('Service Type', compute='_get_lead_values')
     active = fields.Boolean(default=True)
+    reg_no = fields.Char('Registration Number')
     status = fields.Selection([
-        ('lost', 'Lost'),
-        ('new','New'),
-        ('won', 'Won'),
+        ('lost', 'Not Reported'),
+        ('new','Pending'),
+        ('won', 'Reported'),
     ], string='Status', store=True, default='new')
 
     @api.depends('lead_id')
@@ -169,6 +170,8 @@ class ServiceBooking(models.Model):
         for booking in self:
             booking.partner_name = booking.lead_id.partner_name
             booking.vehicle_id = booking.lead_id.vehicle_id
+            booking.reg_no = booking.lead_id.vehicle_id.registration_no
+
             booking.mobile = booking.lead_id.mobile
             booking.mail = booking.lead_id.email_from
             booking.vehicle_model = booking.lead_id.vehicle_id.product_id.name
@@ -195,6 +198,11 @@ class ServiceBooking(models.Model):
     def mark_won(self):
         self.write({'status':'won','active':True})
 
+    @api.multi
+    def mark_lost(self):
+        self.write({'status': 'lost', 'active': False})
+        lead = self.sudo().env['dms.vehicle.lead'].browse(self.lead_id.id)
+        lead.write({'type': 'lead', 'probability': 40})
     # @api.multi
     # def restore_booking_lost_action_new(self):
     #     self.write({'active': True})

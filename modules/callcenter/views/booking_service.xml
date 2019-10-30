@@ -7,32 +7,32 @@
         <field name="arch" type="xml">
             <form string="Service Bookings">
                 <header>
-                    <button name="%(crm_dms.dms_vehicle_lead_lost_action)d" string="Mark as Lost"
+                    <button name="mark_lost" string="Not Reported"
                             context="{'default_lead_id': active_id,'active_type':'service_booking'}"
-                            type="action" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}"/>
-                    <button name="mark_won" string="Mark as Won" type="object"
-                            class="oe_highlight" attrs="{'invisible': [('status', '=', 'won')]}"/>
+                            type="object" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}" groups="service.group_dms_service_corordinator"/>
+                    <button name="mark_won" string="Reported" type="object"
+                            class="oe_highlight" attrs="{'invisible': [('status', '=', 'won')]}" groups="service.group_dms_service_corordinator"/>
+                    <field name="status" widget="statusbar" statusbar_visible="lost,new,won"/>
+
                 </header>
                 <sheet>
                     <div class="badge-pill badge-danger float-right"
-                         attrs="{'invisible': [('active', '=', True)]}">Lost
+                         attrs="{'invisible': [('active', '=', True)]}">Not Reported
                     </div>
                     <div class="badge-pill badge-success float-right"
-                         attrs="{'invisible': [('status', '!=', 'won')]}">Won
+                         attrs="{'invisible': [('status', '!=', 'won')]}">Reported
                     </div>
                     <group string="Service Bookings">
                         <field name="active" invisible="1"/>
-                        <field name="status" invisible="1"/>
                         <field name="lead_id" domain="[('opportunity_type','=','Service')]"/>
+                        <field name="reg_no"/>
                         <field name="dop" string="Appointment Date"/>
                         <field name="partner_name"/>
                         <field name="mobile"/>
-                        <field name="mail"/>
                         <field name="vehicle_model"/>
                         <field name="service_type"/>
                         <field name="booking_type" string="Pickup/Walkin"/>
                         <field name="pick_up_address" string="Address"/>
-                        <field name="vehicle_id"/>
                         <field name="location_id" string="Service Location"/>
                     </group>
                 </sheet>
