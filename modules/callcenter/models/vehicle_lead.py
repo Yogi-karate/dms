@@ -10,9 +10,18 @@ class VehicleLead(models.Model):
     vehicle_id = fields.Many2one('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1,
                                  index=True)
     registration_no = fields.Char('Registration No.', compute='_compute_vehicle_values', store=True)
-    vin_no = fields.Char('Chassis No.')
-    dos = fields.Datetime(string='Date of Sale')
-    source = fields.Char('Dealer')
+    vin_no = fields.Char('Chassis No.', compute='_compute_vehicle_values', store=True)
+    partner_name = fields.Char(compute='_compute_vehicle_values', store=True)
+    mobile = fields.Char(compute='_compute_vehicle_values', store=True)
+    street = fields.Char(compute='_compute_vehicle_values', store=True)
+    email_from = fields.Char(compute='_compute_vehicle_values', store=True)
+    phone = fields.Char(compute='_compute_vehicle_values', store=True)
+
+
+
+
+    dos = fields.Datetime(string='Date of Sale',compute='_compute_vehicle_values', store=True)
+    source = fields.Char('Dealer',compute='_compute_vehicle_values', store=True)
     service_type = fields.Selection([
         ('first', 'First Free Service'),
         ('second', 'Second Free Service'),
