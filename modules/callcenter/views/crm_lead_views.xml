@@ -54,6 +54,9 @@
                     <div class="badge-pill badge-success float-right"
                          attrs="{'invisible': [('probability', '&lt;', 100)]}">Booked
                     </div>
+                    <div class="badge-pill badge-warning float-right"
+                         attrs="{'invisible': [('probability', '!=', 40)]}">Booking Lost
+                    </div>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" string="Lead"/>
                         <h1>
@@ -94,8 +97,8 @@
                             <field name="model"/>
                                 <field name="registration_no" readonly="1"/>
                                 <field name="vin_no" readonly="1"/>
-                                <field name="dos" readonly="1"/>
-                                <field name="source" readonly="1"/>
+                                <field name="dos" readonly="1" force_save="1"/>
+                                <field name="source" readonly="1" force_save="1"/>
                             <div class="o_row o_row_readonly">
                                 <i class="fa fa-ban" style="color: red;" role="img"
                                    title="This email is blacklisted for mass mailing"
@@ -143,7 +146,8 @@
         <field name="name">crm.lead.tree.lead.new</field>
         <field name="model">dms.vehicle.lead</field>
         <field name="arch" type="xml">
-            <tree string="Leads" decoration-bf="message_needaction==True" decoration-muted="probability == 100"
+            <tree string="Leads" decoration-bf="message_needaction==True" decoration-success="probability == 100"
+                   decoration-warning="probability == 40"
                   decoration-danger="activity_date_deadline and (activity_date_deadline &lt; current_date)">
 
                 <field name="create_date" invisible="1"/>

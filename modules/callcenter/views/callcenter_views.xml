@@ -15,7 +15,7 @@
     <menuitem action="action_service_booking" id="menu_action_vehicle_lead_form_oppor_service"
               parent="base_dms.menu_dms_reports_root"
               string="Service Bookings"
-              sequence="2" groups="group_dms_telecaller"/>
+              sequence="2" groups="group_dms_telecaller,service.group_dms_service_coordinator"/>
     <menuitem action="action_insurance_booking" id="menu_action_vehicle_lead_form_oppor_insurance"
               parent="base_dms.menu_dms_reports_root"
               string="Insurance Bookings"
