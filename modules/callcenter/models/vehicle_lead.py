@@ -9,7 +9,7 @@ class VehicleLead(models.Model):
 
     vehicle_id = fields.Many2one('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1,
                                  index=True)
-    registration_no = fields.Char('Registration No.')
+    registration_no = fields.Char('Registration No.', compute='_compute_vehicle_values', store=True)
     vin_no = fields.Char('Chassis No.')
     dos = fields.Datetime(string='Date of Sale')
     source = fields.Char('Dealer')
@@ -71,6 +71,13 @@ class VehicleLead(models.Model):
                 lead.call_state = 'fresh'
             if len(lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back')) > 0:
                 lead.call_state = 'call-back'
+
+    @api.depends('vehicle_id')
+    @api.multi
+    def _compute_vehicle_values(self):
+        for lead in self:
+            lead.registration_no = lead.vehicle_id.registration_no
+        self.get_values()
 
     @api.onchange('vehicle_id')
     def get_values(self):
