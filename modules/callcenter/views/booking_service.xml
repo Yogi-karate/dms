@@ -25,6 +25,7 @@
                     <group string="Service Bookings">
                         <field name="active" invisible="1"/>
                         <field name="lead_id" domain="[('opportunity_type','=','Service')]"/>
+                        <field name="vehicle_id" invisible="1"/>
                         <field name="reg_no"/>
                         <field name="dop" string="Appointment Date"/>
                         <field name="partner_name"/>

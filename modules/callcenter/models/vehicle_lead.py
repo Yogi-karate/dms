@@ -154,7 +154,7 @@ class ServiceBooking(models.Model):
                               index=True, track_visibility='onchange')
     service_type = fields.Char('Service Type', compute='_get_lead_values')
     active = fields.Boolean(default=True)
-    reg_no = fields.Char('Registration Number')
+    reg_no = fields.Char('Registration Number', compute='_get_lead_values')
     status = fields.Selection([
         ('new','Pending'),
         ('won', 'Reported'),
