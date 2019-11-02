@@ -16,14 +16,20 @@ from werkzeug.urls import url_encode
 class DmsSaleOrder(models.Model):
     _name = "sale.order"
     _inherit = 'sale.order'
+
+    user_name = fields.Char(compute='_compute_consultant')
+    user_mobile = fields.Char(compute='_compute_consultant')
     finance_type = fields.Selection([
         ('in', 'in-house'),
         ('out', 'out-house'),
         ('cash', 'Cash'),
     ], string='Finance Type', store=True, default='in')
     financier_name = fields.Many2one('res.bank', string='Financier', help="Bank for finance")
-    payment_date = fields.Datetime('Payment Date')
-    delivery_date = fields.Datetime('Delivery Date')
+    finance_pmt = fields.Float('Finance Amount')
+    finance_payment_date = fields.Date('Finance Payment Date')
+    margin_pmt = fields.Float('Margin Money Amount')
+    margin_payment_date = fields.Date('Margin Money Payment Date')
+    delivery_date = fields.Date('Delivery Date')
     state = fields.Selection([
         ('draft', 'Quotation'),
         ('sent', 'Quotation Sent'),
@@ -40,7 +46,7 @@ class DmsSaleOrder(models.Model):
         ('3', 'High'),
     ])
     stock_status = fields.Selection([
-        ('delivered','Delivered'),
+        ('delivered', 'Delivered'),
         ('allotted', 'Allotted'),
         ('not-allotted', 'Not-Allotted'),
     ], string='Status', compute='_calculate_product', default='not-allotted')
@@ -49,6 +55,16 @@ class DmsSaleOrder(models.Model):
     product_variant = fields.Char('Variant', compute='_calculate_product')
     product_color = fields.Char('Color', compute='_calculate_product')
     balance_amount = fields.Float('Balance Amount', compute='_calculate_residual_amount')
+
+    @api.depends('name')
+    def _compute_consultant(self):
+        """ Compute difference between create date and open date """
+        user = self.env['res.users'].sudo().search([('id', '=', self.user_id.id)])
+        self.user_name = user.partner_id.name
+        if user.partner_id.mobile:
+            self.user_mobile = user.partner_id.mobile
+        else:
+            self.user_mobile = user.partner_id.phone
 
     def _calculate_residual_amount(self):
         for order in self:
@@ -62,7 +78,7 @@ class DmsSaleOrder(models.Model):
             for pick in order.picking_ids:
                 if pick.state == 'draft' or pick.state == 'confirmed':
                     order.stock_status = 'not-allotted'
-                elif  pick.state == 'waiting':
+                elif pick.state == 'waiting':
                     order.stock_status = 'allotted'
                 else:
                     order.stock_status = 'delivered'
@@ -85,6 +101,7 @@ class DmsSaleOrder(models.Model):
             if 'Nacharam' in location_name:
                 values['name'] = self.env['ir.sequence'].next_by_code('sale.order.nac') or _('New')
         return super(DmsSaleOrder, self).write(values)
+
 
 class DmsSaleOrderLine(models.Model):
     _name = "sale.order.line"
@@ -115,12 +132,12 @@ class DmsSaleOrderLine(models.Model):
         calculated from the ordered quantity. Otherwise, the quantity delivered is used.
         """
         for line in self:
-            print(line.qty_invoiced, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>", line.name,line.product_uom_qty)
+            print(line.qty_invoiced, ">>>>>>>>>>>>>>>>>>>>>>>>>>>>", line.name, line.product_uom_qty)
             # if line.is_downpayment and line.qty_invoiced == 0.0:
             #     line.qty_invoiced = 1
             if line.order_id.state in ['sale', 'booked', 'done']:
                 if line.product_id.invoice_policy == 'order':
-                    print("Product uom qty in invoice qty -----", line.name,line.product_uom_qty, line.qty_invoiced)
+                    print("Product uom qty in invoice qty -----", line.name, line.product_uom_qty, line.qty_invoiced)
                     line.qty_to_invoice = line.product_uom_qty - line.qty_invoiced
                 else:
                     line.qty_to_invoice = line.qty_delivered - line.qty_invoiced

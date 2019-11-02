@@ -16,7 +16,6 @@ class VehicleLead(models.Model):
     mobile = fields.Char(compute='_compute_vehicle_values', store=True)
     street = fields.Char(compute='_compute_vehicle_values', store=True)
     email_from = fields.Char(compute='_compute_vehicle_values', store=True)
-    phone = fields.Char(compute='_compute_vehicle_values', store=True)
     dos = fields.Datetime(string='Date of Sale', compute='_compute_vehicle_values', store=True)
     source = fields.Char('Dealer', compute='_compute_vehicle_values', store=True)
     service_type = fields.Selection([
@@ -98,7 +97,6 @@ class VehicleLead(models.Model):
             lead.street = lead.vehicle_id.partner_id.street
             lead.source = lead.vehicle_id.source
             lead.mobile = lead.vehicle_id.partner_id.mobile
-            lead.phone = lead.vehicle_id.partner_id.phone
             lead.email_from = lead.vehicle_id.partner_id.email
             lead.registration_no = lead.vehicle_id.registration_no
             lead.vin_no = lead.vehicle_id.chassis_no

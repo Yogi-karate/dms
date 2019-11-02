@@ -6,14 +6,19 @@
             <field name="model">update.booking.details</field>
             <field name="arch" type="xml">
                 <form string="Update Booking Details">
-                    <group string="Update Booking Details">
-                        <field name="finance_type"/>
+                    <group string="Finance Details">
+                    <field name="finance_type"/>
                     <field name="financier_name"/>
-                    <field name="payment_date"/>
-                    <field name="delivery_date"/>
-
+                    <field name="finance_pmt"/>
+                    <field name="finance_payment_date"/>
                     </group>
-
+                    <group string="Margin Money Details">
+                    <field name="margin_pmt"/>
+                    <field name="margin_payment_date"/>
+                    </group>
+                    <group string="Delivery">
+                        <field name="delivery_date"/>
+                    </group>
                     <footer>
                         <button name="action_update" type="object" string="Update" class="btn-primary"/>
                         <button string="Cancel" class="btn-secondary" special="cancel"/>
