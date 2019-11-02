@@ -54,6 +54,9 @@
                     <div class="badge-pill badge-success float-right"
                          attrs="{'invisible': [('probability', '&lt;', 100)]}">Booked
                     </div>
+                    <div class="badge-pill badge-warning float-right"
+                         attrs="{'invisible': [('probability', '!=', 40)]}">Booking Lost
+                    </div>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only" string="Lead"/>
                         <h1>
@@ -78,7 +81,10 @@
                             </div>
                             <field name="website" widget="url" placeholder="e.g. www.odoo.com" invisible="1"/>
                             <field name="mobile"/>
+                            <field name="service_type"  attrs="{'invisible': [('call_type', '=', 'Insurance')]}"/>
                             <field name="phone" string="Alternate Number"/>
+                            <field name="email_from" widget="email"/>
+
                         </group>
                         <group>
                             <label for="contact_name" invisible="1"/>
@@ -87,15 +93,17 @@
                                 <field name="title" placeholder="Title" domain="[]" options='{"no_open": True}'/>
                             </div>
                             <field name="is_blacklisted" invisible="1"/>
-                            <field name="service_type"/>
-                            <field name="source" groups="dms.group_dms_callcenter_manager"/>
-                            <label for="email_from" class="oe_inline"/>
+                                <field name="vehicle_id"/>
+                            <field name="model"/>
+                                <field name="registration_no" readonly="1"/>
+                                <field name="vin_no" readonly="1"/>
+                                <field name="dos" readonly="1" force_save="1"/>
+                                <field name="source" readonly="1" force_save="1"/>
                             <div class="o_row o_row_readonly">
                                 <i class="fa fa-ban" style="color: red;" role="img"
                                    title="This email is blacklisted for mass mailing"
                                    aria-label="Blacklisted" attrs="{'invisible': [('is_blacklisted', '=', False)]}"
                                    groups="base.group_user"></i>
-                                <field name="email_from" widget="email"/>
                             </div>
                             <field name="function" invisible="1"/>
                         </group>
@@ -115,10 +123,7 @@
                         </group>
                     </group>
                     <notebook>
-                        <page name="Vehicle" string="Vehicle">
-                            <field name="vehicle_id"/>
 
-                        </page>
                           <page name="Insurance" string="Insurance History">
                             <field name="insurance_history"/>
                         </page>
@@ -144,12 +149,14 @@
         <field name="name">crm.lead.tree.lead.new</field>
         <field name="model">dms.vehicle.lead</field>
         <field name="arch" type="xml">
-            <tree string="Leads" decoration-bf="message_needaction==True" decoration-muted="probability == 100"
+            <tree string="Leads" decoration-bf="message_needaction==True" decoration-success="probability == 100"
+                   decoration-warning="probability == 40"
                   decoration-danger="activity_date_deadline and (activity_date_deadline &lt; current_date)">
 
                 <field name="create_date" invisible="1"/>
                 <field name="name" string="Lead"/>
-                <field name="service_type"/>
+                <field name="service_type" invisible="context.get('insurance',True)"/>
+                <field name="dos" />
                 <field name="mobile"/>
                 <field name="activity_date_deadline" invisible="1"/>
                 <field name="current_due_date" string="FollowUp Date"/>
@@ -217,6 +224,8 @@
                     <filter string="Conversion Date" name="date_conversion" context="{'group_by':'date_conversion'}"/>
                     <filter string="Expected Closing Date" name="date_deadline" context="{'group_by':'date_deadline'}"/>
                     <filter string="Closed Date" name="date_closed" context="{'group_by':'date_closed'}"/>
+                    <filter string="Due Date" name="date_deadline" context="{'group_by':'date_deadline'}"/>
+
                 </group>
             </search>
         </field>
@@ -235,6 +244,7 @@
             'default_user_id': uid,
             'default_source_type': 'Service',
             'search_default_activities_overdue': 1,
+            'insurance':False
             }
         </field>
         <field name="search_view_id" ref="view_dms_vehicle_leads_filter"/>
@@ -259,7 +269,8 @@
         <field name="context">{
             'default_user_id': uid,
             'search_default_activities_overdue': 1,
-            'default_source_type': 'Insurance'
+            'default_source_type': 'Insurance',
+            'insurance':True
             }
         </field>
         <field name="search_view_id" ref="view_dms_vehicle_leads_filter"/>

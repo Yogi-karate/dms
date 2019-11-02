@@ -2,7 +2,8 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-from odoo.addons import  decimal_precision as dp
+from odoo.addons import decimal_precision as dp
+
 
 class Vehicle(models.Model):
     _name = 'vehicle'
@@ -50,7 +51,7 @@ class Vehicle(models.Model):
     insurance_history = fields.One2many('vehicle.insurance', 'vehicle_id', string='Vehicle Insurance', copy=True,
                                         auto_join=True)
     finance_history = fields.One2many('vehicle.finance', 'vehicle_id', string='Vehicle Finance', copy=True,
-                                        auto_join=True)
+                                      auto_join=True)
 
     @api.depends('order_id')
     def _on_change_sale_order(self):
@@ -80,7 +81,8 @@ class Vehicle(models.Model):
     @api.depends('partner_id')
     def _get_customer_details(self):
         for vehicle in self:
-            print("hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
+            print(
+                "hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
             vehicle.partner_name = vehicle.partner_id.name
             vehicle.partner_mobile = vehicle.partner_id.mobile
             vehicle.partner_email = vehicle.partner_id.email
@@ -112,8 +114,10 @@ class VehicleInsurance(models.Model):
     insurance_company = fields.Many2one('res.insurance.company')
     policy_number = fields.Char('Policy Number')
     policy_idv = fields.Char('IDV value')
-    vehicle_id = fields.Many2one('vehicle', string='Vehicle Reference', required=True, ondelete='cascade', index=True,
+    vehicle_id = fields.Many2one('vehicle', string='Engine No.', required=True, ondelete='cascade', index=True,
                                  copy=False)
+
+
 class VehicleFinance(models.Model):
     _name = 'vehicle.finance'
     _inherit = ['mail.thread', 'mail.activity.mixin']
@@ -134,4 +138,3 @@ class VehicleFinance(models.Model):
     ], string='Finance Type', store=True, default='in')
     vehicle_id = fields.Many2one('vehicle', string='Vehicle Reference', required=True, ondelete='cascade', index=True,
                                  copy=False)
-

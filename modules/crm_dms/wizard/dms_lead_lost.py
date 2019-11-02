@@ -43,18 +43,16 @@ class CrmLeadLost(models.TransientModel):
 
     @api.multi
     def action_lost_reason(self):
-        booking = False
-        lead = False
-        if self.model == 'insurance.booking':
-            booking = self.env['insurance.booking'].browse(self.env.context.get('active_ids'))
-        if self.model == 'service.booking':
-            booking = self.env['service.booking'].browse(self.env.context.get('active_ids'))
-        if booking:
-            booking.write({'active': False})
-            lead = booking.lead_id
+
+        model = self._context.get('active_model')
+        if model == 'dms.vehicle.lead' or model == 'crm.lead':
+            lead = self.env[model].browse(self.env.context.get('active_ids'))
         else:
-            print("in dms vehicle read ----------")
-            lead = self.env['dms.vehicle.lead'].browse(self.env.context.get('active_ids'))
+            booking = self.env[model].browse(self.env.context.get('active_ids'))
+            booking.write({'active': False,'status':'lost'})
+            lead = booking.lead_id
+            lead.write({'type':'lead','probability':40})
+            return
         if not lead:
             return
         lead.write({'lost_reason': self.lost_reason.id, 'lost_remarks': self.lost_remarks})
