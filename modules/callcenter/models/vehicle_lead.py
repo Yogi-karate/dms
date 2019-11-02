@@ -2,6 +2,7 @@ from odoo import api, fields, models, _
 from datetime import datetime, timedelta
 from odoo.exceptions import UserError
 
+
 class VehicleLead(models.Model):
     _name = "dms.vehicle.lead"
     _description = "Vehicle Lead"
@@ -15,13 +16,8 @@ class VehicleLead(models.Model):
     mobile = fields.Char(compute='_compute_vehicle_values', store=True)
     street = fields.Char(compute='_compute_vehicle_values', store=True)
     email_from = fields.Char(compute='_compute_vehicle_values', store=True)
-    phone = fields.Char(compute='_compute_vehicle_values', store=True)
-
-
-
-
-    dos = fields.Datetime(string='Date of Sale',compute='_compute_vehicle_values', store=True)
-    source = fields.Char('Dealer',compute='_compute_vehicle_values', store=True)
+    dos = fields.Datetime(string='Date of Sale', compute='_compute_vehicle_values', store=True)
+    source = fields.Char('Dealer', compute='_compute_vehicle_values', store=True)
     service_type = fields.Selection([
         ('first', 'First Free Service'),
         ('second', 'Second Free Service'),
@@ -43,6 +39,9 @@ class VehicleLead(models.Model):
     current_due_date = fields.Date(string='Current Due-Date', compute='_process_call_status', store=True)
     insurance_history = fields.One2many('vehicle.insurance', string='Current Insurance Data',
                                         compute='_process_insurance_data')
+
+    finance_history = fields.One2many('vehicle.finance', string='Current Finance Data',
+                                      compute='_process_insurance_data')
     model = fields.Char(string='Vehicle Model', compute='get_values')
     disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
 
@@ -50,6 +49,7 @@ class VehicleLead(models.Model):
     def _process_insurance_data(self):
         for lead in self:
             lead.insurance_history = lead.vehicle_id.insurance_history
+            lead.finance_history = lead.vehicle_id.finance_history
 
     @api.multi
     def _compute_lead_type(self):
@@ -65,7 +65,7 @@ class VehicleLead(models.Model):
             rec['opportunity_type'] = opportunity.id
             rec['call_type'] = opportunity.name
             if opportunity.name == 'Insurance':
-                    rec['service_type'] = 'Insurance'
+                rec['service_type'] = 'Insurance'
         return rec
 
     @api.depends('activity_ids.date_deadline')
@@ -97,7 +97,6 @@ class VehicleLead(models.Model):
             lead.street = lead.vehicle_id.partner_id.street
             lead.source = lead.vehicle_id.source
             lead.mobile = lead.vehicle_id.partner_id.mobile
-            lead.phone = lead.vehicle_id.partner_id.phone
             lead.email_from = lead.vehicle_id.partner_id.email
             lead.registration_no = lead.vehicle_id.registration_no
             lead.vin_no = lead.vehicle_id.chassis_no
@@ -120,11 +119,11 @@ class VehicleLead(models.Model):
         return result
 
     def write(self, vals):
-            if 'vehicle_id' in vals:
-                raise UserError(_("Vehicle related fields can't be changed for an existing Lead. Please create a New Lead."))
+        if 'vehicle_id' in vals:
+            raise UserError(
+                _("Vehicle related fields can't be changed for an existing Lead. Please create a New Lead."))
 
-
-            return super(VehicleLead, self).write(vals)
+        return super(VehicleLead, self).write(vals)
 
     @api.multi
     def reassign_users(self, user_id, team_id):
@@ -140,6 +139,7 @@ class LostReason(models.Model):
     _name = "crm.lost.reason"
     _inherit = "crm.lost.reason"
     type = fields.Many2one('dms.opportunity.type', string='Reason Type')
+    company_id = fields.Many2one('res.company', string='Company')
 
 
 class ServiceBooking(models.Model):
@@ -172,7 +172,7 @@ class ServiceBooking(models.Model):
     active = fields.Boolean(default=True)
     reg_no = fields.Char('Registration Number', compute='_get_lead_values')
     status = fields.Selection([
-        ('new','Pending'),
+        ('new', 'Pending'),
         ('won', 'Reported'),
         ('lost', 'Not Reported'),
     ], string='Status', store=True, default='new')
@@ -196,7 +196,7 @@ class ServiceBooking(models.Model):
 
     @api.model
     def create(self, vals):
-        duplicate_booking = self.env['service.booking'].search([('lead_id','=',vals['lead_id'])])
+        duplicate_booking = self.env['service.booking'].search([('lead_id', '=', vals['lead_id'])])
         if not duplicate_booking:
             result = super(ServiceBooking, self).create(vals)
             print("---------------the lead in booking is ------------", result.lead_id)
@@ -209,10 +209,12 @@ class ServiceBooking(models.Model):
             result.lead_id.write(values)
             return result
         else:
-            raise UserError(_("Service booking already existed for this lead. Please go back to that Booking and restore."))
+            raise UserError(
+                _("Service booking already existed for this lead. Please go back to that Booking and restore."))
+
     @api.multi
     def mark_won(self):
-        self.write({'status':'won','active':True})
+        self.write({'status': 'won', 'active': True})
 
     @api.multi
     def mark_lost(self):
@@ -314,7 +316,8 @@ class InsuranceBooking(models.Model):
             result.lead_id.write(values)
             return result
         else:
-            raise UserError(_("Insurance booking already existed for this lead. Please go back to that Booking and restore."))
+            raise UserError(
+                _("Insurance booking already existed for this lead. Please go back to that Booking and restore."))
 
     @api.multi
     def mark_won(self):
