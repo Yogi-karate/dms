@@ -8,7 +8,7 @@
     'sequence': 60,
     'summary': 'Handle Sales customization for DMS',
     'description': "Vehicle Dealership Business Domain",
-    'depends': ['crm_dms','vehicle'],
+    'depends': ['crm_dms', 'service', 'vehicle'],
     'data': [
         'security/callcenter_groups.xml',
         'security/ir.model.access.csv',

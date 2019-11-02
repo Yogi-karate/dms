@@ -8,7 +8,6 @@
     'sequence': 60,
     'summary': 'Service Module',
     'description': "Service Module",
-    'depends': ['callcenter'],
     'data': [
         'security/service_security.xml',
         'security/ir.model.access.csv',
