@@ -49,8 +49,6 @@ class VehicleLead(models.Model):
     def _process_insurance_data(self):
         for lead in self:
             lead.insurance_history = lead.vehicle_id.insurance_history
-            lead.finance_history = lead.vehicle_id.finance_history
-
     @api.multi
     def _compute_lead_type(self):
         for lead in self:
