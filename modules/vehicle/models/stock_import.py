@@ -78,6 +78,10 @@ class StockImport(models.Model):
                 ignore_reason = 'Product not present'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
+            if not vehicle.engine_no:
+                ignore_reason = 'Engine number is null'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
             if not vehicle.vin_no:
                 ignore_reason = 'Vin is null'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
