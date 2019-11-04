@@ -15,7 +15,7 @@
                                 <div name="amount_div" class="o_row">
                                     <field name="amount"/>
                                 </div>
-                                <field name="journal_id" widget="selection" attrs="{'invisible': [('amount', '=', 0)]}"/>
+                                <field name="journal_id" widget="selection" />
                                 <field name="dob"/>
                                 <field name="priority" widget="priority" groups="base.group_user"/>
                             </group>
