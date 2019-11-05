@@ -96,7 +96,6 @@ class Enquiry(models.Model):
                                              compute='compute_color_attribute_values')
     test_drive = fields.Boolean('Test Drive', default=False, store=True)
     test_drive_date = fields.Date('Test Drive Date', help="Date of test drive")
-    multi_team_user = fields.Boolean('Multi team user', default=False, compute='check_multi_user')
 
 
     @api.onchange('id')
