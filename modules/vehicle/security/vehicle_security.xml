@@ -12,5 +12,19 @@
         <field name="implied_ids" eval="[(4, ref('group_vehicle_user'))]"/>
         <field name="users" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]"/>
     </record>
+     <!-- DMS Vehicle Lead Company Security -->
+        <record id="vehicle_company_rule" model="ir.rule">
+            <field name="name">Vehicle Multi-Company</field>
+            <field name="model_id" ref="model_vehicle"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]
+            </field>
+        </record>
+     <!-- DMS Vehicle Lead Company Security -->
+        <record id="dms_vehicle_import_company_rule" model="ir.rule">
+            <field name="name">Vehicle Import Multi-Company</field>
+            <field name="model_id" ref="model_dms_vehicle_import"/>
+            <field name="domain_force">['|',('company_id','=',False),('company_id','child_of',[user.company_id.id])]
+            </field>
+        </record>
 </data>
 </odoo>

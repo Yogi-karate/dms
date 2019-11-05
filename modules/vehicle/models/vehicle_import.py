@@ -27,7 +27,8 @@ class ODVehicle(models.Model):
     ], string='Status', copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='draft')
     ignore_reason = fields.Char('Reason for Cancel')
-
+    company_id = fields.Many2one('res.company', string='Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
     @api.model
     def create_vehicles(self):
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")

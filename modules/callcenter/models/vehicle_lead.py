@@ -150,7 +150,8 @@ class ServiceBooking(models.Model):
     location_id = fields.Many2one('stock.location', string='Preferred location of service')
     remarks = fields.Char('Remarks')
     dop = fields.Datetime('Date and Time of Pick-Up')
-
+    company_id = fields.Many2one('res.company', string='Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('service.booking'))
     booking_type = fields.Selection([
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
@@ -262,7 +263,8 @@ class InsuranceBooking(models.Model):
     prev_due_date = fields.Datetime(string='Prev Insurance Due Date')
     discount = fields.Char('Discount')
     dop = fields.Datetime('Date and Time of Pick-Up')
-
+    company_id = fields.Many2one('res.company', string='Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('insurance.booking'))
     cur_dip_or_comp = fields.Selection([
         ('nil-dip', 'NIL-DIP'),
         ('comprehensive', 'Comprehensive'),

@@ -10,9 +10,10 @@ class ServiceLeads(models.TransientModel):
     _name = 'dms.service.lead'
 
     @api.model
-    def _process_service_leads(self):
-        vehicles = self.env['vehicle'].search([])
-        service_type = self.env['dms.opportunity.type'].search([('name', '=', 'Service')])
+    def _process_service_leads(self, company):
+        vehicles = self.env['vehicle'].search([('company_id', '=', company.id)])
+        service_type = self.env['dms.opportunity.type'].search(
+            [('name', '=', 'Service'), ('company_id', '=', company.id)])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
         leads = []
@@ -34,7 +35,10 @@ class ServiceLeads(models.TransientModel):
             service_lead_dict5 = self._create_service_periodic_leads(vehicle, service_type, today)
             if service_lead_dict5:
                 leads.append(service_lead_dict5)
-        teams = self.sudo().env['crm.team'].search([('team_type', '=', 'business-center'), ('member_ids', '!=', False)])
+        teams = self.sudo().env['crm.team'].search(
+            [('team_type', '=', 'business-center'), ('member_ids', '!=', False), ('company_id', '=', company.id)])
+        for lead in leads:
+            lead.update({'company_id': company.id})
         self._allocate_user(leads, teams)
         created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
         for lead in created_leads:
@@ -42,9 +46,10 @@ class ServiceLeads(models.TransientModel):
         _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
 
     @api.model
-    def _process_insurance_leads(self):
-        vehicles = self.env['vehicle'].search([])
-        insurance_type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Insurance')])
+    def _process_insurance_leads(self, company):
+        vehicles = self.env['vehicle'].search([('company_id', '=', company.id)])
+        insurance_type = self.env['dms.opportunity.type'].search(
+            [('name', '=ilike', 'Insurance'), ('company_id', '=', company.id)])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
         leads = []
@@ -52,7 +57,9 @@ class ServiceLeads(models.TransientModel):
             insurance_lead_dict = self._create_insurance_leads(vehicle, insurance_type, today)
             if insurance_lead_dict:
                 leads.append(insurance_lead_dict)
-        self._allocate_insurance_user(leads)
+        self._allocate_insurance_user(leads, company)
+        for lead in leads:
+            lead.update({'company_id': company.id})
         created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
         for lead in created_leads:
             self._schedule_follow_up(lead, today)
@@ -72,7 +79,7 @@ class ServiceLeads(models.TransientModel):
         self._allocate_insurance_user(leads)
         created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
         for lead in created_leads:
-          self._schedule_follow_up(lead, today)
+            self._schedule_follow_up(lead, today)
         _logger.info("Created %s Insurance Leads for %s", len(created_leads), str(today))
 
     @api.model
@@ -125,7 +132,7 @@ class ServiceLeads(models.TransientModel):
         return users
 
     @api.model
-    def _allocate_insurance_user(self, leads):
+    def _allocate_insurance_user(self, leads, company):
         self_team = self.sudo().env['crm.team'].search(
             [('team_type', '=', 'business-center-insurance-renewal'), ('user_id', '!=', False)], limit=1)
         other_teams = self.sudo().env['crm.team'].search(
@@ -170,7 +177,7 @@ class ServiceLeads(models.TransientModel):
             'name': vehicle.partner_name + '-' + vehicle.product_id.name,
             'partner_name': vehicle.partner_name,
             'mobile': vehicle.partner_mobile,
-            'street':vehicle.partner_id.street,
+            'street': vehicle.partner_id.street,
             'opportunity_type': type.id,
             'date_deadline': date_follow_up + timedelta(delta),
             'vehicle_id': vehicle.id,
@@ -280,6 +287,30 @@ class ServiceLeads(models.TransientModel):
             _logger.info("Checking current due date for  %s  Lead  with date %s", lead, lead.current_due_date)
             lead.current_due_date = lead.activity_date_deadline
         _logger.info("Updated current due date for  %s  Leads ", len(leads))
+
+    @api.model
+    def create_all_company_service_leads(self, autocommit=True):
+        self._clean_service_leads()
+        _logger.info("!!!!!!!!!!!!!!Starting Creation of All Company Service Leads!!!!!!!!!!!!!!!!")
+        # get All Child Companies
+        companies = self.env['res.company'].search([('parent_id', '!=', False)])
+        if companies:
+            for company in companies:
+                self._process_service_leads(company)
+        _logger.info("****************Finished creating All Company Service Leads****************")
+        pass
+
+    @api.model
+    def create_all_company_insurance_leads(self, autocommit=True):
+        self._clean_service_leads()
+        _logger.info("!!!!!!!!!!!!!!Starting Creation of All Company Service Leads!!!!!!!!!!!!!!!!")
+        # get All Child Companies
+        companies = self.env['res.company'].search([('parent_id', '!=', False)])
+        if companies:
+            for company in companies:
+                self._process_insurance_leads(company)
+        _logger.info("****************Finished creating All Company Service Leads****************")
+        pass
 
     @api.model
     def create_service_leads(self, autocommit=True):
