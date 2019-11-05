@@ -487,6 +487,29 @@
         </field>
     </record>
 
+
+<record id="action_quotations_new" model="ir.actions.act_window">
+            <field name="name">Quotations.</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.order</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="search_view_id" ref="sale.sale_order_view_search_inherit_quotation"/>
+            <field name="context">{'search_default_my_quotation': 1}</field>
+    <field name="domain">[('state', 'not in', ('sale', 'cancel','booked'))]</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                Create a new quotation, the first step of a new sale!
+              </p><p>
+                Once the quotation is confirmed by the customer, it becomes a sales order.<br/> You will be able to create an invoice and collect the payment.
+              </p>
+            </field>
+        </record>
+
+    <menuitem id="sale.menu_sale_quotations"
+                action="action_quotations_new"
+                parent="sale.sale_order_menu"
+                sequence="1" groups="sales_team.group_sale_salesman"/>
+
     <menuitem id="sale_booking_menu"
             name="Bookings List"
             parent="sale.sale_order_menu"
