@@ -18,7 +18,6 @@
                                 <field name="communication"/>
                                 <field name="journal_id" widget="selection" />
                                 <field name="dob"/>
-                                <field name="priority" widget="priority" groups="base.group_user"/>
                             </group>
                         </group>
                     <footer>
