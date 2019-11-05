@@ -18,6 +18,8 @@ class SaleAdvancePaymentInv(models.TransientModel):
     amount = fields.Float('Down Payment Amount', help="The amount to be invoiced in advance, taxes excluded.")
     journal_id = fields.Many2one('account.journal', string='Payment Journal', required=True, domain=[('type', 'in', ('bank', 'cash'))])
     currency_id = fields.Many2one('res.currency', string='Currency', required=True, default=lambda self: self.env.user.company_id.currency_id)
+    communication = fields.Char(string='Memo')
+
 
     @api.multi
     def create_invoices(self):
@@ -31,7 +33,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
             'move_name': invoice.move_name,
             'amount': self.amount,
             'invoice_ids': [(6, 0, invoice.ids)],
-            'communication': invoice.number,
+            'communication': invoice.communication,
             'currency_id': self.currency_id.id,
             'journal_id': self.journal_id.id,
             'partner_bank_account_id': False,
