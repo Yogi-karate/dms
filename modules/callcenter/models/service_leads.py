@@ -84,14 +84,9 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def _process_follow_up(self):
-        print("!!!!!!!!!!!!!!!!!!!! Hello DMS!!!!!!!!!!!!!!!!!!!!")
         leads = self.sudo().env['dms.vehicle.lead'].search([('current_due_date', '=', False)], limit=10)
         today = fields.Datetime.now()
         for lead in leads:
-            print("Activity Details ------", lead, lead.activity_ids, lead.activity_date_deadline)
-            # latest_activity = lead.activity_ids[:1]
-            # print("Latest Activity Details ------", latest_activity)
-            # latest_activity.write({'date_deadline': today})
             activity_type = self.env['mail.activity.type'].search([('name', 'like', 'Call')], limit=1)
             model_id = self.env['ir.model']._get('dms.vehicle.lead').id
             sample_vals = {
@@ -106,21 +101,10 @@ class ServiceLeads(models.TransientModel):
                 'activity_type_id': 8, 'summary': False,
                 'note': '<p>HALLLLO</p>'
             }
-            create_vals = {
-                'activity_type_id': activity_type.id,
-                'summary': "Hello Test" or activity_type.summary,
-                'automated': True,
-                'note': 'Sample Note',
-                'date_deadline': today,
-                'res_model_id': model_id,
-                'res_id': lead.id,
-            }
             _logger.info("Before Create %s Insurance Leads for %s and activity - %s", lead.name, len(leads),
                          len(lead.activity_ids))
             activities = self.env['mail.activity'].with_context(default_res_id=lead.id,
                                                                 default_res_model=model_id).create(sample_vals)
-            # activities = self.env['mail.activity'].create(create_vals)
-            # self._schedule_follow_up(lead, today)
             _logger.info("Created %s Insurance Leads for %sand activity - %s", lead.name, len(leads),
                          len(lead.activity_ids))
 
@@ -134,10 +118,10 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _allocate_insurance_user(self, leads, company):
         self_team = self.sudo().env['crm.team'].search(
-            [('team_type', '=', 'business-center-insurance-renewal'), ('user_id', '!=', False)], limit=1)
+            [('team_type', '=', 'business-center-insurance-renewal'), ('user_id', '!=', False),('company_id', '=', company.id)], limit=1)
         other_teams = self.sudo().env['crm.team'].search(
             [('team_type', '=', 'business-center-insurance-rollover'), ('member_ids', '!=', False),
-             ('user_id', '!=', False)])
+             ('user_id', '!=', False),('company_id', '=', company.id)])
         self_leads = [lead for lead in leads if lead['source'] == 'saboo']
         other_leads = [lead for lead in leads if lead['source'] != 'saboo']
         for lead in self_leads:

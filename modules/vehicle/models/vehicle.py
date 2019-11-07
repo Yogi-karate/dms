@@ -50,8 +50,7 @@ class Vehicle(models.Model):
                                  default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
     insurance_history = fields.One2many('vehicle.insurance', 'vehicle_id', string='Vehicle Insurance', copy=True,
                                         auto_join=True)
-    finance_history = fields.One2many('vehicle.finance', 'vehicle_id', string='Vehicle Finance', copy=True,
-                                      auto_join=True)
+    finance = fields.Many2one('vehicle.finance', string='Vehicle Finance', change_default=True, ondelete='cascade')
 
     @api.depends('order_id')
     def _on_change_sale_order(self):
@@ -81,8 +80,6 @@ class Vehicle(models.Model):
     @api.depends('partner_id')
     def _get_customer_details(self):
         for vehicle in self:
-            print(
-                "hereeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeehhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh")
             vehicle.partner_name = vehicle.partner_id.name
             vehicle.partner_mobile = vehicle.partner_id.mobile
             vehicle.partner_email = vehicle.partner_id.email
@@ -136,5 +133,3 @@ class VehicleFinance(models.Model):
         ('in', 'in-house'),
         ('out', 'out-house'),
     ], string='Finance Type', store=True, default='in')
-    vehicle_id = fields.Many2one('vehicle', string='Vehicle Reference', required=True, ondelete='cascade', index=True,
-                                 copy=False)

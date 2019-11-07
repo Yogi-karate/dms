@@ -233,7 +233,7 @@ class Enquiry(models.Model):
 
     @api.model
     def _schedule_follow_up(self, lead):
-        lead.activity_schedule(
+        lead.with_context(mail_activity_quick_update=True).activity_schedule(
             'crm_dms.mail_activity_data_follow_up',
             user_id=lead.user_id.id,
             note=_(

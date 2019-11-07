@@ -18,7 +18,6 @@
                     <field name="loan_emi"/>
                     <field name="loan_commission"/>
                     <field name="finance_type"/>
-                    <field name="vehicle_id"/>
                     </group>
 
                 </form>
@@ -39,7 +38,6 @@
                     <field name="loan_emi"/>
                     <field name="loan_commission"/>
                     <field name="finance_type"/>
-                    <field name="vehicle_id"/>
                 </tree>
             </field>
         </record>
