@@ -11,8 +11,8 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def _process_service_leads(self, company):
-        vehicles = self.env['vehicle'].search([('company_id', '=', company.id)])
-        service_type = self.env['dms.opportunity.type'].search(
+        vehicles = self.sudo().env['vehicle'].search([('company_id', '=', company.id)])
+        service_type = self.sudo().env['dms.opportunity.type'].search(
             [('name', '=', 'Service'), ('company_id', '=', company.id)])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
@@ -22,32 +22,72 @@ class ServiceLeads(models.TransientModel):
                 continue
             service_lead_dict1 = self._create_service_first_leads(vehicle, service_type, today)
             if service_lead_dict1:
-                leads.append(service_lead_dict1)
+                dup = self.sudo().env['dms.vehicle.lead'].search([('name','=',service_lead_dict1['name']),
+                                                                  ('partner_name', '=', service_lead_dict1['partner_name']),
+                                                                  ('mobile','=',service_lead_dict1['mobile']),
+                                                                  ('date_deadline', '=', service_lead_dict1['date_deadline']),
+                                                                  ('vehicle_id', '=', service_lead_dict1['vehicle_id'])])
+                if not dup:
+                    leads.append(service_lead_dict1)
+                else:
+                    continue
             service_lead_dict2 = self._create_service_second_leads(vehicle, service_type, today)
             if service_lead_dict2:
-                leads.append(service_lead_dict2)
+                dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict2['name']),
+                                                                  ('partner_name', '=',service_lead_dict2['partner_name']),
+                                                                  ('mobile', '=', service_lead_dict2['mobile']),
+                                                                  ('date_deadline', '=',service_lead_dict2['date_deadline']),
+                                                                  ('vehicle_id', '=', service_lead_dict2['vehicle_id'])])
+                if not dup:
+                    leads.append(service_lead_dict2)
+                else:
+                    continue
             service_lead_dict3 = self._create_service_third_leads(vehicle, service_type, today)
             if service_lead_dict3:
-                leads.append(service_lead_dict3)
+                dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict3['name']),
+                                                                  ('partner_name', '=',service_lead_dict3['partner_name']),
+                                                                  ('mobile', '=', service_lead_dict3['mobile']),
+                                                                  ('date_deadline', '=',service_lead_dict3['date_deadline']),
+                                                                  ('vehicle_id', '=', service_lead_dict3['vehicle_id'])])
+                if not dup:
+                    leads.append(service_lead_dict3)
+                else:
+                    continue
             service_lead_dict4 = self._create_service_paid_leads(vehicle, service_type, today)
             if service_lead_dict4:
-                leads.append(service_lead_dict4)
+                dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict4['name']),
+                                                                  ('partner_name', '=',service_lead_dict4['partner_name']),
+                                                                  ('mobile', '=', service_lead_dict4['mobile']),
+                                                                  ('date_deadline', '=',service_lead_dict4['date_deadline']),
+                                                                  ('vehicle_id', '=', service_lead_dict4['vehicle_id'])])
+                if not dup:
+                    leads.append(service_lead_dict4)
+                else:
+                    continue
             service_lead_dict5 = self._create_service_periodic_leads(vehicle, service_type, today)
             if service_lead_dict5:
-                leads.append(service_lead_dict5)
+                dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict5['name']),
+                                                                  ('partner_name', '=',service_lead_dict5['partner_name']),
+                                                                  ('mobile', '=', service_lead_dict5['mobile']),
+                                                                  ('date_deadline', '=',service_lead_dict5['date_deadline']),
+                                                                  ('vehicle_id', '=', service_lead_dict5['vehicle_id'])])
+                if not dup:
+                    leads.append(service_lead_dict5)
+                else:
+                    continue
         teams = self.sudo().env['crm.team'].search(
             [('team_type', '=', 'business-center'), ('member_ids', '!=', False), ('company_id', '=', company.id)])
         for lead in leads:
             lead.update({'company_id': company.id})
         self._allocate_user(leads, teams)
-        created_leads = self.env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
+        created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
         for lead in created_leads:
             self._schedule_follow_up(lead, today)
         _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
 
     @api.model
     def _process_insurance_leads(self, company):
-        vehicles = self.env['vehicle'].search([('company_id', '=', company.id)])
+        vehicles = self.sudo().env['vehicle'].search([('company_id', '=', company.id)])
         insurance_type = self.env['dms.opportunity.type'].search(
             [('name', '=ilike', 'Insurance'), ('company_id', '=', company.id)])
         today = fields.Datetime.now()
@@ -56,7 +96,15 @@ class ServiceLeads(models.TransientModel):
         for vehicle in vehicles:
             insurance_lead_dict = self._create_insurance_leads(vehicle, insurance_type, today)
             if insurance_lead_dict:
-                leads.append(insurance_lead_dict)
+                dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', insurance_lead_dict['name']),
+                                                                  ('partner_name', '=',insurance_lead_dict['partner_name']),
+                                                                  ('mobile', '=', insurance_lead_dict['mobile']),
+                                                                  ('date_deadline', '=',insurance_lead_dict['date_deadline']),
+                                                                  ('vehicle_id', '=', insurance_lead_dict['vehicle_id'])])
+                if not dup:
+                    leads.append(insurance_lead_dict)
+                else:
+                    continue
         self._allocate_insurance_user(leads, company)
         for lead in leads:
             lead.update({'company_id': company.id})
@@ -67,7 +115,7 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def _process_insurance_leads_oct(self):
-        vehicles = self.env['vehicle'].search([])
+        vehicles = self.sudo().env['vehicle'].search([])
         insurance_type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Insurance')])
         today = fields.Datetime.now()
         today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
@@ -194,6 +242,7 @@ class ServiceLeads(models.TransientModel):
         return dict
 
     def _create_service_second_leads(self, vehicle, type, today):
+
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
         if today + timedelta(7) == sale_date + timedelta(120) and vehicle.fuel_type == 'diesel':
@@ -277,7 +326,7 @@ class ServiceLeads(models.TransientModel):
         self._clean_service_leads()
         _logger.info("!!!!!!!!!!!!!!Starting Creation of All Company Service Leads!!!!!!!!!!!!!!!!")
         # get All Child Companies
-        companies = self.env['res.company'].search([('parent_id', '!=', False)])
+        companies = self.sudo().env['res.company'].search([('parent_id', '!=', False)])
         if companies:
             for company in companies:
                 self._process_service_leads(company)
@@ -286,10 +335,10 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def create_all_company_insurance_leads(self, autocommit=True):
-        self._clean_service_leads()
+        # self._clean_service_leads()
         _logger.info("!!!!!!!!!!!!!!Starting Creation of All Company Service Leads!!!!!!!!!!!!!!!!")
         # get All Child Companies
-        companies = self.env['res.company'].search([('parent_id', '!=', False)])
+        companies = self.sudo().env['res.company'].search([('parent_id', '!=', False)])
         if companies:
             for company in companies:
                 self._process_insurance_leads(company)
@@ -300,7 +349,7 @@ class ServiceLeads(models.TransientModel):
     def create_service_leads(self, autocommit=True):
         self._clean_service_leads()
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Service Leads!!!!!!!!!!!!!!!!")
-        self._process_service_leads()
+        self.create_all_company_service_leads()
         _logger.info("****************Finished creating Service Leads****************")
         pass
 
@@ -308,7 +357,7 @@ class ServiceLeads(models.TransientModel):
     def create_insurance_leads(self, autocommit=True):
         self._clean_insurance_leads()
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Insurance Leads!!!!!!!!!!!!!!!!")
-        self._process_insurance_leads()
+        self.create_all_company_insurance_leads()
         _logger.info("****************Finished creating Insurance Leads****************")
         pass
 

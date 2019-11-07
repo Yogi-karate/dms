@@ -33,7 +33,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
             'move_name': invoice.move_name,
             'amount': self.amount,
             'invoice_ids': [(6, 0, invoice.ids)],
-            'communication': invoice.communication,
+            'communication': self.communication ,
             'currency_id': self.currency_id.id,
             'journal_id': self.journal_id.id,
             'partner_bank_account_id': False,
