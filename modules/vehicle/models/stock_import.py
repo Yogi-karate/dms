@@ -69,10 +69,13 @@ class StockImport(models.Model):
             variant = vehicle.variant.strip().lower()
             color = vehicle.color.strip().lower()
             product = self.env['product.product'].search(
-                [('name', 'ilike', name), ('variant_value', 'ilike', variant), ('color_value', 'ilike', color)],
-                limit=1)
+                [('name', 'ilike', name), ('variant_value', 'ilike', variant), ('color_value', 'ilike', color)])
             print(product)
             print(color, "---", variant, "-----", name)
+            if len(product) > 1:
+                ignore_reason = 'More than one product matched'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
             if not product:
                 ignore_reason = 'Product not present'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
