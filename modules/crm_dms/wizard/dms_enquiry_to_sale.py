@@ -112,15 +112,12 @@ class Lead2OpportunityPartner(models.TransientModel):
         product = self.env['product.product'].search([('product_tmpl_id', '=', self.product_id.id),
                                                       ('color_value', '=', self.product_color.name),
                                                       ('variant_value', '=', self.product_variant.name)], limit=1)
+        if not product:
+            raise UserError(_("Unable to create Quote as product not found"))
         price_item = self.sudo().env['product.pricelist.item'].search(
             [('product_id', '=', product.id), ('pricelist_id', '=', self.pricelist.id)])
         if not price_item:
             raise UserError(_("This Product is not present in this Pricelist"))
-        print("************************************************************************")
-        for x in self.pricelist_components:
-            print(x.type_id)
-        if not product:
-            raise UserError(_("Unable to create Quote as product not found"))
         values = {
             'team_id': self.team_id.id,
             'partner_id': customer.id,
