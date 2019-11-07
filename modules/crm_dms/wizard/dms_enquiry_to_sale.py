@@ -73,6 +73,9 @@ class Lead2OpportunityPartner(models.TransientModel):
     color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
                                              compute='compute_color_attribute_values')
 
+
+
+
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
         if self.variant_attribute_values or self.color_attribute_values:
@@ -109,6 +112,10 @@ class Lead2OpportunityPartner(models.TransientModel):
         product = self.env['product.product'].search([('product_tmpl_id', '=', self.product_id.id),
                                                       ('color_value', '=', self.product_color.name),
                                                       ('variant_value', '=', self.product_variant.name)], limit=1)
+        price_item = self.sudo().env['product.pricelist.item'].search(
+            [('product_id', '=', product.id), ('pricelist_id', '=', self.pricelist.id)])
+        if not price_item:
+            raise UserError(_("This Product is not present in this Pricelist"))
         print("************************************************************************")
         for x in self.pricelist_components:
             print(x.type_id)
