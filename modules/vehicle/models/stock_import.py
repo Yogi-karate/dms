@@ -73,6 +73,10 @@ class StockImport(models.Model):
                 limit=1)
             print(product)
             print(color, "---", variant, "-----", name)
+            if len(product) > 1:
+                ignore_reason = 'More than one product matched'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
             if not product:
                 ignore_reason = 'Product not present'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
