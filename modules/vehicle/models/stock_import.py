@@ -69,7 +69,7 @@ class StockImport(models.Model):
             variant = vehicle.variant.strip().lower()
             color = vehicle.color.strip().lower()
             product = self.env['product.product'].search(
-                [('name', 'ilike', name), ('variant_value', 'ilike', variant), ('color_value', 'ilike', color)],
+                [('name', 'ilike', name), ('variant_value', '=', variant), ('color_value', '=', color)],
                 limit=1)
             print(product)
             print(color, "---", variant, "-----", name)
