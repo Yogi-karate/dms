@@ -65,13 +65,11 @@ class StockImport(models.Model):
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
 
-            name = vehicle.model
-            variant = vehicle.variant
-            color = vehicle.color
+            name = vehicle.model.strip().lower()
+            variant = vehicle.variant.strip().lower()
+            color = vehicle.color.strip().lower()
             product = self.env['product.product'].search(
-                [('name', '=', name), ('variant_value', '=', variant), ('color_value', '=', color)],
-                limit=1)
-            print(product)
+                [('name', 'ilike', name), ('variant_value', 'ilike', variant), ('color_value', 'ilike', color)])
             print(color, "---", variant, "-----", name)
             if len(product) > 1:
                 ignore_reason = 'More than one product matched'
