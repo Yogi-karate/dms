@@ -65,9 +65,9 @@ class StockImport(models.Model):
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
 
-            name = vehicle.model.strip().lower()
-            variant = vehicle.variant.strip().lower()
-            color = vehicle.color.strip().lower()
+            name = vehicle.model.strip()
+            variant = vehicle.variant.strip()
+            color = vehicle.color.strip()
             product = self.env['product.product'].search(
                 [('name', '=', name), ('variant_value', '=', variant), ('color_value', '=', color)])
             print(product)
