@@ -21,8 +21,7 @@ class StockImport(models.Model):
     status = fields.Boolean('status')
     order_no = fields.Char('Order No')
     model_year = fields.Char('Manufatured Year')
-    inventoried_location = fields.Many2one('stock.location', 'inventoried_location')
-    inventory_location = fields.Many2one('stock.location', 'inventory_location')
+    inventory_location = fields.Many2one('stock.location', 'inventoried_location')
     product_id = fields.Many2one('product.product', 'product')
 
     state = fields.Selection([
@@ -36,7 +35,7 @@ class StockImport(models.Model):
     def create_vehicles(self):
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
         self._create_vehicles()
-        self.env['dms.stock.import'].search([('status', '=', True)]).unlink()
+        #self.env['dms.stock.import'].search([('status', '=', True)]).unlink()
         _logger.info("!!!!!!!!!!!!!!End of ->  Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
 
     @api.model
@@ -74,6 +73,12 @@ class StockImport(models.Model):
                 [('name', '=', name), ('variant_value', '=', variant), ('color_value', '=', color)])
             print(product)
             print(color, "---", variant, "-----", name)
+            location = self.env['stock.location'].search([('name','=',vehicle.location)])
+            if not location:
+                ignore_reason = 'This Location does not exist in your Company'
+                vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
+                continue
+            vehicle.inventory_location = location.id
             if len(product) > 1:
                 ignore_reason = 'More than one product matched'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
@@ -90,7 +95,7 @@ class StockImport(models.Model):
                 ignore_reason = 'Vin is null'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
-            self.product_id = product
+            vehicle.product_id = product.id
             duplicate = self.env['vehicle'].search(
                 ['|', ('name', '=', vehicle.vin_no), ('chassis_no', '=', vehicle.vin_no)])
             if duplicate:

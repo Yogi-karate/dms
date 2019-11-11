@@ -61,6 +61,7 @@
                 <field name="chassis_no"/>
                 <field name="battery_no"/>
                 <field name="fuel_type"/>
+                <field name="vehicle_age"/>
             </tree>
         </field>
     </record>

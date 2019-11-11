@@ -61,6 +61,7 @@ class Vehicle(models.Model):
                                         auto_join=True)
     finance = fields.Many2one('vehicle.finance', string='Vehicle Finance', change_default=True, ondelete='cascade')
 
+
     @api.depends('order_id')
     def _on_change_sale_order(self):
         self.partner_id = self.order_id.partner_id
@@ -122,8 +123,12 @@ class Vehicle(models.Model):
 
     @api.multi
     def _get_vehicle_age(self):
+        today = fields.Datetime.now()
         for vehicle in self:
-            vehicle.age = 10
+            if not vehicle.date_order:
+                vehicle.vehicle_age = 0
+            else:
+                vehicle.vehicle_age = int((today  - vehicle.date_order).days / 365.25)
 
 
 class VehicleInsurance(models.Model):
