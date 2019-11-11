@@ -49,7 +49,7 @@ class DmsSaleOrder(models.Model):
         ('delivered', 'Delivered'),
         ('allotted', 'Allotted'),
         ('not-allotted', 'Not-Allotted'),
-    ], string='Status', compute='_calculate_product', default='not-allotted')
+    ], string='Status', compute='_calculate_allocation', default='not-allotted')
     dob = fields.Datetime('Date of Booking')
     product_name = fields.Char('Model', compute='_calculate_product')
     product_variant = fields.Char('Variant', compute='_calculate_product')
@@ -75,18 +75,21 @@ class DmsSaleOrder(models.Model):
 
     def _calculate_product(self):
         for order in self:
+            first_order_line = order.order_line[0]
+            if first_order_line:
+                order.product_name = first_order_line.product_id.name
+                order.product_variant = first_order_line.product_id.variant_value
+                order.product_color = first_order_line.product_id.color_value
+
+    def _calculate_allocation(self):
+        for order in self:
             for pick in order.picking_ids:
-                if pick.state == 'draft' or pick.state == 'confirmed':
+                if pick.state == 'draft' or pick.state == 'confirmed' or pick.state == 'waiting':
                     order.stock_status = 'not-allotted'
-                elif pick.state == 'waiting':
+                elif pick.state == 'assigned':
                     order.stock_status = 'allotted'
-                else:
+                elif pick.state == 'done':
                     order.stock_status = 'delivered'
-                first_order_line = order.order_line[0]
-                if first_order_line:
-                    order.product_name = first_order_line.product_id.name
-                    order.product_variant = first_order_line.product_id.variant_value
-                    order.product_color = first_order_line.product_id.color_value
 
     def write(self, values):
         self.ensure_one()

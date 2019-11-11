@@ -11,18 +11,20 @@ class Vehicle(models.Model):
     _description = 'Vehicle'
     name = fields.Char(
         'Engine Number', default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
-        required=True, help="Unique Machine Number")
+        required=True, help="Unique Vehicle Engine Number")
     _sql_constraints = [
         ('name_ref_uniq', 'unique (name, product_id)', 'The combination of serial number and product must be unique !'),
     ]
     ref = fields.Char('Internal Reference',
                       help="Internal reference number in case it differs from the manufacturer's lot/serial number")
     state = fields.Selection([
-        ('transit', 'Purchased'),
-        ('in-stock', 'Showroom'),
-        ('sold', 'Allocated'),
+        ('transit', 'In-Transit'),
+        ('in-stock', 'Physical Stock'),
+        ('reserved', 'Allocated'),
+        ('sold', 'Delivered'),
         ('cancel', 'Cancelled'),
-    ], string='Status', readonly=True, copy=False, index=True, track_visibility='onchange', track_sequence=3,
+    ], string='Status', readonly=True, compute='_get_vehicle_state', copy=False, index=True,
+        track_visibility='onchange', track_sequence=3,
         default='transit')
     chassis_no = fields.Char('Chassis Number', help="Unique Chasis number of the vehicle")
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
@@ -32,7 +34,14 @@ class Vehicle(models.Model):
     product_id = fields.Many2one(
         'product.product', 'Product',
         domain=[('type', 'in', ['product', 'consu'])], required=True)
-    color = fields.Char('Color', readonly=True, compute='_get_color')
+    model = fields.Char('Model', readonly=True, compute='_get_product_details')
+    variant = fields.Char('Variant', readonly=True, compute='_get_product_details')
+    color = fields.Char('Color', readonly=True, compute='_get_product_details')
+    model_year = fields.Char('Manufatured Year', readonly=True)
+    invoice_date = fields.Date('Vehicle Purchase Date')
+    vehicle_age = fields.Integer('Age', readonly=True, compute='_get_vehicle_age')
+    location_id = location_id = fields.Many2one(
+        'stock.location', 'Location', compute='_get_location_details')
     partner_name = fields.Char('Customer', compute='_get_customer_details', store=True)
     partner_mobile = fields.Char('Mobile No.', compute='_get_customer_details', store=True)
     partner_email = fields.Char('Email', compute='_get_customer_details')
@@ -60,9 +69,6 @@ class Vehicle(models.Model):
 
     @api.model_create_multi
     def create(self, vals_list):
-        for vals in vals_list:
-            if 'no_lot' not in vals:
-                self._create_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
 
     def _create_vehicle_lot(self, vals):
@@ -78,6 +84,7 @@ class Vehicle(models.Model):
         return super(Vehicle, self).write(vals)
 
     @api.depends('partner_id')
+    @api.multi
     def _get_customer_details(self):
         for vehicle in self:
             vehicle.partner_name = vehicle.partner_id.name
@@ -85,21 +92,38 @@ class Vehicle(models.Model):
             vehicle.partner_email = vehicle.partner_id.email
             vehicle.address = vehicle.partner_id.street
 
-    @api.one
+    @api.multi
     def _get_vehicle_details(self):
-        self.fuel_type = self.product_id.fuel_type
-
-    @api.one
-    def _get_color(self):
-        # We only care for the customer if sale order is entered.
-        if self.product_id:
-            color = self.product_id.display_name
-        print("The color is - " + color)
-        return "BLACK"
+        for vehicle in self:
+            vehicle.fuel_type = vehicle.product_id.fuel_type
 
     @api.multi
-    def action_in_stock(self):
-        return self.write({'state': 'in-stock'})
+    def _get_product_details(self):
+        for vehicle in self:
+            if vehicle.product_id:
+                vehicle.model = self.product_id.product_tmpl_id.name
+                vehicle.variant = self.product_id.variant_value
+                vehicle.color = self.product_id.color_value
+
+    @api.multi
+    def _get_vehicle_state(self):
+        for vehicle in self:
+            vehicle.state = 'transit'
+
+    @api.multi
+    def _get_location_details(self):
+        for vehicle in self:
+            quant = vehicle.lot_id.quant_id
+            if quant:
+                vehicle.location_id = quant.location_id
+                vehicle.state = 'in-stock'
+            else:
+                vehicle.location_id = self.env['stock.location'].search([('id', '=', 1)])
+
+    @api.multi
+    def _get_vehicle_age(self):
+        for vehicle in self:
+            vehicle.age = 10
 
 
 class VehicleInsurance(models.Model):

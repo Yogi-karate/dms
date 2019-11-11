@@ -7,39 +7,41 @@ _logger = logging.getLogger(__name__)
 class StockImport(models.Model):
     _name = 'dms.stock.import'
 
-    hyundai_invoice_no = fields.Char('HMI Invoice')
-    import_date = fields.Char('Import Date')
+    invoice_date = fields.Date('Vehicle Purchase Date')
+    import_date = fields.Date('Import Date', default=fields.Date.today)
     model = fields.Char('model')
     variant = fields.Char('variant')
     color = fields.Char('color')
-    color_code = fields.Char('color code')
     engine_no = fields.Char('Engine Number')
     status = fields.Char('Status')
     location = fields.Char('Vehicle Location')
     remarks = fields.Char('Remarks')
-    gdms_bill_date = fields.Char('Hyundai Billed Date')
     vin_no = fields.Char('Chassis Number')
     reg_no = fields.Char('Registration Number')
     status = fields.Boolean('status')
     order_no = fields.Char('Order No')
+    model_year = fields.Char('Manufatured Year')
+    inventoried_location = fields.Many2one('stock.location', 'inventoried_location')
+    inventory_location = fields.Many2one('stock.location', 'inventory_location')
+    product_id = fields.Many2one('product.product', 'product')
 
     state = fields.Selection([
         ('draft', 'New'),
-        ('cancel', 'Cancelled'),
+        ('cancel', 'Failed'),
     ], string='Status', copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='draft')
-    ignore_reason = fields.Char('Reason for Cancel')
+    ignore_reason = fields.Char('Failure Reason')
 
     @api.model
     def create_vehicles(self):
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
         self._create_vehicles()
-        self.env['dms.vehicle.import'].search([('status', '=', True)]).unlink()
+        self.env['dms.stock.import'].search([('status', '=', True)]).unlink()
         _logger.info("!!!!!!!!!!!!!!End of ->  Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
 
     @api.model
     def _create_vehicles(self):
-        od_vehicles = self.env['dms.stock.import'].search([], limit=10000)
+        od_vehicles = self.env['dms.stock.import'].search([('state', '=', 'draft')], limit=1000)
         _logger.info("The number of records to process =>" + str(len(od_vehicles)))
         count = 0
 
@@ -88,7 +90,7 @@ class StockImport(models.Model):
                 ignore_reason = 'Vin is null'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
                 continue
-
+            self.product_id = product
             duplicate = self.env['vehicle'].search(
                 ['|', ('name', '=', vehicle.vin_no), ('chassis_no', '=', vehicle.vin_no)])
             if duplicate:
@@ -103,34 +105,8 @@ class StockImport(models.Model):
                 'product_id': product.id,
                 'source': 'saboo',
                 'ref': vehicle.order_no,
+                'model_year': vehicle.model_year,
+                'invoice_date': vehicle.invoice_date,
             }
             self.env['vehicle'].create(vals)
             vehicle.status = True
-
-    @api.model
-    def _create_inventory_adjustment(self):
-        adj_vals = {"state": "confirm",
-                    "location_id": 12, "filter": "partial",
-                    "date": "2019-11-07 19:33:42", "company_id": 1,
-                    "name": "Y Service",
-                    "accounting_date": false,
-                    "product_id": false,
-                    "category_id": false, "lot_id": false,
-                    "partner_id": false, "package_id": false, "exhausted": false,
-                    "line_ids": [[0, "virtual_535", {"product_id": 2011, "location_id": 12, "prod_lot_id": 63192,
-                                                     "package_id": false, "partner_id": false, "product_qty": 1,
-                                                     "product_tracking": "serial", "product_uom_id": 1,
-                                                     "product_uom_category_id": 1, "theoretical_qty": 0,
-                                                     "state": "confirm"}]],
-                    "move_ids": [], "id": 1},
-        "line_ids", {"state": "1", "name": "", "location_id": "1", "filter": "1", "date": "", "accounting_date": "",
-                     "company_id": "", "product_id": "", "category_id": "", "lot_id": "", "partner_id": "",
-                     "package_id": "", "exhausted": "", "line_ids": "1", "line_ids.product_tracking": "",
-                     "line_ids.product_id": "1", "line_ids.product_uom_id": "1",
-                     "line_ids.product_uom_category_id": "", "line_ids.location_id": "1", "line_ids.prod_lot_id": "1",
-                     "line_ids.package_id": "1", "line_ids.partner_id": "1",
-                     "line_ids.theoretical_qty": "", "line_ids.product_qty": "", "line_ids.state": "", "move_ids": "",
-                     "move_ids.product_id": "1", "move_ids.picking_id": "", "move_ids.create_date": "",
-                     "move_ids.date_expected": "1", "move_ids.scrapped": "", "move_ids.state": "",
-                     "move_ids.location_id": "", "move_ids.location_dest_id": "1", "move_ids.quantity_done": "",
-                     "move_ids.product_uom": "1"},
