@@ -8,6 +8,14 @@
         <field name="arch" type="xml">
             <form string="Vehicles">
                 <header>
+                    <button name="%(vehicle.action_vehicle_receipt)d" string="Receive"
+                                type="action" class="oe_highlight"/>
+                    <button name="%(vehicle.action_vehicle_deliver)d" string="Deliver"
+                                type="action" class="oe_highlight"/>
+                    <button name="%(vehicle.action_vehicle_allocate)d" string="Allocate"
+                                type="action" class="oe_highlight"/>
+                    <button name="%(vehicle.action_vehicle_transfer)d" string="Transfer"
+                                type="action" class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="transit,in-stock,sold"/>
                 </header>
                 <sheet>

@@ -119,6 +119,10 @@ class Vehicle(models.Model):
     def _get_location_details(self):
         for vehicle in self:
             quant = self.sudo().env['stock.quant'].search([('lot_id','=',vehicle.lot_id.id)],limit = 1)
+            print(quant)
+            print(quant.lot_id)
+            print(quant.location_id)
+
             # quant = vehicle.lot_id.quant_id
             if quant:
                 vehicle.location_id = quant.location_id

@@ -15,6 +15,9 @@ class StockMoveLine(models.Model):
     _inherit = "stock.move.line"
     lot_id = fields.Many2one('stock.production.lot', 'Vehicle Number')
     vehicle_id = fields.Many2one('vehicle', help='Move line Associated to a specific vehicle')
+    allocated_qty = fields.Float(
+        'Real Reserved Quantity', digits=0,
+        compute='_compute_product_qty', inverse='_set_product_qty', store=True)
 
     @api.model_create_multi
     def create(self, vals_list):
