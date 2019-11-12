@@ -118,7 +118,7 @@ class Vehicle(models.Model):
     @api.multi
     def _get_location_details(self):
         for vehicle in self:
-            quant = self.sudo().env['stock.quant'].search([('lot_id','=',vehicle.lot_id.id)])
+            quant = self.sudo().env['stock.quant'].search([('lot_id','=',vehicle.lot_id.id)],limit = 1)
             # quant = vehicle.lot_id.quant_id
             if quant:
                 vehicle.location_id = quant.location_id
@@ -130,7 +130,10 @@ class Vehicle(models.Model):
     def _get_vehicle_age(self):
         today = fields.Datetime.now()
         for vehicle in self:
-            vehicle.vehicle_age = (today - vehicle.date_order).days
+            if not vehicle.sale_order:
+                vehicle.vehicle_age = 0
+            else:
+                vehicle.vehicle_age = (today - vehicle.date_order).days
 
 
 class VehicleInsurance(models.Model):
