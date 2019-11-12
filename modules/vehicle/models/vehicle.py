@@ -20,12 +20,13 @@ class Vehicle(models.Model):
     state = fields.Selection([
         ('transit', 'In-Transit'),
         ('in-stock', 'Physical Stock'),
+        ('waiting', 'Waiting'),
         ('reserved', 'Allocated'),
         ('sold', 'Delivered'),
         ('cancel', 'Cancelled'),
     ], string='Status', readonly=True, compute='_get_vehicle_state', copy=False, index=True,
         track_visibility='onchange', track_sequence=3,
-        default='transit')
+        default='transit',store=True)
     chassis_no = fields.Char('Chassis Number', help="Unique Chasis number of the vehicle")
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
@@ -38,7 +39,7 @@ class Vehicle(models.Model):
     variant = fields.Char('Variant', readonly=True, compute='_get_product_details')
     color = fields.Char('Color', readonly=True, compute='_get_product_details')
     model_year = fields.Char('Manufatured Year', readonly=True)
-    invoice_date = fields.Date('Vehicle Purchase Date')
+    invoice_date = fields.Date('Invoice Date')
     vehicle_age = fields.Integer('Age', readonly=True, compute='_get_vehicle_age')
     location_id = location_id = fields.Many2one(
         'stock.location', 'Location', compute='_get_location_details')
@@ -61,7 +62,10 @@ class Vehicle(models.Model):
                                         auto_join=True)
     finance = fields.Many2one('vehicle.finance', string='Vehicle Finance', change_default=True, ondelete='cascade')
 
-
+    @api.depends('lot_id.quant_ids')
+    def _change_state(self):
+        for vehicle in self:
+            vehicle.state = "reserved"
     @api.depends('order_id')
     def _on_change_sale_order(self):
         self.partner_id = self.order_id.partner_id
@@ -102,9 +106,9 @@ class Vehicle(models.Model):
     def _get_product_details(self):
         for vehicle in self:
             if vehicle.product_id:
-                vehicle.model = self.product_id.product_tmpl_id.name
-                vehicle.variant = self.product_id.variant_value
-                vehicle.color = self.product_id.color_value
+                vehicle.model = vehicle.product_id.product_tmpl_id.name
+                vehicle.variant = vehicle.product_id.variant_value
+                vehicle.color = vehicle.product_id.color_value
 
     @api.multi
     def _get_vehicle_state(self):
@@ -114,7 +118,8 @@ class Vehicle(models.Model):
     @api.multi
     def _get_location_details(self):
         for vehicle in self:
-            quant = vehicle.lot_id.quant_id
+            quant = self.sudo().env['stock.quant'].search([('lot_id','=',vehicle.lot_id.id)])
+            # quant = vehicle.lot_id.quant_id
             if quant:
                 vehicle.location_id = quant.location_id
                 vehicle.state = 'in-stock'
@@ -125,10 +130,7 @@ class Vehicle(models.Model):
     def _get_vehicle_age(self):
         today = fields.Datetime.now()
         for vehicle in self:
-            if not vehicle.date_order:
-                vehicle.vehicle_age = 0
-            else:
-                vehicle.vehicle_age = int((today  - vehicle.date_order).days / 365.25)
+            vehicle.vehicle_age = (today - vehicle.date_order).days
 
 
 class VehicleInsurance(models.Model):
