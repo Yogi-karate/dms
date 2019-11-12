@@ -130,7 +130,7 @@ class Vehicle(models.Model):
     def _get_vehicle_age(self):
         today = fields.Datetime.now()
         for vehicle in self:
-            if not vehicle.sale_order:
+            if not vehicle.date_order:
                 vehicle.vehicle_age = 0
             else:
                 vehicle.vehicle_age = (today - vehicle.date_order).days
