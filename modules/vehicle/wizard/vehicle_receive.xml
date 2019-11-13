@@ -1,0 +1,101 @@
+<?xml version="1.0"?>
+<odoo>
+    <record id="view_vehicle_receipt" model="ir.ui.view">
+        <field name="name">vehicle.receipt.form</field>
+        <field name="model">vehicle.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Receive Vehicle">
+
+                <group name="left" string="Confirm Vehicle Details">
+                    <field name="purchase_id"/>
+                </group>
+                <footer>
+                    <button name="action_apply_receive" string="Confirm" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+ <record id="view_vehicle_allocate" model="ir.ui.view">
+        <field name="name">vehicle.receipt.form.allocate</field>
+        <field name="model">vehicle.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Allocate Vehicle">
+
+                <group name="left" string="Confirm Vehicle Details">
+                    <field name="sale_id"/>
+                </group>
+                <footer>
+                    <button name="action_apply_allocate" string="Confirm" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+     <record id="view_vehicle_deliver" model="ir.ui.view">
+        <field name="name">vehicle.receipt.form.deliver</field>
+        <field name="model">vehicle.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Deliver Vehicle">
+
+                <group name="left" string="Confirm Vehicle Details">
+                    <field name="sale_id"/>
+                </group>
+                <footer>
+                    <button name="action_apply_deliver" string="Confirm" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+     <record id="view_vehicle_transfer" model="ir.ui.view">
+        <field name="name">vehicle.receipt.form.deliver</field>
+        <field name="model">vehicle.receipt</field>
+        <field name="arch" type="xml">
+            <form string="Transfer Vehicle">
+
+                <group name="left" string="Confirm Vehicle Details">
+                    <field name="sale_id"/>
+                    <field name="location_id"/>
+                </group>
+                <footer>
+                    <button name="action_apply_transfer" string="Confirm" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+    <record id="action_vehicle_receipt" model="ir.actions.act_window">
+        <field name="name">Confirm the Vehicle and Purchase Order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.receipt</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_vehicle_receipt"/>
+        <field name="target">new</field>
+    </record>
+    <record id="action_vehicle_allocate" model="ir.actions.act_window">
+        <field name="name">Confirm the Vehicle to allocate</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.receipt</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_vehicle_allocate"/>
+        <field name="target">new</field>
+    </record>
+    <record id="action_vehicle_deliver" model="ir.actions.act_window">
+        <field name="name">Confirm the Vehicle to Allocate</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.receipt</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_vehicle_deliver"/>
+        <field name="target">new</field>
+    </record>
+    <record id="action_vehicle_transfer" model="ir.actions.act_window">
+        <field name="name">Confirm the Vehicle to Transfer</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.receipt</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_vehicle_transfer"/>
+        <field name="target">new</field>
+    </record>
+</odoo>
