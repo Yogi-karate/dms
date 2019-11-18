@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <odoo>
     <record id="view_vehicle_receipt" model="ir.ui.view">
-        <field name="name">vehicle.receipt.form</field>
-        <field name="model">vehicle.receipt</field>
+        <field name="name">vehicle.inventory.action.form</field>
+        <field name="model">vehicle.inventory.action</field>
         <field name="arch" type="xml">
             <form string="Receive Vehicle">
 
@@ -17,13 +17,14 @@
         </field>
     </record>
  <record id="view_vehicle_allocate" model="ir.ui.view">
-        <field name="name">vehicle.receipt.form.allocate</field>
-        <field name="model">vehicle.receipt</field>
+        <field name="name">vehicle.inventory.action.form.allocate</field>
+        <field name="model">vehicle.inventory.action</field>
         <field name="arch" type="xml">
             <form string="Allocate Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="sale_id"/>
+                    <field name="order_id" domain="[('state','in',['sale','booked'])]"
+                    options="{'no_create_edit': True}"/>
                 </group>
                 <footer>
                     <button name="action_apply_allocate" string="Confirm" type="object" class="btn-primary"/>
@@ -32,15 +33,27 @@
             </form>
         </field>
     </record>
+    <record id="view_vehicle_deallocate" model="ir.ui.view">
+        <field name="name">vehicle.inventory.action.form.unallocate</field>
+        <field name="model">vehicle.inventory.action</field>
+        <field name="arch" type="xml">
+            <form string="Deallocate Vehicle">
+                <footer>
+                    <button name="action_apply_deallocate" string="Confirm" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
 
      <record id="view_vehicle_deliver" model="ir.ui.view">
-        <field name="name">vehicle.receipt.form.deliver</field>
-        <field name="model">vehicle.receipt</field>
+        <field name="name">vehicle.inventory.action.form.deliver</field>
+        <field name="model">vehicle.inventory.action</field>
         <field name="arch" type="xml">
             <form string="Deliver Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="sale_id"/>
+                    <field name="order_id"/>
                 </group>
                 <footer>
                     <button name="action_apply_deliver" string="Confirm" type="object" class="btn-primary"/>
@@ -50,13 +63,13 @@
         </field>
     </record>
      <record id="view_vehicle_transfer" model="ir.ui.view">
-        <field name="name">vehicle.receipt.form.deliver</field>
-        <field name="model">vehicle.receipt</field>
+        <field name="name">vehicle.inventory.action.form.deliver</field>
+        <field name="model">vehicle.inventory.action</field>
         <field name="arch" type="xml">
             <form string="Transfer Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="sale_id"/>
+                    <field name="order_id"/>
                     <field name="location_id"/>
                 </group>
                 <footer>
@@ -69,33 +82,51 @@
     <record id="action_vehicle_receipt" model="ir.actions.act_window">
         <field name="name">Confirm the Vehicle and Purchase Order</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">vehicle.receipt</field>
+        <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_vehicle_receipt"/>
         <field name="target">new</field>
+        <field name="context">{
+            'default_action': 'receipt'}</field>
     </record>
     <record id="action_vehicle_allocate" model="ir.actions.act_window">
         <field name="name">Confirm the Vehicle to allocate</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">vehicle.receipt</field>
+        <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_vehicle_allocate"/>
         <field name="target">new</field>
+        <field name="context">{
+            'default_action': 'allocate'}</field>
+    </record>
+    <record id="action_vehicle_deallocate" model="ir.actions.act_window">
+        <field name="name">Confirm the Vehicle to allocate</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.inventory.action</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_vehicle_deallocate"/>
+        <field name="target">new</field>
+        <field name="context">{
+            'default_action': 'deallocate'}</field>
     </record>
     <record id="action_vehicle_deliver" model="ir.actions.act_window">
         <field name="name">Confirm the Vehicle to Allocate</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">vehicle.receipt</field>
+        <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_vehicle_deliver"/>
         <field name="target">new</field>
+        <field name="context">{
+            'default_action': 'deliver'}</field>
     </record>
     <record id="action_vehicle_transfer" model="ir.actions.act_window">
         <field name="name">Confirm the Vehicle to Transfer</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">vehicle.receipt</field>
+        <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>
         <field name="view_id" ref="view_vehicle_transfer"/>
         <field name="target">new</field>
+        <field name="context">{
+            'default_action': 'transfer'}</field>
     </record>
 </odoo>

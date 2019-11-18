@@ -13,7 +13,11 @@
                     <button name="%(vehicle.action_vehicle_deliver)d" string="Deliver"
                                 type="action" class="oe_highlight"/>
                     <button name="%(vehicle.action_vehicle_allocate)d" string="Allocate"
-                                type="action" class="oe_highlight"/>
+                                type="action" class="oe_highlight"
+                    attrs="{'invisible': [('allocation_state', '=', 'allocated')]}"/>
+                    <button name="%(vehicle.action_vehicle_allocate)d" string="Deallocate"
+                                type="action" class="oe_highlight"
+                    attrs="{'invisible': [('allocation_state', '=', 'free')]}"/>
                     <button name="%(vehicle.action_vehicle_transfer)d" string="Transfer"
                                 type="action" class="oe_highlight"/>
                     <field name="state" widget="statusbar" statusbar_visible="transit,in-stock,sold"/>
@@ -25,27 +29,32 @@
                             <field name="name" placeholder="e.g. LOT/0001/20121"/>
                         </h1>
                     </div>
-                    <group name="main_group">
-                        <group>
+                     <group>
+                        <field name="allocation_state" invisible="1"></field>
+                        <group string="Product Details">
                             <field name="product_id"
                                    help="Product this vehicle belongs to. You cannot change it anymore if it has already been moved."/>
-                            <field name="partner_id"/>
-                            <field name="ref"/>
+                            <field name="model"/>
+                            <field name="variant"/>
+                            <field name="color"/>
+                        </group>
+                        <group string="Vehicle Details">
+                            <field name="invoice_date"/>
                             <field name="source"/>
                             <field name="chassis_no"/>
                             <field name="battery_no"/>
                             <field name="registration_no"/>
                             <field name="fuel_type"/>
-                             <field name="vehicle_age"/>
-                            <field name="invoice_date"/>
+                        </group>
+                        <group string = "Allocation Details">
+                            <field name="partner_id"/>
+                            <field name="order_id"/>
+                            <field name="location_id"/>
                         </group>
                     </group>
                     <notebook colspan="4">
                         <page name="Insurance" string="Insurance History">
                             <field name="insurance_history"/>
-                        </page>
-                        <page name="Finance" string="Finance History">
-                            <field name="finance"/>
                         </page>
                     </notebook>
                 </sheet>

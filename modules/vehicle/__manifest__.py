@@ -12,7 +12,7 @@
     'data': [
         'security/vehicle_security.xml',
         'security/ir.model.access.csv',
-        'wizard/vehicle_receive.xml',
+        'wizard/vehicle_inventory_views.xml',
         'views/vehicle_views.xml',
         'views/stock_picking_views.xml',
         'views/vehicle_customer_views.xml',

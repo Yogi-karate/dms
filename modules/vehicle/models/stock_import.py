@@ -35,7 +35,7 @@ class StockImport(models.Model):
     def create_vehicles(self):
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
         self._create_vehicles()
-        #self.env['dms.stock.import'].search([('status', '=', True)]).unlink()
+        # self.env['dms.stock.import'].search([('status', '=', True)]).unlink()
         _logger.info("!!!!!!!!!!!!!!End of ->  Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
 
     @api.model
@@ -73,7 +73,7 @@ class StockImport(models.Model):
                 [('name', '=', name), ('variant_value', '=', variant), ('color_value', '=', color)])
             print(product)
             print(color, "---", variant, "-----", name)
-            location = self.env['stock.location'].search([('name','=',vehicle.location)])
+            location = self.env['stock.location'].search([('name', '=', vehicle.location)], limit=1)
             if not location:
                 ignore_reason = 'This Location does not exist in your Company'
                 vehicle.write({'ignore_reason': ignore_reason, 'state': 'cancel'})
@@ -112,6 +112,7 @@ class StockImport(models.Model):
                 'ref': vehicle.order_no,
                 'model_year': vehicle.model_year,
                 'invoice_date': vehicle.invoice_date,
+                'lot': True
             }
             self.env['vehicle'].create(vals)
             vehicle.status = True

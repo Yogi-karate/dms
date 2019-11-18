@@ -26,7 +26,7 @@ class Vehicle(models.Model):
         ('cancel', 'Cancelled'),
     ], string='Status', readonly=True, compute='_get_vehicle_state', copy=False, index=True,
         track_visibility='onchange', track_sequence=3,
-        default='transit',store=True)
+        default='transit', store=True)
     chassis_no = fields.Char('Chassis Number', help="Unique Chasis number of the vehicle")
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
@@ -61,19 +61,30 @@ class Vehicle(models.Model):
     insurance_history = fields.One2many('vehicle.insurance', 'vehicle_id', string='Vehicle Insurance', copy=True,
                                         auto_join=True)
     finance = fields.Many2one('vehicle.finance', string='Vehicle Finance', change_default=True, ondelete='cascade')
+    allocation_state = fields.Selection([
+        ('free', 'Free Stock'),
+        ('allocated', 'Allocated'),
+    ], string='Allocation', readonly=True, copy=False, index=True,
+        track_visibility='onchange', track_sequence=3,
+        default='free', store=True)
+    allocation_date = fields.Datetime('Allocation Date')
+    delivery_date = fields.Datetime('Delivery Date')
 
     @api.depends('lot_id.quant_ids')
-    def _change_state(self):
+    def _get_vehicle_state(self):
         for vehicle in self:
             vehicle.state = "reserved"
+
     @api.depends('order_id')
     def _on_change_sale_order(self):
         self.partner_id = self.order_id.partner_id
-        # We only care for the customer if sale order is entered.
         self.date_order = self.order_id.date_order
 
     @api.model_create_multi
     def create(self, vals_list):
+        for vals in vals_list:
+            if 'lot' in vals:
+                self._create_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
 
     def _create_vehicle_lot(self, vals):
@@ -110,34 +121,36 @@ class Vehicle(models.Model):
                 vehicle.variant = vehicle.product_id.variant_value
                 vehicle.color = vehicle.product_id.color_value
 
-    @api.multi
-    def _get_vehicle_state(self):
-        for vehicle in self:
-            vehicle.state = 'transit'
+    # @api.multi
+    # def _get_vehicle_state(self):
+    #     for vehicle in self:
+    #         vehicle.state = 'transit'
 
     @api.multi
     def _get_location_details(self):
         for vehicle in self:
-            quant = self.sudo().env['stock.quant'].search([('lot_id','=',vehicle.lot_id.id)],limit = 1)
+            quant = self.sudo().env['stock.quant'].search([('lot_id', '=', vehicle.lot_id.id)], limit=1)
             print(quant)
             print(quant.lot_id)
             print(quant.location_id)
-
-            # quant = vehicle.lot_id.quant_id
             if quant:
                 vehicle.location_id = quant.location_id
-                vehicle.state = 'in-stock'
-            else:
-                vehicle.location_id = self.env['stock.location'].search([('id', '=', 1)])
+                if vehicle.location_id and vehicle.location_id.usage == 'transit':
+                    vehicle.state = 'in-transit'
+                else:
+                    if vehicle.location_id and vehicle.location_id.usage == 'internal':
+                        vehicle.state = 'in-stock'
+                    else:
+                        vehicle.state = 'waiting'
 
     @api.multi
     def _get_vehicle_age(self):
         today = fields.Datetime.now()
         for vehicle in self:
-            if not vehicle.date_order:
+            if not vehicle.invoice_date:
                 vehicle.vehicle_age = 0
             else:
-                vehicle.vehicle_age = (today - vehicle.date_order).days
+                vehicle.vehicle_age = (today - vehicle.invoice_date).days
 
 
 class VehicleInsurance(models.Model):
