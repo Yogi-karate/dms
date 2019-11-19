@@ -18,14 +18,16 @@ class VehicleInventoryActions(models.TransientModel):
         ('transfer', 'Transfer Vehicle'),
     ], string='Action', copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='receipt')
+    vehicle_id = fields.Many2one('vehicle')
     purchase_id = fields.Many2one('purchase.order')
     order_id = fields.Many2one('sale.order')
     new_order_id = fields.Many2one('sale.order')
     allocation_order_id = fields.Many2one('sale.order')
-    location_id = fields.Many2one('stock.location')
+    destination_location_id = fields.Many2one('stock.location')
     delivery_date = fields.Date("Delivery Date")
     allocation_age = fields.Char("Days Allocated")
     partner_id = fields.Many2one('res.partner')
+    transfer_date = fields.Date("Transfer Date")
 
     @api.model
     def default_get(self, fields):
@@ -39,6 +41,8 @@ class VehicleInventoryActions(models.TransientModel):
         if self._context.get('active_id'):
             vehicle = self.env['vehicle'].browse(self._context['active_id'])
             print("---- In Active id Vehicle Default Get -------", vehicle)
+            if vehicle:
+                result['vehicle_id'] = vehicle
             if vehicle.delivery_date:
                 result['delivery_date'] = vehicle.delivery_date
             if vehicle.order_id:
@@ -46,6 +50,19 @@ class VehicleInventoryActions(models.TransientModel):
             if vehicle.partner_id:
                 result['partner_id'] = vehicle.partner_id
         return result
+
+    @api.model
+    def _default_transfer_picking_type(self):
+        type_obj = self.env['stock.picking.type']
+        company_id = self.env.context.get('company_id') or self.env.user.company_id.id
+        types = type_obj.search([('code', '=', 'internal'), ('warehouse_id.company_id', '=', company_id)])
+        if not types:
+            types = type_obj.search([('code', '=', 'internale'), ('warehouse_id', '=', False)])
+        return types[:1]
+
+    picking_type_id = fields.Many2one('stock.picking.type', 'Transfer To',
+                                      required=True, default=_default_transfer_picking_type,
+                                      help="This will determine operation type of transfer vehicle")
 
     def action_apply_receive(self):
         print("the  active ids is", self._context.get('active_ids', []))
@@ -108,42 +125,65 @@ class VehicleInventoryActions(models.TransientModel):
 
     @api.model
     def _prepare_picking(self):
-        if not self.group_id:
-            self.group_id = self.group_id.create({
-                'name': self.name,
-                'partner_id': self.partner_id.id
-            })
-        if not self.partner_id.property_stock_supplier.id:
-            raise UserError(_("You must set a Vendor Location for this partner %s") % self.partner_id.name)
+
         return {
             'picking_type_id': self.picking_type_id.id,
-            'partner_id': self.partner_id.id,
-            'date': self.date_order,
-            'origin': self.name,
-            'location_dest_id': self._get_destination_location(),
-            'location_id': self.partner_id.property_stock_supplier.id,
+            'partner_id': False,
+            'date': self.transfer_date,
+            'origin': self.vehicle.name,
+            'location_dest_id': self.vehicle.location_id.id,
+            'location_dest_id': self.destination_location_id.id,
             'company_id': self.company_id.id,
         }
 
     @api.multi
-    def _create_picking(self):
+    def _create_transfer_picking(self):
         StockPicking = self.env['stock.picking']
-        for order in self:
-            if any([ptype in ['product', 'consu'] for ptype in order.order_line.mapped('product_id.type')]):
-                pickings = order.picking_ids.filtered(lambda x: x.state not in ('done', 'cancel'))
-                if not pickings:
-                    res = order._prepare_picking()
-                    picking = StockPicking.create(res)
-                else:
-                    picking = pickings[0]
-                moves = order.order_line._create_stock_moves(picking)
-                moves = moves.filtered(lambda x: x.state not in ('done', 'cancel'))._action_confirm()
-                seq = 0
-                for move in sorted(moves, key=lambda move: move.date_expected):
-                    seq += 5
-                    move.sequence = seq
-                moves._action_assign()
-                picking.message_post_with_view('mail.message_origin_link',
-                                               values={'self': picking, 'origin': order},
-                                               subtype_id=self.env.ref('mail.mt_note').id)
+        StockMoveLine = self.env['stock.move.line']
+        movelines = StockMoveLine.search(
+            [('state', '!=', 'done'), ('vehicle_id', '=', self.vehicle_id.id), ('picking_id.code', '=', 'internal')])
+        if movelines:
+            raise UserError(_(
+                "There is already a transfer order for this vehicle."))
+        else:
+            res = self._prepare_picking()
+            picking = StockPicking.create(res)
+
+        moves = self._create_stock_moves(picking)
+        moves = moves.filtered(lambda x: x.state not in ('done', 'cancel'))._action_confirm()
+        # seq = 0
+        # for move in sorted(moves, key=lambda move: move.date_expected):
+        #     seq += 5
+        #     move.sequence = seq
+        # moves._action_assign()
         return True
+
+    @api.multi
+    def _prepare_stock_moves(self, picking):
+        """ Prepare the stock moves data for one order line. This function returns a list of
+        dictionary ready to be used in stock.move's create()
+        """
+        self.ensure_one()
+        res = []
+        if self.product_id.type not in ['product', 'consu']:
+            return res
+        template = {
+            'name': self.name or '',
+            'product_id': self.vehicle_id.product_id.id,
+            'product_uom': 1,
+            'date': fields.Datetime.now(),
+            'date_expected': False,
+            'location_dest_id': self.vehicle.location_id.id,
+            'location_dest_id': self.destination_location_id.id,
+            'picking_id': picking.id,
+            'partner_id': False,
+            'state': 'draft',
+            'company_id': self.vehicle_id.company_id.id,
+            'picking_type_id': self.picking_type_id.id,
+            'origin': self.vehicle_id.name,
+            'route_ids': self.order_id.picking_type_id.warehouse_id and [
+                (6, 0, [x.id for x in self.picking_type_id.warehouse_id.route_ids])] or [],
+            'warehouse_id': self.picking_type_id.warehouse_id.id,
+        }
+        res.append(template)
+        return res

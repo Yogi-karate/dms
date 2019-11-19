@@ -70,7 +70,7 @@
 
                 <group name="left" string="Confirm Vehicle Details">
                     <field name="order_id"/>
-                    <field name="location_id"/>
+                    <field name="destination_location_id"/>
                 </group>
                 <footer>
                     <button name="action_apply_transfer" string="Confirm" type="object" class="btn-primary"/>
