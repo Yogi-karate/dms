@@ -6,7 +6,7 @@
         <field name="arch" type="xml">
             <form string="Receive Vehicle">
 
-                <group name="left" string="Confirm Vehicle Details">
+                <group name="left" string="Confirm Purchase Order">
                     <field name="purchase_id" domain="[('state','in',['done','purchase'])]"
                      options="{'no_create_edit': True}"/>
                 </group>
@@ -39,7 +39,8 @@
         <field name="model">vehicle.inventory.action</field>
         <field name="arch" type="xml">
             <form string="Deallocate Vehicle">
-                <field name="partner_id"/>
+                <field name="order_id" readonly="1" />
+                <field name="partner_id" readonly="1"/>
                 <footer>
                     <button name="action_apply_deallocate" string="Confirm" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
@@ -55,8 +56,8 @@
             <form string="Deliver Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="allocation_order_id"/>
-                    <field name="partner_id"/>
+                    <field name="order_id" readonly="1" />
+                    <field name="partner_id" readonly="1"/>
                 </group>
                 <footer>
                     <button name="action_apply_deliver" string="Confirm" type="object" class="btn-primary"/>
@@ -82,7 +83,7 @@
         </field>
     </record>
     <record id="action_vehicle_receipt" model="ir.actions.act_window">
-        <field name="name">Confirm the Vehicle and Purchase Order</field>
+        <field name="name">Confirm Purchase Order</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>
@@ -92,7 +93,7 @@
             'default_action': 'receipt'}</field>
     </record>
     <record id="action_vehicle_allocate" model="ir.actions.act_window">
-        <field name="name">Confirm the Vehicle to allocate</field>
+        <field name="name">Confirm booking to allocate</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>
@@ -102,7 +103,7 @@
             'default_action': 'allocate'}</field>
     </record>
     <record id="action_vehicle_deallocate" model="ir.actions.act_window">
-        <field name="name">Confirm the Vehicle to allocate</field>
+        <field name="name">Confirm deallocation</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>
@@ -112,7 +113,7 @@
             'default_action': 'deallocate'}</field>
     </record>
     <record id="action_vehicle_deliver" model="ir.actions.act_window">
-        <field name="name">Confirm the Vehicle to Allocate</field>
+        <field name="name">Confirm Delivery</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>
@@ -122,7 +123,7 @@
             'default_action': 'deliver'}</field>
     </record>
     <record id="action_vehicle_transfer" model="ir.actions.act_window">
-        <field name="name">Confirm the Vehicle to Transfer</field>
+        <field name="name">Confirm Transfer Location</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">vehicle.inventory.action</field>
         <field name="view_mode">form</field>

@@ -40,7 +40,7 @@ class Vehicle(models.Model):
     model_year = fields.Char('Manufatured Year', readonly=True)
     invoice_date = fields.Date('Invoice Date')
     age = fields.Integer('Age', readonly=True, compute='_get_vehicle_age')
-    location_id = location_id = fields.Many2one(
+    location_id = fields.Many2one(
         'stock.location', 'Location', compute='_get_location_details', store=True)
     partner_name = fields.Char('Customer', compute='_get_customer_details', store=True)
     partner_mobile = fields.Char('Mobile No.', compute='_get_customer_details', store=True)

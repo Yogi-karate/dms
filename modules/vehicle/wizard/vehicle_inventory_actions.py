@@ -11,8 +11,8 @@ class VehicleInventoryActions(models.TransientModel):
     _name = "vehicle.inventory.action"
     _description = "Vehicle receipts"
     action = fields.Selection([
-        ('allocation', 'Allocate Vehicle'),
-        ('deallocation', 'Deallocate Vehicle'),
+        ('allocate', 'Allocate Vehicle'),
+        ('deallocate', 'Deallocate Vehicle'),
         ('receipt', 'Recieve Vehicle'),
         ('deliver', 'Deliver Vehicle'),
         ('transfer', 'Transfer Vehicle'),
@@ -20,13 +20,13 @@ class VehicleInventoryActions(models.TransientModel):
         default='receipt')
     vehicle_id = fields.Many2one('vehicle')
     purchase_id = fields.Many2one('purchase.order')
-    # order_id = fields.Many2one('sale.order')
+    order_id = fields.Many2one('sale.order')
     # new_order_id = fields.Many2one('sale.order')
     allocation_order_id = fields.Many2one('sale.order')
     destination_location_id = fields.Many2one('stock.location')
     delivery_date = fields.Date("Delivery Date")
     allocation_age = fields.Char("Days Allocated")
-    partner_id = fields.Many2one('res.partner')
+    partner_id = fields.Many2one('res.partner', string="Customer")
     transfer_date = fields.Date("Transfer Date")
 
     @api.model
@@ -46,7 +46,7 @@ class VehicleInventoryActions(models.TransientModel):
             if vehicle.delivery_date:
                 result['delivery_date'] = vehicle.delivery_date
             if vehicle.order_id:
-                result['allocation_order_id'] = vehicle.order_id.id
+                result['order_id'] = vehicle.order_id.id
             if vehicle.partner_id:
                 result['partner_id'] = vehicle.partner_id.id
         return result
@@ -86,7 +86,7 @@ class VehicleInventoryActions(models.TransientModel):
     def action_apply_deliver(self):
         vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
         product = vehicle.product_id
-        if len(self.order_id.picking_ids) > 1:
+        if len(self.allocation_order_id.picking_ids) > 1:
             raise UserError(_("Multiple Pickings. Please go to Sale order screen and receive Manually"))
         if not self.order_id.picking_ids:
             raise UserError(_("Invalid Sale order for this Vehicle"))
@@ -100,13 +100,13 @@ class VehicleInventoryActions(models.TransientModel):
 
     def action_apply_allocate(self):
         vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
-        vehicle.write({'order_id': self.allocation_order_id, 'allocation_state': 'allocated',
-                       'allocated_date': fields.Datetime.now()})
+        vehicle.write({'order_id': self.allocation_order_id.id, 'allocation_state': 'allocated',
+                       'allocation_date': fields.Date.today()})
         return
 
     def action_apply_deallocate(self):
         vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
-        vehicle.write({'allocation_state': 'free', 'allocated_date': False, 'order_id': False})
+        vehicle.write({'allocation_state': 'free', 'allocation_date': False, 'order_id': False})
         return
 
     def action_apply_transfer(self):
