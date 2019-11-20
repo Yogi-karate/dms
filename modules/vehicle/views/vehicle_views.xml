@@ -9,18 +9,19 @@
             <form string="Vehicles">
                 <header>
                     <button name="%(vehicle.action_vehicle_receipt)d" string="Receive"
-                                type="action" class="oe_highlight"/>
+                                type="action" class="oe_highlight" attrs="{'invisible': [('state', 'in', ['in-stock','sold'])]}"/>
                     <button name="%(vehicle.action_vehicle_deliver)d" string="Deliver"
-                                type="action" class="oe_highlight"/>
+                                type="action" class="oe_highlight" attrs="{'invisible': [('state', 'in', ['pending','sold'])]}"/>
                     <button name="%(vehicle.action_vehicle_allocate)d" string="Allocate"
                                 type="action" class="oe_highlight"
-                    attrs="{'invisible': [('allocation_state', '=', 'allocated')]}"/>
+                    attrs="{'invisible': ['|',('allocation_state', '=', 'allocated'),('state', 'in', ['pending','sold'])]}"/>
                     <button name="%(vehicle.action_vehicle_allocate)d" string="Deallocate"
                                 type="action" class="oe_highlight"
-                    attrs="{'invisible': [('allocation_state', '=', 'free')]}"/>
+                    attrs="{'invisible': ['|',('allocation_state', '=', 'free'),('state', 'in', ['pending','sold'])]}"/>
                     <button name="%(vehicle.action_vehicle_transfer)d" string="Transfer"
-                                type="action" class="oe_highlight"/>
-                    <field name="state" widget="statusbar" statusbar_visible="transit,in-stock,sold"/>
+                                type="action" class="oe_highlight"
+                            attrs="{'invisible': [('state', 'in', ['pending','sold'])]}"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,transit,in-stock,sold"/>
                 </header>
                 <sheet>
                     <div class="oe_title">
@@ -47,9 +48,11 @@
                             <field name="fuel_type"/>
                         </group>
                         <group string = "Allocation Details">
-                            <field name="partner_id"/>
-                            <field name="order_id"/>
-                            <field name="location_id"/>
+                            <field name="partner_id" readonly="1"/>
+                            <field name="order_id" readonly="1"/>
+                            <field name="location_id" readonly="1"/>
+                            <field name="allocation_date" readonly="1"/>
+                            <field name="allocation_age" readonly="1"/>
                         </group>
                     </group>
                     <notebook colspan="4">
@@ -202,15 +205,15 @@
         <field name="model">vehicle</field>
         <field name="arch" type="xml">
             <tree string="vehicles">
-                <field name="invoice_date"/>
                 <field name="model"/>
                 <field name="color"/>
                 <field name="variant"/>
-                <field name="vehicle_age"/>
                 <field name="name"/>
+                <field name="age"/>
+                <field name="partner_id"/>
                 <field name="location_id"/>
                 <field name="state"/>
-
+                <field name="allocation_state"/>
             </tree>
         </field>
     </record>
@@ -234,7 +237,7 @@
 
 
     <record id="action_vehicle_stock" model="ir.actions.act_window">
-        <field name="name">Vehicles in Stock</field>
+        <field name="name">Vehicle Inventory</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">vehicle</field>
         <field name="view_ids"
@@ -252,4 +255,9 @@
           </p>
         </field>
     </record>
+    <menuitem action="vehicle.action_vehicle_stock" id="menu_action_vehicle_stock"
+              parent="stock.menu_stock_warehouse_mgmt" groups="stock.group_stock_user"
+              sequence="1"/>
+
+
 </odoo>

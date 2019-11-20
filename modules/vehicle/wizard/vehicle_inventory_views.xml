@@ -7,7 +7,8 @@
             <form string="Receive Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="purchase_id"/>
+                    <field name="purchase_id" domain="[('state','in',['done','purchase'])]"
+                     options="{'no_create_edit': True}"/>
                 </group>
                 <footer>
                     <button name="action_apply_receive" string="Confirm" type="object" class="btn-primary"/>
@@ -23,7 +24,7 @@
             <form string="Allocate Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="order_id" domain="[('state','in',['sale','booked'])]"
+                    <field name="allocation_order_id" domain="[('state','in',['sale','booked'])]"
                     options="{'no_create_edit': True}"/>
                 </group>
                 <footer>
@@ -38,6 +39,7 @@
         <field name="model">vehicle.inventory.action</field>
         <field name="arch" type="xml">
             <form string="Deallocate Vehicle">
+                <field name="partner_id"/>
                 <footer>
                     <button name="action_apply_deallocate" string="Confirm" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
@@ -53,7 +55,8 @@
             <form string="Deliver Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="order_id"/>
+                    <field name="allocation_order_id"/>
+                    <field name="partner_id"/>
                 </group>
                 <footer>
                     <button name="action_apply_deliver" string="Confirm" type="object" class="btn-primary"/>
@@ -69,7 +72,6 @@
             <form string="Transfer Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="order_id"/>
                     <field name="destination_location_id"/>
                 </group>
                 <footer>

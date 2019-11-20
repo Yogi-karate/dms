@@ -18,15 +18,14 @@ class Vehicle(models.Model):
     ref = fields.Char('Internal Reference',
                       help="Internal reference number in case it differs from the manufacturer's lot/serial number")
     state = fields.Selection([
+        ('waiting', 'Pending'),
         ('transit', 'In-Transit'),
         ('in-stock', 'Physical Stock'),
-        ('waiting', 'Waiting'),
-        ('reserved', 'Allocated'),
         ('sold', 'Delivered'),
         ('cancel', 'Cancelled'),
-    ], string='Status', readonly=True, compute='_get_vehicle_state', copy=False, index=True,
+    ], string='Status', readonly=True, copy=False, index=True,
         track_visibility='onchange', track_sequence=3,
-        default='transit', store=True)
+        default='waiting')
     chassis_no = fields.Char('Chassis Number', help="Unique Chasis number of the vehicle")
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
@@ -40,9 +39,9 @@ class Vehicle(models.Model):
     color = fields.Char('Color', readonly=True, compute='_get_product_details')
     model_year = fields.Char('Manufatured Year', readonly=True)
     invoice_date = fields.Date('Invoice Date')
-    vehicle_age = fields.Integer('Age', readonly=True, compute='_get_vehicle_age')
+    age = fields.Integer('Age', readonly=True, compute='_get_vehicle_age')
     location_id = location_id = fields.Many2one(
-        'stock.location', 'Location', compute='_get_location_details')
+        'stock.location', 'Location', compute='_get_location_details', store=True)
     partner_name = fields.Char('Customer', compute='_get_customer_details', store=True)
     partner_mobile = fields.Char('Mobile No.', compute='_get_customer_details', store=True)
     partner_email = fields.Char('Email', compute='_get_customer_details')
@@ -69,11 +68,37 @@ class Vehicle(models.Model):
         default='free', store=True)
     allocation_date = fields.Datetime('Allocation Date')
     delivery_date = fields.Datetime('Delivery Date')
+    allocation_age = fields.Integer('Age', readonly=True, compute='_get_vehicle_allocation_age')
+
+    @api.multi
+    def change_vehicle_state(self):
+        for vehicle in self:
+            if vehicle.state != 'sold':
+                quant = self.sudo().env['stock.quant'].search(
+                    [('lot_id', '=', vehicle.lot_id.id), ('quantity', '=', 1)],
+                    limit=1)
+                print(quant)
+                print(quant.lot_id)
+                print(quant.location_id)
+                if quant:
+                    state = vehicle.state
+                    vehicle.location_id = quant.location_id
+                    if vehicle.location_id and vehicle.location_id.usage == 'transit':
+                        state = 'transit'
+                    else:
+                        if vehicle.location_id and vehicle.location_id.usage == 'internal':
+                            state = 'in-stock'
+                        else:
+                            if vehicle.state != 'waiting':
+                                state = 'waiting'
+                    print("before writing state to db", state, vehicle.state)
+                    if vehicle.state != state:
+                        print("writing state to db", state, vehicle.state)
+                        vehicle.write({'state': state})
 
     @api.depends('lot_id.quant_ids')
     def _get_vehicle_state(self):
-        for vehicle in self:
-            vehicle.state = "reserved"
+        self.change_vehicle_state()
 
     @api.depends('order_id')
     def _on_change_sale_order(self):
@@ -128,20 +153,16 @@ class Vehicle(models.Model):
 
     @api.multi
     def _get_location_details(self):
+        self.change_vehicle_state()
+
+    @api.multi
+    def _get_vehicle_allocation_age(self):
+        today = fields.Datetime.now()
         for vehicle in self:
-            quant = self.sudo().env['stock.quant'].search([('lot_id', '=', vehicle.lot_id.id)], limit=1)
-            print(quant)
-            print(quant.lot_id)
-            print(quant.location_id)
-            if quant:
-                vehicle.location_id = quant.location_id
-                if vehicle.location_id and vehicle.location_id.usage == 'transit':
-                    vehicle.state = 'in-transit'
-                else:
-                    if vehicle.location_id and vehicle.location_id.usage == 'internal':
-                        vehicle.state = 'in-stock'
-                    else:
-                        vehicle.state = 'waiting'
+            if not vehicle.allocation_date:
+                vehicle.allocation_age = 0
+            else:
+                vehicle.allocation_age = (today - vehicle.allocation_date).days
 
     @api.multi
     def _get_vehicle_age(self):

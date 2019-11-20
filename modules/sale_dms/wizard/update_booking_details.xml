@@ -8,7 +8,7 @@
                 <form string="Update Booking Details">
                     <group string="Finance Details">
                     <field name="finance_type"/>
-                    <field name="financier_name"/>
+                    <field name="financier_name" options='{"no_create_edit": True}'/>
                     <field name="finance_pmt"/>
                     <field name="finance_payment_date"/>
                     </group>

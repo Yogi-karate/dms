@@ -20,8 +20,8 @@ class VehicleInventoryActions(models.TransientModel):
         default='receipt')
     vehicle_id = fields.Many2one('vehicle')
     purchase_id = fields.Many2one('purchase.order')
-    order_id = fields.Many2one('sale.order')
-    new_order_id = fields.Many2one('sale.order')
+    # order_id = fields.Many2one('sale.order')
+    # new_order_id = fields.Many2one('sale.order')
     allocation_order_id = fields.Many2one('sale.order')
     destination_location_id = fields.Many2one('stock.location')
     delivery_date = fields.Date("Delivery Date")
@@ -36,19 +36,19 @@ class VehicleInventoryActions(models.TransientModel):
             Ensure Vehicle is in stock or transit and allocation status is available
         """
         result = super(VehicleInventoryActions, self).default_get(fields)
-        if self._context.get('source') and self._context.get('source') == 'allocate':
+        if self._context.get('action') and self._context.get('action') == 'allocate':
             print("*** In allocate Vehicle Default Get ****")
         if self._context.get('active_id'):
             vehicle = self.env['vehicle'].browse(self._context['active_id'])
             print("---- In Active id Vehicle Default Get -------", vehicle)
             if vehicle:
-                result['vehicle_id'] = vehicle
+                result['vehicle_id'] = vehicle.id
             if vehicle.delivery_date:
                 result['delivery_date'] = vehicle.delivery_date
             if vehicle.order_id:
-                result['order_id'] = vehicle.order_id
+                result['allocation_order_id'] = vehicle.order_id.id
             if vehicle.partner_id:
-                result['partner_id'] = vehicle.partner_id
+                result['partner_id'] = vehicle.partner_id.id
         return result
 
     @api.model
