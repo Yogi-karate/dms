@@ -151,6 +151,9 @@ class VehicleInventoryActions(models.TransientModel):
                 .create(move_val) \
                 ._action_confirm() \
                 ._action_assign()
+
+        for move_line in picking.move_line_ids:
+            move_line.write({'qty_done': 1})
         return True
 
     @api.multi
