@@ -31,6 +31,7 @@ class Lead2OpportunityPartner(models.TransientModel):
         result = super(Lead2OpportunityPartner, self).default_get(fields)
         if self._context.get('active_id'):
             lead = self.env['crm.lead'].browse(self._context['active_id'])
+            result['lead_id'] = lead.id
             enquiry = lead.enquiry_id
             print(fields)
             if 'partner_id' in fields:
@@ -52,7 +53,7 @@ class Lead2OpportunityPartner(models.TransientModel):
             if enquiry.partner_email:
                 result['partner_email'] = enquiry.partner_email
         return result
-
+    lead_id = fields.Many2one('crm.lead', 'Lead')
     user_id = fields.Many2one('res.users', 'User')
     team_id = fields.Many2one('crm.team', 'Team')
     partner_id = fields.Many2one('res.partner', 'Customer')
@@ -122,7 +123,7 @@ class Lead2OpportunityPartner(models.TransientModel):
             'team_id': self.team_id.id,
             'partner_id': customer.id,
             'user_id': self.user_id.id,
-            'opportunity_id': self._context['active_id'],
+            'opportunity_id': self.lead_id.id,
             'pricelist_id': self.pricelist.id
         }
         order = sale.create(values)

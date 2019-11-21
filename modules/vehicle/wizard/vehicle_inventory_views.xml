@@ -23,7 +23,7 @@
         <field name="arch" type="xml">
             <form string="Allocate Vehicle">
 
-                <group name="left" string="Confirm Vehicle Details">
+                <group name="left" string="Select Order to Allocate">
                     <field name="allocation_order_id" domain="[('state','in',['sale','booked'])]"
                     options="{'no_create_edit': True}"/>
                 </group>
@@ -39,8 +39,11 @@
         <field name="model">vehicle.inventory.action</field>
         <field name="arch" type="xml">
             <form string="Deallocate Vehicle">
+                 <group name="left" string="Allocation Details">
                 <field name="order_id" readonly="1" />
                 <field name="partner_id" readonly="1"/>
+                 </group>
+
                 <footer>
                     <button name="action_apply_deallocate" string="Confirm" type="object" class="btn-primary"/>
                     <button string="Cancel" class="btn-secondary" special="cancel"/>
@@ -55,7 +58,7 @@
         <field name="arch" type="xml">
             <form string="Deliver Vehicle">
 
-                <group name="left" string="Confirm Vehicle Details">
+                <group name="left" string="Confirm">
                     <field name="order_id" readonly="1" />
                     <field name="partner_id" readonly="1"/>
                 </group>
@@ -73,7 +76,9 @@
             <form string="Transfer Vehicle">
 
                 <group name="left" string="Confirm Vehicle Details">
-                    <field name="destination_location_id"/>
+                    <field name="location_id" readonly="1"/>
+                    <field name="destination_location_id" domain="[('usage','in',['internal','transit'])]"
+                    options="{'no_create_edit': True}"/>
                 </group>
                 <footer>
                     <button name="action_apply_transfer" string="Confirm" type="object" class="btn-primary"/>

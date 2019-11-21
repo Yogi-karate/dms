@@ -21,7 +21,7 @@ class VehicleInventoryActions(models.TransientModel):
     vehicle_id = fields.Many2one('vehicle')
     purchase_id = fields.Many2one('purchase.order')
     order_id = fields.Many2one('sale.order')
-    # new_order_id = fields.Many2one('sale.order')
+    location_id = fields.Many2one('stock.location')
     allocation_order_id = fields.Many2one('sale.order')
     destination_location_id = fields.Many2one('stock.location')
     delivery_date = fields.Date("Delivery Date")
@@ -49,6 +49,8 @@ class VehicleInventoryActions(models.TransientModel):
                 result['order_id'] = vehicle.order_id.id
             if vehicle.partner_id:
                 result['partner_id'] = vehicle.partner_id.id
+            if vehicle.location_id:
+                result['location_id'] = vehicle.location_id.id
         return result
 
     @api.model
@@ -96,6 +98,7 @@ class VehicleInventoryActions(models.TransientModel):
             raise UserError(_(
                 "There is a different Product in the Receipt. Product in Vehicle and Purchase order should be same. "))
         move_line.write({'vehicle_id': vehicle.id, 'qty_done': 1})
+        vehicle.write({'state': 'sold'})
         return
 
     def action_apply_allocate(self):
@@ -112,15 +115,7 @@ class VehicleInventoryActions(models.TransientModel):
     def action_apply_transfer(self):
         vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
         product = vehicle.product_id
-        if len(self.order_id.picking_ids) > 1:
-            raise UserError(_("Multiple Pickings. Please go to Sale order screen and receive Manually"))
-        if not self.order_id.picking_ids:
-            raise UserError(_("Invalid Sale order for this Vehicle"))
-        move_line = self.sudo().env['stock.move.line'].search([('vehicle_id', '=', vehicle.id)])
-        if not move_line:
-            raise UserError(_(
-                "There is a different Product in the Receipt. Product in Vehicle and Purchase order should be same. "))
-        move_line.write({'location_id': self.location_id.id})
+        self._create_transfer_picking()
         return
 
     @api.model
@@ -130,10 +125,10 @@ class VehicleInventoryActions(models.TransientModel):
             'picking_type_id': self.picking_type_id.id,
             'partner_id': False,
             'date': self.transfer_date,
-            'origin': self.vehicle.name,
-            'location_dest_id': self.vehicle.location_id.id,
+            'origin': self.vehicle_id.name,
+            'location_id': self.vehicle_id.location_id.id,
             'location_dest_id': self.destination_location_id.id,
-            'company_id': self.company_id.id,
+            'company_id': self.vehicle_id.company_id.id,
         }
 
     @api.multi
@@ -141,7 +136,8 @@ class VehicleInventoryActions(models.TransientModel):
         StockPicking = self.env['stock.picking']
         StockMoveLine = self.env['stock.move.line']
         movelines = StockMoveLine.search(
-            [('state', '!=', 'done'), ('vehicle_id', '=', self.vehicle_id.id), ('picking_id.code', '=', 'internal')])
+            [('state', '!=', 'done'), ('vehicle_id', '=', self.vehicle_id.id),
+             ('picking_id.picking_type_code', '=', 'internal')])
         if movelines:
             raise UserError(_(
                 "There is already a transfer order for this vehicle."))
@@ -149,13 +145,12 @@ class VehicleInventoryActions(models.TransientModel):
             res = self._prepare_picking()
             picking = StockPicking.create(res)
 
-        moves = self._create_stock_moves(picking)
-        moves = moves.filtered(lambda x: x.state not in ('done', 'cancel'))._action_confirm()
-        # seq = 0
-        # for move in sorted(moves, key=lambda move: move.date_expected):
-        #     seq += 5
-        #     move.sequence = seq
-        # moves._action_assign()
+        move_vals = self._prepare_stock_moves(picking)
+        for move_val in move_vals:
+            self.env['stock.move'] \
+                .create(move_val) \
+                ._action_confirm() \
+                ._action_assign()
         return True
 
     @api.multi
@@ -165,15 +160,15 @@ class VehicleInventoryActions(models.TransientModel):
         """
         self.ensure_one()
         res = []
-        if self.product_id.type not in ['product', 'consu']:
+        if self.vehicle_id.product_id.type not in ['product', 'consu']:
             return res
         template = {
-            'name': self.name or '',
+            'name': self.vehicle_id.name or '',
             'product_id': self.vehicle_id.product_id.id,
             'product_uom': 1,
             'date': fields.Datetime.now(),
-            'date_expected': False,
-            'location_dest_id': self.vehicle.location_id.id,
+            'date_expected': fields.Datetime.now(),
+            'location_id': self.vehicle_id.location_id.id,
             'location_dest_id': self.destination_location_id.id,
             'picking_id': picking.id,
             'partner_id': False,
@@ -181,9 +176,10 @@ class VehicleInventoryActions(models.TransientModel):
             'company_id': self.vehicle_id.company_id.id,
             'picking_type_id': self.picking_type_id.id,
             'origin': self.vehicle_id.name,
-            'route_ids': self.order_id.picking_type_id.warehouse_id and [
+            'route_ids': self.picking_type_id.warehouse_id and [
                 (6, 0, [x.id for x in self.picking_type_id.warehouse_id.route_ids])] or [],
             'warehouse_id': self.picking_type_id.warehouse_id.id,
+            'product_uom_qty': 1,
         }
         res.append(template)
         return res

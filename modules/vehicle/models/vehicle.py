@@ -48,7 +48,7 @@ class Vehicle(models.Model):
     date_order = fields.Datetime('Sale-Date')
     address = fields.Char('Address', compute='_get_customer_details')
     fuel_type = fields.Char('Fuel Type', compute='_get_vehicle_details')
-    partner_id = fields.Many2one('res.partner')
+    partner_id = fields.Many2one('res.partner', compute='_get_customer_details', store=True)
     order_id = fields.Many2one('sale.order')
     source = fields.Selection([
         ('od', 'Other Dealer'),
@@ -61,14 +61,14 @@ class Vehicle(models.Model):
                                         auto_join=True)
     finance = fields.Many2one('vehicle.finance', string='Vehicle Finance', change_default=True, ondelete='cascade')
     allocation_state = fields.Selection([
-        ('free', 'Free Stock'),
+        ('free', 'Free'),
         ('allocated', 'Allocated'),
     ], string='Allocation', readonly=True, copy=False, index=True,
         track_visibility='onchange', track_sequence=3,
         default='free', store=True)
     allocation_date = fields.Datetime('Allocation Date')
     delivery_date = fields.Datetime('Delivery Date')
-    allocation_age = fields.Integer('Age', readonly=True, compute='_get_vehicle_allocation_age')
+    allocation_age = fields.Integer('Allocation Age', readonly=True, compute='_get_vehicle_allocation_age')
 
     @api.multi
     def change_vehicle_state(self):
@@ -95,15 +95,18 @@ class Vehicle(models.Model):
                     if vehicle.state != state:
                         print("writing state to db", state, vehicle.state)
                         vehicle.write({'state': state})
+            else:
+                vehicle.location_id = False
 
     @api.depends('lot_id.quant_ids')
     def _get_vehicle_state(self):
+        print("!!!!!!!Quant id changed for vehicle !!!!!!!!!")
         self.change_vehicle_state()
 
-    @api.depends('order_id')
-    def _on_change_sale_order(self):
-        self.partner_id = self.order_id.partner_id
-        self.date_order = self.order_id.date_order
+    # @api.depends('order_id')
+    # def _get_partner_details(self):
+    #     self.partner_id = self.order_id.partner_id
+    #     self.date_order = self.order_id.date_order
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -120,14 +123,12 @@ class Vehicle(models.Model):
         vals['lot_id'] = new_lot.id
         print("The new Lot created is " + new_lot.name)
 
-    @api.multi
-    def write(self, vals):
-        return super(Vehicle, self).write(vals)
-
-    @api.depends('partner_id')
+    @api.depends('order_id')
     @api.multi
     def _get_customer_details(self):
         for vehicle in self:
+            vehicle.partner_id = vehicle.order_id.partner_id
+            vehicle.date_order = vehicle.order_id.date_order
             vehicle.partner_name = vehicle.partner_id.name
             vehicle.partner_mobile = vehicle.partner_id.mobile
             vehicle.partner_email = vehicle.partner_id.email
