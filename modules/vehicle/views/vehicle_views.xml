@@ -9,18 +9,18 @@
             <form string="Vehicles">
                 <header>
                     <button name="%(vehicle.action_vehicle_receipt)d" string="Receive"
-                                type="action" class="oe_highlight" attrs="{'invisible': [('state', 'in', ['in-stock','sold'])]}"/>
+                                type="action" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting')]}"/>
                     <button name="%(vehicle.action_vehicle_allocate)d" string="Allocate"
                                 type="action" class="oe_highlight"
-                    attrs="{'invisible': ['|',('allocation_state', '=', 'allocated'),('state', 'in', ['pending','sold'])]}"/>
+                    attrs="{'invisible': ['|',('allocation_state', '=', 'allocated'),('state', 'not in', ['in-stock','in-transit'])]}"/>
                     <button name="%(vehicle.action_vehicle_deallocate)d" string="Deallocate"
                                 type="action" class="oe_highlight"
-                    attrs="{'invisible': ['|',('allocation_state', '=', 'free'),('state', 'in', ['pending','sold'])]}"/>
+                    attrs="{'invisible': ['|',('allocation_state', '=', 'free'),('state', 'not in', ['in-stock','in-transit'])]}"/>
                     <button name="%(vehicle.action_vehicle_deliver)d" string="Deliver"
-                                type="action" class="oe_highlight" attrs="{'invisible': ['|',('state', 'in', ['pending','sold']),('allocation_state','=','free')]}"/>
+                                type="action" class="oe_highlight" attrs="{'invisible': ['|',('state', 'not in', ['in-stock']),('allocation_state','=','free')]}"/>
                     <button name="%(vehicle.action_vehicle_transfer)d" string="Transfer"
                                 type="action" class="oe_highlight"
-                            attrs="{'invisible': [('state', 'in', ['pending','sold'])]}"/>
+                            attrs="{'invisible': [('state', 'not in', ['in-transit','in-stock'])]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="waiting,transit,in-stock,sold"/>
                 </header>
                 <sheet>
@@ -46,6 +46,7 @@
                             <field name="battery_no"/>
                             <field name="registration_no"/>
                             <field name="fuel_type"/>
+                            <field name="age"/>
                         </group>
                         <group string = "Allocation Details">
                             <field name="partner_id" readonly="1"/>
@@ -58,6 +59,9 @@
                     <notebook colspan="4">
                         <page name="Insurance" string="Insurance History">
                             <field name="insurance_history"/>
+                        </page>
+                        <page name="Finance" string="Finance Details">
+                            <field name="finance"/>
                         </page>
                     </notebook>
                 </sheet>
@@ -226,9 +230,30 @@
                 <field name="name" string="Vehicle" filter_domain="['|',('name','ilike',self),('ref','ilike',self)]"/>
                 <field name="product_id"/>
                 <field name="partner_mobile"/>
+                <field name="partner_name"/>
+                <field name="model"/>
+                <field name="variant"/>
+                <separator/>
+                <filter string="Pending" name="Pending Vin"
+                        domain="[('state', '=', 'waiting')]"
+                        help="Show all Vehicles pending for Vin allocation"/>
+                <filter string="Physical Stock" name="In Stock"
+                        domain="[('state', '=', 'in-stock')]"
+                        help="Show all Vehicles in our Stock"/>
+                <filter string="Transit" name="In Transit"
+                        domain="[('state', '=', 'transit')]"
+                        help="Show all Vehicles in transit"/>
+                <separator/>
+                <filter string="Free Stock" name="Free"
+                        domain="[('allocation_state', '=', 'free')]"
+                        help="Show all Vehicles Free for allocation"/>
+                <filter string="Allocated" name="In Transit"
+                        domain="[('allocation_state', '=', 'allocated')]"
+                        help="Show all Vehicles Allocated"/>
                 <group expand="0" string="Group By">
                     <filter name="group_by_product" string="Product" domain="[]" context="{'group_by':'product_id'}"/>
-                    <filter name="group_by_sale_date" string="Sale Date" domain="[]" context="{'group_by':'date_order'}"/>
+                    <filter name="group_by_location_id" string="Location" domain="[]" context="{'group_by':'location_id'}"/>
+                    <filter name="group_by_state" string="Status" domain="[]" context="{'group_by':'state'}"/>
                 </group>
             </search>
         </field>
@@ -244,14 +269,13 @@
                    eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('view_vehicle_stock')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('view_vehicle_form')})]"/>
-        <field name="search_view_id" ref="search_vehicle_customer_filter"/>
-        <field name="domain">[('source','=','saboo'),('state','!=','sold'),('state','!=','cancel')]</field>
+        <field name="search_view_id" ref="search_vehicle_stock"/>
+        <field name="domain">[('source','=','saboo'),('state','!=','sold')]</field>
         <field name="help" type="html">
           <p class="o_view_nocontent_smiling_face">
             Add a Vehicle
           </p><p>
-            This is the list of all the Vehicle you sold. When
-            you select a select, you can get the traceability of the vehicles sold.
+            This is the list of all your current Vehicle.
           </p>
         </field>
     </record>
