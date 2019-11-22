@@ -24,8 +24,7 @@ class Vehicle(models.Model):
         ('sold', 'Delivered'),
         ('cancel', 'Cancelled'),
     ], string='Status', readonly=True, copy=False, index=True,
-        track_visibility='onchange', track_sequence=3,
-        default='waiting')
+        track_visibility='onchange', track_sequence=3, compute='_get_vehicle_state', store=True)
     chassis_no = fields.Char('Chassis Number', help="Unique Chasis number of the vehicle")
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
@@ -73,6 +72,7 @@ class Vehicle(models.Model):
     @api.multi
     def change_vehicle_state(self):
         for vehicle in self:
+            print("-------In vehicle change location compute-------")
             if vehicle.state != 'sold':
                 quant = self.sudo().env['stock.quant'].search(
                     [('lot_id', '=', vehicle.lot_id.id), ('quantity', '=', 1)],
@@ -81,38 +81,46 @@ class Vehicle(models.Model):
                 print(quant.lot_id)
                 print(quant.location_id)
                 if quant:
-                    state = vehicle.state
                     vehicle.location_id = quant.location_id
-                    if vehicle.location_id and vehicle.location_id.usage == 'transit':
-                        state = 'transit'
-                    else:
-                        if vehicle.location_id and vehicle.location_id.usage == 'internal':
-                            state = 'in-stock'
-                        else:
-                            if vehicle.state != 'waiting':
-                                state = 'waiting'
-                    print("before writing state to db", state, vehicle.state)
-                    if vehicle.state != state:
-                        print("writing state to db", state, vehicle.state)
-                        vehicle.write({'state': state})
             else:
                 vehicle.location_id = False
 
-    @api.depends('lot_id.quant_ids')
+    @api.depends('lot_id.quant_ids.location_id', 'lot_id.quant_ids.quantity')
+    @api.multi
     def _get_vehicle_state(self):
-        print("!!!!!!!Quant id changed for vehicle !!!!!!!!!")
-        self.change_vehicle_state()
+        for vehicle in self:
+            print("!!!!!!!state change for vehicle !!!!!!!!!")
+            state = vehicle.state
+            quant = vehicle.lot_id.quant_ids.filtered(lambda l: l.quantity == 1)
+            print("the quant in state compute", quant)
+            if quant:
+                location_id = quant.location_id
+                if location_id and location_id.usage == 'transit':
+                    state = 'transit'
+                else:
+                    if location_id and location_id.usage == 'internal':
+                        state = 'in-stock'
+                    else:
+                        if vehicle.state != 'waiting':
+                            state = 'waiting'
+                print("before writing state to db", state, vehicle.state)
+                if vehicle.state != state:
+                    print("writing state to db", state, vehicle.state)
+                    vehicle.state = state
+            else:
+                vehicle.state = 'waiting'
 
-    # @api.depends('order_id')
-    # def _get_partner_details(self):
-    #     self.partner_id = self.order_id.partner_id
-    #     self.date_order = self.order_id.date_order
+    @api.depends('lot_id.quant_ids.location_id','lot_id.quant_ids.quantity')
+    @api.multi
+    def _get_location_details(self):
+        for vehicle in self:
+            vehicle.change_vehicle_state()
 
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            if 'lot' in vals:
-                self._create_vehicle_lot(vals)
+            self._create_vehicle_lot(vals)
+            vals['state'] = 'waiting'
         return super(Vehicle, self).create(vals_list)
 
     def _create_vehicle_lot(self, vals):
@@ -151,10 +159,6 @@ class Vehicle(models.Model):
     # def _get_vehicle_state(self):
     #     for vehicle in self:
     #         vehicle.state = 'transit'
-
-    @api.multi
-    def _get_location_details(self):
-        self.change_vehicle_state()
 
     @api.multi
     def _get_vehicle_allocation_age(self):

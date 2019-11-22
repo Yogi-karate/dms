@@ -87,24 +87,44 @@ class VehicleInventoryActions(models.TransientModel):
 
     def action_apply_deliver(self):
         vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
-        product = vehicle.product_id
-        if len(self.allocation_order_id.picking_ids) > 1:
+        order_id = vehicle.order_id
+        print("the picking in deliver of vehicle ******", order_id, order_id.picking_ids)
+        if len(order_id.picking_ids) > 1:
             raise UserError(_("Multiple Pickings. Please go to Sale order screen and receive Manually"))
         if not self.order_id.picking_ids:
             raise UserError(_("Invalid Sale order for this Vehicle"))
+        picking = order_id.picking_ids[0]
         move_line = self.sudo().env['stock.move.line'].search(
-            [('vehicle_id', '=', vehicle.id)])
-        if not move_line:
+            [('picking_id', '=', picking.id)])
+        if not move_line[0] or not len(move_line) == 1:
             raise UserError(_(
-                "There is a different Product in the Receipt. Product in Vehicle and Purchase order should be same. "))
-        move_line.write({'vehicle_id': vehicle.id, 'qty_done': 1})
+                "There is more than one move in this delivery order ...please check:"))
+        print("The location of move line is ", move_line[0].location_id)
+        if move_line[0].location_id.id != self.location_id.id:
+            raise UserError(_(
+                "The Location of vehicle is not as per sale order.Check vehicle is in location or do a transfer"))
+        move_line[0].write({'vehicle_id': vehicle.id, 'qty_done': 1})
+        picking.action_done()
         vehicle.write({'state': 'sold'})
         return
 
     def action_apply_allocate(self):
         vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
-        vehicle.write({'order_id': self.allocation_order_id.id, 'allocation_state': 'allocated',
-                       'allocation_date': fields.Date.today()})
+        product_id = vehicle.product_id
+        order_product_id = self.allocation_order_id.order_line[0].product_id
+        if product_id.id == order_product_id.id:
+            vehicle.write({'order_id': self.allocation_order_id.id, 'allocation_state': 'allocated',
+                           'allocation_date': fields.Date.today()})
+        else:
+            raise UserError(_(
+                "There is a different Product in the Sale Order. Product in Vehicle and Sale order should be same. "))
+
+        if product_id.id == order_product_id.id:
+            vehicle.write({'order_id': self.allocation_order_id.id, 'allocation_state': 'allocated',
+                           'allocation_date': fields.Date.today()})
+        else:
+            raise UserError(_(
+                "There is a different Product in the Sale Order. Product in Vehicle and Sale order should be same. "))
         return
 
     def action_apply_deallocate(self):
@@ -113,9 +133,8 @@ class VehicleInventoryActions(models.TransientModel):
         return
 
     def action_apply_transfer(self):
-        vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
-        product = vehicle.product_id
-        self._create_transfer_picking()
+        picking = self._create_transfer_picking()
+        picking.action_done()
         return
 
     @api.model
@@ -153,8 +172,11 @@ class VehicleInventoryActions(models.TransientModel):
                 ._action_assign()
 
         for move_line in picking.move_line_ids:
-            move_line.write({'qty_done': 1})
-        return True
+            print("The move line after move confirm ----", move_line)
+            print("The move line after move confirm ----", move_line.lot_id)
+            print("The move line after move confirm ----", move_line.lot_name)
+            move_line.write({'vehicle_id': self.vehicle_id.id, 'qty_done': 1})
+        return picking
 
     @api.multi
     def _prepare_stock_moves(self, picking):

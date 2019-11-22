@@ -22,11 +22,14 @@ class ServiceLeads(models.TransientModel):
                 continue
             service_lead_dict1 = self._create_service_first_leads(vehicle, service_type, today)
             if service_lead_dict1:
-                dup = self.sudo().env['dms.vehicle.lead'].search([('name','=',service_lead_dict1['name']),
-                                                                  ('partner_name', '=', service_lead_dict1['partner_name']),
-                                                                  ('mobile','=',service_lead_dict1['mobile']),
-                                                                  ('date_deadline', '=', service_lead_dict1['date_deadline']),
-                                                                  ('vehicle_id', '=', service_lead_dict1['vehicle_id'])])
+                dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict1['name']),
+                                                                  ('partner_name', '=',
+                                                                   service_lead_dict1['partner_name']),
+                                                                  ('mobile', '=', service_lead_dict1['mobile']),
+                                                                  ('date_deadline', '=',
+                                                                   service_lead_dict1['date_deadline']),
+                                                                  (
+                                                                  'vehicle_id', '=', service_lead_dict1['vehicle_id'])])
                 if not dup:
                     leads.append(service_lead_dict1)
                 else:
@@ -34,10 +37,13 @@ class ServiceLeads(models.TransientModel):
             service_lead_dict2 = self._create_service_second_leads(vehicle, service_type, today)
             if service_lead_dict2:
                 dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict2['name']),
-                                                                  ('partner_name', '=',service_lead_dict2['partner_name']),
+                                                                  ('partner_name', '=',
+                                                                   service_lead_dict2['partner_name']),
                                                                   ('mobile', '=', service_lead_dict2['mobile']),
-                                                                  ('date_deadline', '=',service_lead_dict2['date_deadline']),
-                                                                  ('vehicle_id', '=', service_lead_dict2['vehicle_id'])])
+                                                                  ('date_deadline', '=',
+                                                                   service_lead_dict2['date_deadline']),
+                                                                  (
+                                                                  'vehicle_id', '=', service_lead_dict2['vehicle_id'])])
                 if not dup:
                     leads.append(service_lead_dict2)
                 else:
@@ -45,10 +51,13 @@ class ServiceLeads(models.TransientModel):
             service_lead_dict3 = self._create_service_third_leads(vehicle, service_type, today)
             if service_lead_dict3:
                 dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict3['name']),
-                                                                  ('partner_name', '=',service_lead_dict3['partner_name']),
+                                                                  ('partner_name', '=',
+                                                                   service_lead_dict3['partner_name']),
                                                                   ('mobile', '=', service_lead_dict3['mobile']),
-                                                                  ('date_deadline', '=',service_lead_dict3['date_deadline']),
-                                                                  ('vehicle_id', '=', service_lead_dict3['vehicle_id'])])
+                                                                  ('date_deadline', '=',
+                                                                   service_lead_dict3['date_deadline']),
+                                                                  (
+                                                                  'vehicle_id', '=', service_lead_dict3['vehicle_id'])])
                 if not dup:
                     leads.append(service_lead_dict3)
                 else:
@@ -56,10 +65,13 @@ class ServiceLeads(models.TransientModel):
             service_lead_dict4 = self._create_service_paid_leads(vehicle, service_type, today)
             if service_lead_dict4:
                 dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict4['name']),
-                                                                  ('partner_name', '=',service_lead_dict4['partner_name']),
+                                                                  ('partner_name', '=',
+                                                                   service_lead_dict4['partner_name']),
                                                                   ('mobile', '=', service_lead_dict4['mobile']),
-                                                                  ('date_deadline', '=',service_lead_dict4['date_deadline']),
-                                                                  ('vehicle_id', '=', service_lead_dict4['vehicle_id'])])
+                                                                  ('date_deadline', '=',
+                                                                   service_lead_dict4['date_deadline']),
+                                                                  (
+                                                                  'vehicle_id', '=', service_lead_dict4['vehicle_id'])])
                 if not dup:
                     leads.append(service_lead_dict4)
                 else:
@@ -67,10 +79,13 @@ class ServiceLeads(models.TransientModel):
             service_lead_dict5 = self._create_service_periodic_leads(vehicle, service_type, today)
             if service_lead_dict5:
                 dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', service_lead_dict5['name']),
-                                                                  ('partner_name', '=',service_lead_dict5['partner_name']),
+                                                                  ('partner_name', '=',
+                                                                   service_lead_dict5['partner_name']),
                                                                   ('mobile', '=', service_lead_dict5['mobile']),
-                                                                  ('date_deadline', '=',service_lead_dict5['date_deadline']),
-                                                                  ('vehicle_id', '=', service_lead_dict5['vehicle_id'])])
+                                                                  ('date_deadline', '=',
+                                                                   service_lead_dict5['date_deadline']),
+                                                                  (
+                                                                  'vehicle_id', '=', service_lead_dict5['vehicle_id'])])
                 if not dup:
                     leads.append(service_lead_dict5)
                 else:
@@ -97,10 +112,13 @@ class ServiceLeads(models.TransientModel):
             insurance_lead_dict = self._create_insurance_leads(vehicle, insurance_type, today)
             if insurance_lead_dict:
                 dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', insurance_lead_dict['name']),
-                                                                  ('partner_name', '=',insurance_lead_dict['partner_name']),
+                                                                  ('partner_name', '=',
+                                                                   insurance_lead_dict['partner_name']),
                                                                   ('mobile', '=', insurance_lead_dict['mobile']),
-                                                                  ('date_deadline', '=',insurance_lead_dict['date_deadline']),
-                                                                  ('vehicle_id', '=', insurance_lead_dict['vehicle_id'])])
+                                                                  ('date_deadline', '=',
+                                                                   insurance_lead_dict['date_deadline']),
+                                                                  ('vehicle_id', '=',
+                                                                   insurance_lead_dict['vehicle_id'])])
                 if not dup:
                     leads.append(insurance_lead_dict)
                 else:
@@ -166,10 +184,11 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _allocate_insurance_user(self, leads, company):
         self_team = self.sudo().env['crm.team'].search(
-            [('team_type', '=', 'business-center-insurance-renewal'), ('user_id', '!=', False),('company_id', '=', company.id)], limit=1)
+            [('team_type', '=', 'business-center-insurance-renewal'), ('user_id', '!=', False),
+             ('company_id', '=', company.id)], limit=1)
         other_teams = self.sudo().env['crm.team'].search(
             [('team_type', '=', 'business-center-insurance-rollover'), ('member_ids', '!=', False),
-             ('user_id', '!=', False),('company_id', '=', company.id)])
+             ('user_id', '!=', False), ('company_id', '=', company.id)])
         self_leads = [lead for lead in leads if lead['source'] == 'saboo']
         other_leads = [lead for lead in leads if lead['source'] != 'saboo']
         for lead in self_leads:
@@ -315,7 +334,8 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def _process_lead_due_date(self):
-        leads = self.env['dms.vehicle.lead'].search([('current_due_date', '=', False)])
+        leads = self.env['dms.vehicle.lead'].search(
+            [('current_due_date', '=', False), ('activity_date_deadline', '!=', False)])
         for lead in leads:
             _logger.info("Checking current due date for  %s  Lead  with date %s", lead, lead.current_due_date)
             lead.current_due_date = lead.activity_date_deadline
