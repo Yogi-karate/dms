@@ -12,16 +12,16 @@
                             type="action" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting')]}"/>
                     <button name="%(vehicle.action_vehicle_allocate)d" string="Allocate"
                             type="action" class="oe_highlight"
-                            attrs="{'invisible': ['|',('allocation_state', '=', 'allocated'),('state', 'not in', ['in-stock','in-transit'])]}"/>
+                            attrs="{'invisible': ['|',('allocation_state', '=', 'allocated'),('state', 'not in', ['in-stock','transit'])]}"/>
                     <button name="%(vehicle.action_vehicle_deallocate)d" string="Deallocate"
                             type="action" class="oe_highlight"
-                            attrs="{'invisible': ['|',('allocation_state', '=', 'free'),('state', 'not in', ['in-stock','in-transit'])]}"/>
+                            attrs="{'invisible': ['|',('allocation_state', '=', 'free'),('state', 'not in', ['in-stock','transit'])]}"/>
                     <button name="%(vehicle.action_vehicle_deliver)d" string="Deliver"
                             type="action" class="oe_highlight"
                             attrs="{'invisible': ['|',('state', 'not in', ['in-stock']),('allocation_state','=','free')]}"/>
                     <button name="%(vehicle.action_vehicle_transfer)d" string="Transfer"
                             type="action" class="oe_highlight"
-                            attrs="{'invisible': [('state', 'not in', ['in-transit','in-stock'])]}"/>
+                            attrs="{'invisible': [('state', 'not in', ['transit','in-stock'])]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="waiting,transit,in-stock,sold"/>
                 </header>
                 <sheet>
