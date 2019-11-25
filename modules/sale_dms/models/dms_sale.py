@@ -83,12 +83,13 @@ class DmsSaleOrder(models.Model):
 
     def _calculate_allocation(self):
         for order in self:
+            vehicle = self.env['vehicle'].search([('order_id', '=', order.id)])
+            if vehicle:
+                order.stock_status = 'allotted'
+            else:
+                order.stock_status = 'not-allotted'
             for pick in order.picking_ids:
-                if pick.state == 'draft' or pick.state == 'confirmed' or pick.state == 'waiting':
-                    order.stock_status = 'not-allotted'
-                elif pick.state == 'assigned':
-                    order.stock_status = 'allotted'
-                elif pick.state == 'done':
+                if pick.state == 'done':
                     order.stock_status = 'delivered'
 
     def write(self, values):

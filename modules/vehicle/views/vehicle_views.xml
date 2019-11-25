@@ -9,28 +9,56 @@
             <form string="Vehicles">
                 <header>
                     <button name="%(vehicle.action_vehicle_receipt)d" string="Receive"
-                                type="action" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting')]}"/>
+                            type="action" class="oe_highlight" attrs="{'invisible': [('state', '!=', 'waiting')]}"/>
                     <button name="%(vehicle.action_vehicle_allocate)d" string="Allocate"
-                                type="action" class="oe_highlight"
-                    attrs="{'invisible': ['|',('allocation_state', '=', 'allocated'),('state', 'not in', ['in-stock','in-transit'])]}"/>
+                            type="action" class="oe_highlight"
+                            attrs="{'invisible': ['|',('allocation_state', '=', 'allocated'),('state', 'not in', ['in-stock','in-transit'])]}"/>
                     <button name="%(vehicle.action_vehicle_deallocate)d" string="Deallocate"
-                                type="action" class="oe_highlight"
-                    attrs="{'invisible': ['|',('allocation_state', '=', 'free'),('state', 'not in', ['in-stock','in-transit'])]}"/>
+                            type="action" class="oe_highlight"
+                            attrs="{'invisible': ['|',('allocation_state', '=', 'free'),('state', 'not in', ['in-stock','in-transit'])]}"/>
                     <button name="%(vehicle.action_vehicle_deliver)d" string="Deliver"
-                                type="action" class="oe_highlight" attrs="{'invisible': ['|',('state', 'not in', ['in-stock']),('allocation_state','=','free')]}"/>
+                            type="action" class="oe_highlight"
+                            attrs="{'invisible': ['|',('state', 'not in', ['in-stock']),('allocation_state','=','free')]}"/>
                     <button name="%(vehicle.action_vehicle_transfer)d" string="Transfer"
-                                type="action" class="oe_highlight"
+                            type="action" class="oe_highlight"
                             attrs="{'invisible': [('state', 'not in', ['in-transit','in-stock'])]}"/>
                     <field name="state" widget="statusbar" statusbar_visible="waiting,transit,in-stock,sold"/>
                 </header>
                 <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_sale_order" icon="fa-pencil-square-o"
+                                context="{'default_partner_id': partner_id, 'search_default_draft': 1, 'search_default_sent': 1}"
+                                attrs="{'invisible': [('order_count', '=', 0)]}">
+                                <field name="order_count" widget="statinfo" string="Sale Order"/>
+                        </button>
+                        <button class="oe_stat_button" type="object"
+                                name="action_view_purchase_order" icon="fa-pencil-square-o"
+                                attrs="{'invisible': [('purchase_count', '=', 0)]}">
+                                <field name="purchase_count" widget="statinfo" string="Purchase Order"/>
+                        </button>
+                        <button name="action_view_delivery"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                attrs="{'invisible': [('delivery_count', '=', 0)]}">
+                            <field name="delivery_count" widget="statinfo" string="Delivery"/>
+                        </button>
+                        <button name="action_view_receipt"
+                                type="object"
+                                class="oe_stat_button"
+                                icon="fa-truck"
+                                attrs="{'invisible': [('receipt_count', '=', 0)]}">
+                            <field name="receipt_count" widget="statinfo" string="Receipt"/>
+                        </button>
+                    </div>
                     <div class="oe_title">
                         <label for="name" class="oe_edit_only"/>
                         <h1>
-                            <field name="name" placeholder="e.g. LOT/0001/20121"/>
+                            <field name="name" placeholder="e.g. VEHICLE/0001/20121"/>
                         </h1>
                     </div>
-                     <group>
+                    <group>
                         <field name="allocation_state" invisible="1"></field>
                         <group string="Product Details">
                             <field name="product_id"
@@ -48,7 +76,7 @@
                             <field name="fuel_type"/>
                             <field name="age"/>
                         </group>
-                        <group string = "Allocation Details">
+                        <group string="Allocation Details">
                             <field name="partner_id" readonly="1"/>
                             <field name="order_id" readonly="1"/>
                             <field name="location_id" readonly="1"/>
@@ -97,7 +125,8 @@
         <field name="model">vehicle</field>
         <field name="arch" type="xml">
             <search string="Vehicle Filter">
-                <field name="name" string="VIN NO" filter_domain="['|',('name','ilike',self),('chassis_no','ilike',self)]"/>
+                <field name="name" string="VIN NO"
+                       filter_domain="['|',('name','ilike',self),('chassis_no','ilike',self)]"/>
                 <field name="name" string="VIN No"
                        filter_domain="['|',('name','ilike',self),('chassis_no','ilike',self)]"/>
                 <field name="product_id"/>
@@ -205,7 +234,7 @@
     </record>
 
 
-     <record id="view_vehicle_stock" model="ir.ui.view">
+    <record id="view_vehicle_stock" model="ir.ui.view">
         <field name="name">vehicle.stock.tree</field>
         <field name="model">vehicle</field>
         <field name="arch" type="xml">
@@ -214,11 +243,11 @@
                 <field name="color"/>
                 <field name="variant"/>
                 <field name="name"/>
-                <field name="age"/>
                 <field name="partner_id"/>
                 <field name="location_id"/>
                 <field name="state"/>
                 <field name="allocation_state"/>
+                <field name="age"/>
             </tree>
         </field>
     </record>
@@ -253,7 +282,8 @@
                         help="Show all Vehicles Allocated"/>
                 <group expand="0" string="Group By">
                     <filter name="group_by_product" string="Product" domain="[]" context="{'group_by':'product_id'}"/>
-                    <filter name="group_by_location_id" string="Location" domain="[]" context="{'group_by':'location_id'}"/>
+                    <filter name="group_by_location_id" string="Location" domain="[]"
+                            context="{'group_by':'location_id'}"/>
                     <filter name="group_by_state" string="Status" domain="[]" context="{'group_by':'state'}"/>
                 </group>
             </search>
@@ -261,23 +291,23 @@
     </record>
 
 
-
     <record id="action_vehicle_stock" model="ir.actions.act_window">
         <field name="name">Vehicle Inventory</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">vehicle</field>
         <field name="view_ids"
-                   eval="[(5, 0, 0),
+               eval="[(5, 0, 0),
                           (0, 0, {'view_mode': 'tree', 'view_id': ref('view_vehicle_stock')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('view_vehicle_form')})]"/>
         <field name="search_view_id" ref="search_vehicle_stock"/>
         <field name="domain">[('source','=','saboo'),('state','!=','sold')]</field>
         <field name="help" type="html">
-          <p class="o_view_nocontent_smiling_face">
-            Add a Vehicle
-          </p><p>
-            This is the list of all your current Vehicle.
-          </p>
+            <p class="o_view_nocontent_smiling_face">
+                Add a Vehicle
+            </p>
+            <p>
+                This is the list of all your current Vehicle.
+            </p>
         </field>
     </record>
     <menuitem action="vehicle.action_vehicle_stock" id="menu_action_vehicle_stock"

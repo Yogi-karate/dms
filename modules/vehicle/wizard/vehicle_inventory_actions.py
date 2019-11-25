@@ -83,6 +83,7 @@ class VehicleInventoryActions(models.TransientModel):
                 "There is a different Product in the Receipt. Product in Vehicle and Purchase order should be same. "))
         move_line.write({'qty_done': 1, 'vehicle_id': vehicle.id})
         picking.action_done()
+        vehicle.purchase_id = self.purchase_id
         return
 
     def action_apply_deliver(self):
@@ -94,18 +95,27 @@ class VehicleInventoryActions(models.TransientModel):
         if not self.order_id.picking_ids:
             raise UserError(_("Invalid Sale order for this Vehicle"))
         picking = order_id.picking_ids[0]
-        move_line = self.sudo().env['stock.move.line'].search(
-            [('picking_id', '=', picking.id)])
-        if not move_line[0] or not len(move_line) == 1:
-            raise UserError(_(
-                "There is more than one move in this delivery order ...please check:"))
-        print("The location of move line is ", move_line[0].location_id)
-        if move_line[0].location_id.id != self.location_id.id:
+
+        if picking.location_id == self.location_id or self.location_id in picking.location_id.child_ids:
+            # no move lines as availability is not there try confirming stock move
+            move = picking.move_ids_without_package[0]
+            if move:
+                print("the move is&&&&&", move)
+                move._action_confirm() \
+                    ._action_assign()
+
+            move_line = picking.move_line_ids[0]
+            if not move_line or len(move_line) > 1:
+                raise UserError(_(
+                    "Could not confirm this delivery order ...please check location and availability:"))
+            else:
+                print("The location of move line is ", move_line[0].location_id)
+                move_line[0].write({'vehicle_id': vehicle.id, 'qty_done': 1})
+                picking.action_done()
+                vehicle.write({'state': 'sold'})
+        else:
             raise UserError(_(
                 "The Location of vehicle is not as per sale order.Check vehicle is in location or do a transfer"))
-        move_line[0].write({'vehicle_id': vehicle.id, 'qty_done': 1})
-        picking.action_done()
-        vehicle.write({'state': 'sold'})
         return
 
     def action_apply_allocate(self):
@@ -172,9 +182,6 @@ class VehicleInventoryActions(models.TransientModel):
                 ._action_assign()
 
         for move_line in picking.move_line_ids:
-            print("The move line after move confirm ----", move_line)
-            print("The move line after move confirm ----", move_line.lot_id)
-            print("The move line after move confirm ----", move_line.lot_name)
             move_line.write({'vehicle_id': self.vehicle_id.id, 'qty_done': 1})
         return picking
 

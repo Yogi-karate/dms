@@ -49,6 +49,7 @@ class Vehicle(models.Model):
     fuel_type = fields.Char('Fuel Type', compute='_get_vehicle_details')
     partner_id = fields.Many2one('res.partner', compute='_get_customer_details', store=True)
     order_id = fields.Many2one('sale.order')
+    purchase_id = fields.Many2one('purchase.order')
     source = fields.Selection([
         ('od', 'Other Dealer'),
         ('saboo', 'Saboo'),
@@ -68,18 +69,37 @@ class Vehicle(models.Model):
     allocation_date = fields.Datetime('Allocation Date')
     delivery_date = fields.Datetime('Delivery Date')
     allocation_age = fields.Integer('Allocation Age', readonly=True, compute='_get_vehicle_allocation_age')
+    order_count = fields.Integer(string='Order Count', compute='_get_sale_order_count', readonly=True)
+    purchase_count = fields.Integer(string='Purchase Count', compute='_get_purchase_order_count', readonly=True)
+    delivery_count = fields.Integer(string='Delivery Count', compute='_get_sale_order_count', readonly=True)
+    receipt_count = fields.Integer(string='Receipt Count', compute='_get_purchase_order_count', readonly=True)
+
+    @api.multi
+    def _get_sale_order_count(self):
+        for vehicle in self:
+            if vehicle.order_id:
+                vehicle.order_count = 1
+                vehicle.delivery_count = 1
+            else:
+                vehicle.order_count = 0
+                vehicle.delivery_count = 0
+
+    @api.multi
+    def _get_purchase_order_count(self):
+        for vehicle in self:
+            if vehicle.purchase_id:
+                vehicle.purchase_count = 1
+                vehicle.receipt_count = 1
+            else:
+                vehicle.purchase_count = 0
+                vehicle.receipt_count = 0
 
     @api.multi
     def change_vehicle_state(self):
         for vehicle in self:
             print("-------In vehicle change location compute-------")
             if vehicle.state != 'sold':
-                quant = self.sudo().env['stock.quant'].search(
-                    [('lot_id', '=', vehicle.lot_id.id), ('quantity', '=', 1)],
-                    limit=1)
-                print(quant)
-                print(quant.lot_id)
-                print(quant.location_id)
+                quant = vehicle.lot_id.quant_ids.filtered(lambda l: l.quantity == 1)
                 if quant:
                     vehicle.location_id = quant.location_id
             else:
@@ -103,14 +123,12 @@ class Vehicle(models.Model):
                     else:
                         if vehicle.state != 'waiting':
                             state = 'waiting'
-                print("before writing state to db", state, vehicle.state)
                 if vehicle.state != state:
-                    print("writing state to db", state, vehicle.state)
                     vehicle.state = state
             else:
                 vehicle.state = 'waiting'
 
-    @api.depends('lot_id.quant_ids.location_id','lot_id.quant_ids.quantity')
+    @api.depends('lot_id.quant_ids.location_id', 'lot_id.quant_ids.quantity')
     @api.multi
     def _get_location_details(self):
         for vehicle in self:
@@ -155,11 +173,6 @@ class Vehicle(models.Model):
                 vehicle.variant = vehicle.product_id.variant_value
                 vehicle.color = vehicle.product_id.color_value
 
-    # @api.multi
-    # def _get_vehicle_state(self):
-    #     for vehicle in self:
-    #         vehicle.state = 'transit'
-
     @api.multi
     def _get_vehicle_allocation_age(self):
         today = fields.Datetime.now()
@@ -177,6 +190,69 @@ class Vehicle(models.Model):
                 vehicle.vehicle_age = 0
             else:
                 vehicle.vehicle_age = (today - vehicle.invoice_date).days
+    @api.multi
+    def action_view_sale_order(self):
+        action = self.env.ref('sale.action_orders').read()[0]
+        print(action)
+        action['views'] = [(self.env.ref('sale.view_order_form').id, 'form')]
+        action['res_id'] = self.order_id.id
+        return action
+
+    @api.multi
+    def action_view_purchase_order(self):
+        action = self.env.ref('purchase.purchase_form_action').read()[0]
+        print(action)
+        action['views'] = [(self.env.ref('purchase.purchase_order_form').id, 'form')]
+        action['res_id'] = self.purchase_id.id
+        return action
+
+    @api.multi
+    def action_view_delivery(self):
+        '''
+        This function returns an action that display existing delivery orders
+        of given sales order ids. It can either be a in a list or in a form
+        view, if there is only one delivery order to show.
+        '''
+        action = self.env.ref('stock.action_picking_tree_all').read()[0]
+        pickings = self.order_id.picking_ids
+        if len(pickings) > 1:
+            action['domain'] = [('id', 'in', pickings.ids)]
+        elif pickings:
+            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
+            action['res_id'] = self.order_id.id
+        return action
+
+    @api.multi
+    def action_view_receipt(self):
+        '''
+        This function returns an action that display existing delivery orders
+        of given sales order ids. It can either be a in a list or in a form
+        view, if there is only one delivery order to show.
+        '''
+        action = self.env.ref('stock.action_picking_tree_all').read()[0]
+        pickings = self.purchase_id.picking_ids
+        if len(pickings) > 1:
+            action['domain'] = [('id', 'in', pickings.ids)]
+        elif pickings:
+            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
+            action['res_id'] = pickings.id
+        return action
+
+    @api.multi
+    def action_view_transfers(self):
+        '''
+        This function returns an action that display existing delivery orders
+        of given sales order ids. It can either be a in a list or in a form
+        view, if there is only one delivery order to show.
+        '''
+        action = self.env.ref('stock.action_picking_tree_all').read()[0]
+        pickings = self.order_id.picking_ids
+        if len(pickings) > 1:
+            action['domain'] = [('id', 'in', pickings.ids)]
+        elif pickings:
+            action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
+            action['res_id'] = pickings.id
+        return action
 
 
 class VehicleInsurance(models.Model):
