@@ -219,7 +219,7 @@ class Vehicle(models.Model):
             action['domain'] = [('id', 'in', pickings.ids)]
         elif pickings:
             action['views'] = [(self.env.ref('stock.view_picking_form').id, 'form')]
-            action['res_id'] = self.order_id.id
+            action['res_id'] = pickings.id
         return action
 
     @api.multi
