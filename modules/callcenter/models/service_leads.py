@@ -11,7 +11,7 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def _process_service_leads(self, company):
-        vehicles = self.sudo().env['vehicle'].search([('company_id', '=', company.id), ('state', '=', 'sold')])
+        vehicles = self.sudo().env['vehicle'].search([('company_id', '=', company.id),('state', '=', 'sold')])
         service_type = self.sudo().env['dms.opportunity.type'].search(
             [('name', '=', 'Service'), ('company_id', '=', company.id)])
         today = fields.Datetime.now()
@@ -24,27 +24,27 @@ class ServiceLeads(models.TransientModel):
             if service_lead_dict1 and not self._check_duplicate(service_lead_dict1):
                 leads.append(service_lead_dict1)
             else:
-                continue
+                pass
             service_lead_dict2 = self._create_service_second_leads(vehicle, service_type, today)
             if service_lead_dict2 and not self._check_duplicate(service_lead_dict2):
                 leads.append(service_lead_dict2)
             else:
-                continue
+                pass
             service_lead_dict3 = self._create_service_third_leads(vehicle, service_type, today)
             if service_lead_dict3 and not self._check_duplicate(service_lead_dict3):
                 leads.append(service_lead_dict3)
             else:
-                continue
+                pass
             service_lead_dict4 = self._create_service_paid_leads(vehicle, service_type, today)
             if service_lead_dict4 and not self._check_duplicate(service_lead_dict4):
                 leads.append(service_lead_dict4)
             else:
-                continue
+                pass
             service_lead_dict5 = self._create_service_periodic_leads(vehicle, service_type, today)
             if service_lead_dict5 and not self._check_duplicate(service_lead_dict5):
                 leads.append(service_lead_dict5)
             else:
-                continue
+                pass
         teams = self.sudo().env['crm.team'].search(
             [('team_type', '=', 'business-center'), ('member_ids', '!=', False), ('company_id', '=', company.id)])
         for lead in leads:
@@ -80,13 +80,14 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _check_duplicate(self, lead_dict):
         dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', lead_dict['name']),
-                                                          ('partner_name', '=',
-                                                           lead_dict['partner_name']),
+                                                          ('partner_name', '=',lead_dict['partner_name']),
                                                           ('mobile', '=', lead_dict['mobile']),
                                                           ('date_deadline', '=',
                                                            lead_dict['date_deadline'])])
         if dup:
             return True
+        else:
+            return False
 
     @api.model
     def _process_insurance_leads_oct(self):
