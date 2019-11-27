@@ -8,7 +8,7 @@
     'sequence': 60,
     'summary': 'Handle Sales customization for DMS',
     'description': "Vehicle Dealership Business Domain",
-    'depends': ['base_dms', 'account','sale_management'],
+    'depends': ['base_dms', 'account', 'sale_management', 'vehicle'],
     'data': [
         'wizard/sale_booking_views.xml',
         'wizard/update_booking_details.xml',
@@ -22,6 +22,7 @@
         'report/pdf_report_templates.xml',
         'security/sale_security.xml',
         'security/ir.model.access.csv',
+        'data/booking_allotment_cron.xml',
     ],
     'installable': True,
     'auto_install': True,

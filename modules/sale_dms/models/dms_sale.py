@@ -48,13 +48,16 @@ class DmsSaleOrder(models.Model):
     stock_status = fields.Selection([
         ('delivered', 'Delivered'),
         ('allotted', 'Allotted'),
-        ('not-allotted', 'Not-Allotted'),
-    ], string='Status', compute='_calculate_allocation', default='not-allotted')
+        ('purchase-pending', 'Yet-To-Order'),
+        ('purchase-confirmed', 'Purchase Order Confirmed'),
+        ('purchase-draft', 'Purchase Order Placed'),
+    ], string='Allocation Status', compute='_calculate_allocation', default='purchase-pending', store=True)
     dob = fields.Datetime('Date of Booking')
     product_name = fields.Char('Model', compute='_calculate_product')
     product_variant = fields.Char('Variant', compute='_calculate_product')
     product_color = fields.Char('Color', compute='_calculate_product')
     balance_amount = fields.Float('Balance Amount', compute='_calculate_residual_amount')
+    booking_amt = fields.Float(' Booking Amount')
 
     @api.depends('name')
     def _compute_consultant(self):
@@ -81,20 +84,24 @@ class DmsSaleOrder(models.Model):
                 order.product_variant = first_order_line.product_id.variant_value
                 order.product_color = first_order_line.product_id.color_value
 
+    @api.depends('dob', 'delivery_date')
     def _calculate_allocation(self):
         for order in self:
-            vehicle = self.env['vehicle'].search([('order_id', '=', order.id)])
-            if vehicle:
-                order.stock_status = 'allotted'
+            if order.state == 'booked':
+                vehicle = self.sudo().env['vehicle'].search([('order_id', '=', order.id)])
+                if vehicle:
+                    order.stock_status = 'allotted'
+                else:
+                    order.stock_status = 'purchase-pending'
+                for pick in order.picking_ids:
+                    if pick.state == 'done':
+                        order.stock_status = 'delivered'
             else:
-                order.stock_status = 'not-allotted'
-            for pick in order.picking_ids:
-                if pick.state == 'done':
-                    order.stock_status = 'delivered'
+                order.state = False
 
     def write(self, values):
         self.ensure_one()
-        location_name = self.team_id.location_id.name
+        location_name = self.warehouse_id.name
         if location_name and 'state' in values and values['state'] == 'booked':
             if 'Tirumalgiri' in location_name:
                 values['name'] = self.env['ir.sequence'].next_by_code('sale.order.tir') or _('New')
@@ -295,3 +302,67 @@ class SaleCleanup(models.TransientModel):
         _logger.info("---------Order cleanup process started ---------")
         self.env['dms.order.cleanup'].search([('state', '=', 'draft')]).reassign_partner()
         _logger.info("---------Order cleanup process completed ---------")
+
+
+class DmsBookingAllocation(models.Model):
+    _name = "booking.order.allocation"
+
+    def process_allocations(self):
+        _logger.info("---------Order allocation process started ---------")
+        self._process_allocations()
+        _logger.info("---------Order allocation process completed ---------")
+
+    def _calculate_purchase_state(self, order):
+        products_to_be_allocated = {}
+        product_id = order.order_line[0].product_id
+        prod_orders = products_to_be_allocated.get(product_id, False)
+        if prod_orders:
+            prod_orders.append(order.id)
+        else:
+            products_to_be_allocated.update({order.order_line[0].product_id: [order]})
+        print("The products to be allocated are ", products_to_be_allocated)
+        for prod in products_to_be_allocated.keys():
+            print("the product we are working on is ", prod)
+            moves = self.env['stock.move'].search(
+                [('state', 'not in', ['done', 'cancel']), ('product_id', '=', prod.id),
+                 ('picking_id.picking_type_code', '=', 'incoming')])
+            remaining = len(products_to_be_allocated[prod])
+            if moves:
+                print("the count values are ", len(moves), len(products_to_be_allocated[prod]), moves)
+                if len(moves) >= len(products_to_be_allocated[prod]):
+                    # nothing to do ...mark all orders as order confirmed
+                    count = len(products_to_be_allocated[prod])
+                else:
+                    count = len(products_to_be_allocated[prod][:len(moves)])
+                    remaining = len(products_to_be_allocated[prod]) - len(moves)
+                print("the count is ", count)
+                for index in range(count):
+                    print("the count index is ", index, products_to_be_allocated[prod])
+                    products_to_be_allocated[prod][index].write({'stock_status': 'purchase-confirmed'})
+            if remaining:
+                rem_count = 0
+                purchases_lines = self.env['purchase.order.line'].search(
+                    [('order_id.state', '=', 'draft'), ('product_id', '=', prod.id)])
+                if purchases_lines:
+                    if len(purchases_lines) >= remaining:
+                        rem_count = remaining
+                    else:
+                        rem_count = remaining - len(purchases_lines)
+                else:
+                    products_to_be_allocated[prod][index].write({'stock_status': 'purchase-pending'})
+
+                print("the count of remaining orders is ", rem_count)
+
+    def _process_allocations(self):
+        orders = self.env['sale.order'].search([('state', '=', 'booked')])
+        for order in orders:
+            vehicle = self.sudo().env['vehicle'].search([('order_id', '=', order.id)])
+            if vehicle:
+                order.stock_status = 'allotted'
+                continue
+            else:
+                if order.picking_ids and order.picking_ids.state == 'done':
+                    order.stock_status = 'delivered'
+                    continue
+                else:
+                    self._calculate_purchase_state(order)

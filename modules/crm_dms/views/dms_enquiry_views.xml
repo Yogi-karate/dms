@@ -126,13 +126,11 @@
                eval="[(5, 0, 0), (0, 0, {'view_mode': 'tree', 'view_id': ref('crm.crm_lead_view_tree_activity')}),
                           (0, 0, {'view_mode': 'form', 'view_id': ref('crm.crm_case_form_view_oppor')}),
                           (0, 0, {'view_mode': 'kanban'}), (0, 0, {'view_mode': 'calendar'}), (0, 0, {'view_mode': 'pivot'}), (0, 0, {'view_mode': 'graph'})]"/>
-        <field name="domain">[('type','=','opportunity'), ('enquiry_id', '=', active_id),('activity_date_deadline',
-            '!=', False)]
+        <field name="domain">[('type','=','opportunity'), ('enquiry_id', '=', active_id)]
         </field>
         <field name="context">{
             'default_type': 'opportunity',
             'default_user_id': uid,
-            'search_default_activities_my': 1,
             }
         </field>
         <field name="help" type="html">
