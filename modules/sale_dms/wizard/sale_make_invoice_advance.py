@@ -24,7 +24,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
     @api.multi
     def create_invoices(self):
         sale_orders = self.env['sale.order'].browse(self._context.get('active_ids', []))
-        sale_orders.write({'state': 'booked', 'priority': self.priority, 'dob': self.dob})
+        sale_orders.write({'state': 'booked', 'priority': self.priority, 'dob': self.dob,'booking_amt':self.amount})
         inv = sale_orders.action_invoice_create(final=True)
         invoice = self.env['account.invoice'].search([('id', '=', inv[0])])
         invoice.action_invoice_open()

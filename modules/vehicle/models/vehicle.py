@@ -66,8 +66,8 @@ class Vehicle(models.Model):
     ], string='Allocation', readonly=True, copy=False, index=True,
         track_visibility='onchange', track_sequence=3,
         default='free', store=True)
-    allocation_date = fields.Datetime('Allocation Date')
-    delivery_date = fields.Datetime('Delivery Date')
+    allocation_date = fields.Date('Allocation Date')
+    delivery_date = fields.Date('Delivery Date')
     allocation_age = fields.Integer('Allocation Age', readonly=True, compute='_get_vehicle_allocation_age')
     order_count = fields.Integer(string='Order Count', compute='_get_sale_order_count', readonly=True)
     purchase_count = fields.Integer(string='Purchase Count', compute='_get_purchase_order_count', readonly=True)
@@ -175,7 +175,7 @@ class Vehicle(models.Model):
 
     @api.multi
     def _get_vehicle_allocation_age(self):
-        today = fields.Datetime.now()
+        today = fields.Date.today()
         for vehicle in self:
             if not vehicle.allocation_date:
                 vehicle.allocation_age = 0
@@ -184,12 +184,12 @@ class Vehicle(models.Model):
 
     @api.multi
     def _get_vehicle_age(self):
-        today = fields.Datetime.now()
+        today = fields.Date.today()
         for vehicle in self:
             if not vehicle.invoice_date:
-                vehicle.vehicle_age = 0
+                vehicle.age = 0
             else:
-                vehicle.vehicle_age = (today - vehicle.invoice_date).days
+                vehicle.age = (today - vehicle.invoice_date).days
     @api.multi
     def action_view_sale_order(self):
         action = self.env.ref('sale.action_orders').read()[0]
