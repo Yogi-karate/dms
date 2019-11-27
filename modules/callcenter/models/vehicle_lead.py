@@ -8,14 +8,10 @@ class VehicleLead(models.Model):
     _description = "Vehicle Lead"
     _inherit = ['crm.lead']
 
-    vehicle_id = fields.Many2one('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1,
+    vehicle_id = fields.Many2one('vehicle', string='Vehicle', track_visibility='onchange', track_sequence=1, required=True,
                                  index=True)
     registration_no = fields.Char('Registration No.', compute='_compute_vehicle_values', store=True)
     vin_no = fields.Char('Chassis No.', compute='_compute_vehicle_values', store=True)
-    partner_name = fields.Char(compute='_compute_vehicle_values', store=True)
-    mobile = fields.Char(compute='_compute_vehicle_values', store=True)
-    street = fields.Char(compute='_compute_vehicle_values', store=True)
-    email_from = fields.Char(compute='_compute_vehicle_values', store=True)
     dos = fields.Datetime(string='Date of Sale', compute='_compute_vehicle_values', store=True)
     source = fields.Char('Dealer', compute='_compute_vehicle_values', store=True)
     service_type = fields.Selection([
@@ -42,8 +38,12 @@ class VehicleLead(models.Model):
 
     finance_history = fields.One2many('vehicle.finance', string='Current Finance Data',
                                       compute='_process_insurance_data')
-    model = fields.Char(string='Vehicle Model', compute='get_values')
+    model = fields.Char(string='Vehicle Model', compute='_compute_vehicle_values')
     disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
+    partner_id = fields.Many2one('res.partner',compute='_computer_partner',store=True)
+    partner_name = fields.Char('Customer',compute='_computer_partner_values',store=True)
+    mobile = fields.Char('Mobile',compute='_computer_partner_values',store=True)
+
 
     @api.onchange('vehicle_id')
     def _process_insurance_data(self):
@@ -82,29 +82,47 @@ class VehicleLead(models.Model):
             if len(lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back')) > 0:
                 lead.call_state = 'call-back'
 
-    @api.depends('vehicle_id')
+    @api.depends('vehicle_id.registration_no','vehicle_id.source','vehicle_id.date_order','vehicle_id.chassis_no','vehicle_id.product_id')
     @api.multi
     def _compute_vehicle_values(self):
         for lead in self:
             lead.registration_no = lead.vehicle_id.registration_no
-        self.get_values()
-
-    @api.onchange('vehicle_id')
-    def get_values(self):
-        for lead in self:
-            lead.partner_name = lead.vehicle_id.partner_id.name
-            lead.street = lead.vehicle_id.partner_id.street
-            lead.source = lead.vehicle_id.source
-            lead.mobile = lead.vehicle_id.partner_id.mobile
-            lead.email_from = lead.vehicle_id.partner_id.email
-            lead.registration_no = lead.vehicle_id.registration_no
-            lead.vin_no = lead.vehicle_id.chassis_no
-            lead.dos = lead.vehicle_id.date_order
             lead.model = lead.vehicle_id.product_id.name
+            lead.dos = lead.vehicle_id.date_order
             sale_date = lead.vehicle_id.date_order
+            lead.vin_no = lead.vehicle_id.chassis_no
+            lead.source = lead.vehicle_id.source
             if sale_date:
                 today = fields.Datetime.now()
                 lead.date_deadline = sale_date.date().replace(year=today.year)
+        # self.get_values()
+
+    @api.depends('vehicle_id.partner_id')
+    def _computer_partner(self):
+        for lead in self:
+            lead.partner_id = lead.vehicle_id.partner_id
+    @api.depends('partner_id.name','partner_id.mobile')
+    def _computer_partner_values(self):
+        for lead in self:
+            # if not lead.partner_id:
+            #     lead.partner_name = lead.vehicle_id.partner_id.name
+            #     lead.mobile = lead.vehicle_id.partner_id.mobile
+            # else:
+                lead.partner_name = lead.partner_id.name
+                lead.mobile = lead.partner_id.mobile
+
+
+
+    # @api.onchange('vehicle_id')
+    # def get_values(self):
+    #     for lead in self:
+    #         lead.source = lead.vehicle_id.source
+    #         lead.registration_no = lead.vehicle_id.registration_no
+    #         lead.vin_no = lead.vehicle_id.chassis_no
+    #         lead.dos = lead.vehicle_id.date_order
+    #         lead.model = lead.vehicle_id.product_id.name
+    #         sale_date = lead.vehicle_id.date_order
+
 
     @api.model
     def create(self, vals):

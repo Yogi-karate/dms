@@ -225,6 +225,7 @@ class Enquiry(models.Model):
             'partner_name': self.partner_name,
             'company_id': self.env.user.company_id.id,
             'mobile': self.partner_mobile,
+            'email_from': self.partner_email,
             'enquiry_id': self.id,
             'opportunity_type': type.id,
             'date_deadline': self.date_follow_up,
