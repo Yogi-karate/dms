@@ -69,6 +69,7 @@ class DmsSaleOrder(models.Model):
         else:
             self.user_mobile = user.partner_id.phone
 
+    @api.multi
     def _calculate_residual_amount(self):
         for order in self:
             balance = 0
@@ -78,8 +79,10 @@ class DmsSaleOrder(models.Model):
 
     def _calculate_product(self):
         for order in self:
+            print(" the order lines is ", order.order_line)
             first_order_line = order.order_line[0]
             if first_order_line:
+                print(" the product id for order is ", first_order_line.product_id, order)
                 order.product_name = first_order_line.product_id.name
                 order.product_variant = first_order_line.product_id.variant_value
                 order.product_color = first_order_line.product_id.color_value
@@ -312,21 +315,16 @@ class DmsBookingAllocation(models.Model):
         self._process_allocations()
         _logger.info("---------Order allocation process completed ---------")
 
-    def _calculate_purchase_state(self, order):
-        products_to_be_allocated = {}
-        product_id = order.order_line[0].product_id
-        prod_orders = products_to_be_allocated.get(product_id, False)
-        if prod_orders:
-            prod_orders.append(order.id)
-        else:
-            products_to_be_allocated.update({order.order_line[0].product_id: [order]})
-        print("The products to be allocated are ", products_to_be_allocated)
+    def _calculate_purchase_state(self, products_to_be_allocated):
+
         for prod in products_to_be_allocated.keys():
             print("the product we are working on is ", prod)
             moves = self.env['stock.move'].search(
                 [('state', 'not in', ['done', 'cancel']), ('product_id', '=', prod.id),
                  ('picking_id.picking_type_code', '=', 'incoming')])
             remaining = len(products_to_be_allocated[prod])
+            count = 0
+            print("the moves for this prod", moves)
             if moves:
                 print("the count values are ", len(moves), len(products_to_be_allocated[prod]), moves)
                 if len(moves) >= len(products_to_be_allocated[prod]):
@@ -344,17 +342,21 @@ class DmsBookingAllocation(models.Model):
                 purchases_lines = self.env['purchase.order.line'].search(
                     [('order_id.state', '=', 'draft'), ('product_id', '=', prod.id)])
                 if purchases_lines:
+                    print("the moves for this prod", purchases_lines)
                     if len(purchases_lines) >= remaining:
                         rem_count = remaining
                     else:
                         rem_count = remaining - len(purchases_lines)
+                        for index in range(rem_count):
+                            products_to_be_allocated[prod][count + index].write({'stock_status': 'purchase-draft'})
                 else:
-                    products_to_be_allocated[prod][index].write({'stock_status': 'purchase-pending'})
-
+                    for index in range(remaining):
+                        products_to_be_allocated[prod][count + index].write({'stock_status': 'purchase-pending'})
                 print("the count of remaining orders is ", rem_count)
 
     def _process_allocations(self):
         orders = self.env['sale.order'].search([('state', '=', 'booked')])
+        products_to_be_allocated = {}
         for order in orders:
             vehicle = self.sudo().env['vehicle'].search([('order_id', '=', order.id)])
             if vehicle:
@@ -365,4 +367,12 @@ class DmsBookingAllocation(models.Model):
                     order.stock_status = 'delivered'
                     continue
                 else:
-                    self._calculate_purchase_state(order)
+                    product_id = order.order_line[0].product_id
+                    prod_orders = products_to_be_allocated.get(product_id, False)
+                    print("the prod orders ", prod_orders)
+                    if prod_orders:
+                        prod_orders.append(order)
+                    else:
+                        products_to_be_allocated.update({order.order_line[0].product_id: [order]})
+                    print("The products to be allocated are ", products_to_be_allocated)
+        self._calculate_purchase_state(products_to_be_allocated)

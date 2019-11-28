@@ -8,7 +8,7 @@
             <field name="state">code</field>
             <field name="code">model.process_allocations()</field>
             <field name="user_id" ref="base.user_admin"/>
-            <field name="interval_number">5</field>
+            <field name="interval_number">15</field>
             <field name="interval_type">minutes</field>
             <field name="numbercall">-1</field>
             <field name="doall" eval="False"/>

@@ -24,7 +24,7 @@
             <form string="Allocate Vehicle">
 
                 <group name="left" string="Select Order to Allocate">
-                    <field name="allocation_order_id" domain="[('state','in',['sale','booked'])]"
+                    <field name="allocation_order_id" domain="[('state','=','booked')]"
                     options="{'no_create_edit': True}"/>
                 </group>
                 <footer>
