@@ -104,15 +104,15 @@ class DmsSaleOrder(models.Model):
 
     def write(self, values):
         self.ensure_one()
-        location_name = self.warehouse_id.name
+        location_name = self.warehouse_id.name.lower()
         if location_name and 'state' in values and values['state'] == 'booked':
-            if 'Tirumalgiri' in location_name:
+            if 'tirumalgiri' in location_name:
                 values['name'] = self.env['ir.sequence'].next_by_code('sale.order.tir') or _('New')
-            if 'Mettuguda' in location_name:
+            if 'mettuguda' in location_name:
                 values['name'] = self.env['ir.sequence'].next_by_code('sale.order.met') or _('New')
-            if 'Ranigunj' in location_name:
-                values['name'] = self.env['ir.sequence'].next_by_code('sale.order.rani') or _('New')
-            if 'Nacharam' in location_name:
+            if 'ranigunj' in location_name:
+                values['name'] = self.env['ir.sequence'].next_by_code('sale.order.nac') or _('New')
+            if 'nacharam' in location_name:
                 values['name'] = self.env['ir.sequence'].next_by_code('sale.order.nac') or _('New')
         return super(DmsSaleOrder, self).write(values)
 
@@ -315,44 +315,34 @@ class DmsBookingAllocation(models.Model):
         self._process_allocations()
         _logger.info("---------Order allocation process completed ---------")
 
+    def _update_state(self, orders, state):
+        for order in orders:
+            print("order and state to be changed ", order, state)
+            order.write({'stock_status': state})
+
     def _calculate_purchase_state(self, products_to_be_allocated):
 
         for prod in products_to_be_allocated.keys():
             print("the product we are working on is ", prod)
+            order_list = products_to_be_allocated[prod]
             moves = self.env['stock.move'].search(
                 [('state', 'not in', ['done', 'cancel']), ('product_id', '=', prod.id),
                  ('picking_id.picking_type_code', '=', 'incoming')])
-            remaining = len(products_to_be_allocated[prod])
-            count = 0
-            print("the moves for this prod", moves)
             if moves:
-                print("the count values are ", len(moves), len(products_to_be_allocated[prod]), moves)
-                if len(moves) >= len(products_to_be_allocated[prod]):
-                    # nothing to do ...mark all orders as order confirmed
-                    count = len(products_to_be_allocated[prod])
-                else:
-                    count = len(products_to_be_allocated[prod][:len(moves)])
-                    remaining = len(products_to_be_allocated[prod]) - len(moves)
-                print("the count is ", count)
-                for index in range(count):
-                    print("the count index is ", index, products_to_be_allocated[prod])
-                    products_to_be_allocated[prod][index].write({'stock_status': 'purchase-confirmed'})
-            if remaining:
-                rem_count = 0
+                print("the orders to be confirmed", order_list[:len(moves)])
+                self._update_state(order_list[:len(moves)], 'purchase-confirmed')
+            if len(moves) < len(order_list):
                 purchases_lines = self.env['purchase.order.line'].search(
                     [('order_id.state', '=', 'draft'), ('product_id', '=', prod.id)])
                 if purchases_lines:
-                    print("the moves for this prod", purchases_lines)
-                    if len(purchases_lines) >= remaining:
-                        rem_count = remaining
-                    else:
-                        rem_count = remaining - len(purchases_lines)
-                        for index in range(rem_count):
-                            products_to_be_allocated[prod][count + index].write({'stock_status': 'purchase-draft'})
+                    draft_counter = len(moves)+len(purchases_lines)
+                    print("the orders to be draft", order_list[len(moves):draft_counter])
+                    self._update_state(order_list[len(moves):draft_counter], 'purchase-draft')
+                    if draft_counter < len(order_list):
+                        self._update_state(order_list[draft_counter:], 'purchase-pending')
                 else:
-                    for index in range(remaining):
-                        products_to_be_allocated[prod][count + index].write({'stock_status': 'purchase-pending'})
-                print("the count of remaining orders is ", rem_count)
+                    print("the orders to be yet to order", order_list[len(moves):])
+                    self._update_state(order_list[len(moves):], 'purchase-pending')
 
     def _process_allocations(self):
         orders = self.env['sale.order'].search([('state', '=', 'booked')])
@@ -374,5 +364,5 @@ class DmsBookingAllocation(models.Model):
                         prod_orders.append(order)
                     else:
                         products_to_be_allocated.update({order.order_line[0].product_id: [order]})
-                    print("The products to be allocated are ", products_to_be_allocated)
+        print("The products to be allocated are ", products_to_be_allocated)
         self._calculate_purchase_state(products_to_be_allocated)
