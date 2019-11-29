@@ -137,8 +137,8 @@ class Vehicle(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
-            self._create_vehicle_lot(vals)
-            vals['state'] = 'waiting'
+            if 'no_lot' not in vals:
+                self._create_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
 
     def _create_vehicle_lot(self, vals):
