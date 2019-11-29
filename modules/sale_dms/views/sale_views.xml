@@ -418,7 +418,8 @@
                     <field name="product_name"/>
                     <field name="product_variant"/>
                     <field name="product_color"/>
-                    <field name="state"/>
+                    <field name="partner_id" string="Customer"/>
+                    <field name="state" invisible="1"/>
                     <field name="finance_type"/>
                     <field name="financier_name"/>
                     <field name="finance_pmt"/>
@@ -450,7 +451,8 @@
                     <field name="name" string="Order Number"/>
                     <field name="partner_id"/>
                     <field name="user_id"/>
-                    <field name="team_id"/>
+                                        <field name="team_id"/>
+
                     <field name="amount_total" sum="Total Tax Included" widget="monetary"/>
                     <field name="currency_id" invisible="1"/>
                     <field name="invoice_status" invisible="1"/>

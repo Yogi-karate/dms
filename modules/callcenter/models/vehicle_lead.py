@@ -95,7 +95,11 @@ class VehicleLead(models.Model):
             lead.source = lead.vehicle_id.source
             if sale_date:
                 today = fields.Datetime.now()
-                lead.date_deadline = sale_date.date().replace(year=today.year)
+                if sale_date.date().day == 29 and sale_date.date().month == 2:
+                    lead.date_deadline = sale_date.date().replace(day=28)
+                    lead.date_deadline = lead.date_deadline.replace(year=today.year)
+                else:
+                    lead.date_deadline = sale_date.date().replace(year=today.year)
         # self.get_values()
 
     @api.depends('vehicle_id.partner_id')
