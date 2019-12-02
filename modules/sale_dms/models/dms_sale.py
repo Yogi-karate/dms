@@ -12,6 +12,36 @@ _logger = logging.getLogger(__name__)
 
 from werkzeug.urls import url_encode
 
+class AccountInvoiceLine(models.Model):
+    _name = "account.invoice.line"
+    _inherit = "account.invoice.line"
+    _description = "Invoice Line"
+    _order = "invoice_id,sequence,id"
+
+    discount_price = fields.Float('Discount', digits=dp.get_precision('Product Price'), default=0.0)
+
+    @api.one
+    @api.depends('price_unit', 'discount','discount_price', 'invoice_line_tax_ids', 'quantity',
+        'product_id', 'invoice_id.partner_id', 'invoice_id.currency_id', 'invoice_id.company_id',
+        'invoice_id.date_invoice', 'invoice_id.date')
+    def _compute_price(self):
+        currency = self.invoice_id and self.invoice_id.currency_id or None
+        if self.discount_price:
+            price = self.price_unit - self.discount_price
+        else:
+            price = self.price_unit * (1 - (self.discount or 0.0) / 100.0)
+        taxes = False
+        if self.invoice_line_tax_ids:
+            taxes = self.invoice_line_tax_ids.compute_all(price, currency, self.quantity, product=self.product_id, partner=self.invoice_id.partner_id)
+        self.price_subtotal = price_subtotal_signed = taxes['total_excluded'] if taxes else self.quantity * price
+        self.price_total = taxes['total_included'] if taxes else self.price_subtotal
+        if self.invoice_id.currency_id and self.invoice_id.currency_id != self.invoice_id.company_id.currency_id:
+            currency = self.invoice_id.currency_id
+            date = self.invoice_id._get_currency_rate_date()
+            price_subtotal_signed = currency._convert(price_subtotal_signed, self.invoice_id.company_id.currency_id, self.company_id or self.env.user.company_id, date or fields.Date.today())
+        sign = self.invoice_id.type in ['in_refund', 'out_refund'] and -1 or 1
+        self.price_subtotal_signed = price_subtotal_signed * sign
+        
 
 class DmsSaleOrder(models.Model):
     _name = "sale.order"
@@ -174,6 +204,43 @@ class DmsSaleOrderLine(models.Model):
                 line.qty_to_invoice = 0
 
     @api.multi
+    def _prepare_invoice_line(self, qty):
+        """
+        Prepare the dict of values to create the new invoice line for a sales order line.
+
+        :param qty: float quantity to invoice
+        """
+        self.ensure_one()
+        res = {}
+        account = self.product_id.property_account_income_id or self.product_id.categ_id.property_account_income_categ_id
+
+        if not account and self.product_id:
+            raise UserError(
+                _('Please define income account for this product: "%s" (id:%d) - or for its category: "%s".') %
+                (self.product_id.name, self.product_id.id, self.product_id.categ_id.name))
+
+        fpos = self.order_id.fiscal_position_id or self.order_id.partner_id.property_account_position_id
+        if fpos and account:
+            account = fpos.map_account(account)
+
+        res = {
+            'name': self.name,
+            'sequence': self.sequence,
+            'origin': self.order_id.name,
+            'account_id': account.id,
+            'price_unit': self.price_unit,
+            'quantity': qty,
+            'discount': self.discount,
+            'discount_price': self.discount_price,
+            'uom_id': self.product_uom.id,
+            'product_id': self.product_id.id or False,
+            'invoice_line_tax_ids': [(6, 0, self.tax_id.ids)],
+            'account_analytic_id': self.order_id.analytic_account_id.id,
+            'analytic_tag_ids': [(6, 0, self.analytic_tag_ids.ids)],
+            'display_type': self.display_type,
+        }
+        return res
+    @api.multi
     def action_invoice_create(self, grouped=False, final=False):
         """
         Create the invoice associated to the SO.
@@ -281,6 +348,17 @@ class SaleCleanup(models.TransientModel):
     ], string='Status', copy=False, index=True, track_visibility='onchange', track_sequence=3,
         default='draft')
 
+    @api.model
+    def discount_update(self):
+        orders = self.env['sale.order'].search([('state', '=', 'booked')])
+        for order in orders:
+            for line in order.order_line:
+                if line.discount_price:
+                    for invoice_line in line.invoice_lines:
+                        print("the invoice line is ", invoice_line)
+                        if invoice_line.price_unit == line.price_unit:
+                            invoice_line.write({'discount_price': line.discount_price})
+
     @api.multi
     def reassign_partner(self):
         _logger.info("The number of records to process =>" + str(len(self)))
@@ -321,6 +399,12 @@ class SaleCleanup(models.TransientModel):
         self.env['dms.order.cleanup'].search([('state', '=', 'draft')]).reassign_partner()
         _logger.info("---------Order cleanup process completed ---------")
 
+    @api.model
+    def order_discount_update(self):
+        _logger.info("---------Order discount update process started ---------")
+        self.discount_update()
+        _logger.info("---------Order discount update process completed ---------")
+
 
 class DmsBookingAllocation(models.Model):
     _name = "booking.order.allocation"
@@ -350,7 +434,7 @@ class DmsBookingAllocation(models.Model):
                 purchases_lines = self.env['purchase.order.line'].search(
                     [('order_id.state', '=', 'draft'), ('product_id', '=', prod.id)])
                 if purchases_lines:
-                    draft_counter = len(moves)+len(purchases_lines)
+                    draft_counter = len(moves) + len(purchases_lines)
                     print("the orders to be draft", order_list[len(moves):draft_counter])
                     self._update_state(order_list[len(moves):draft_counter], 'purchase-draft')
                     if draft_counter < len(order_list):
@@ -381,3 +465,5 @@ class DmsBookingAllocation(models.Model):
                         products_to_be_allocated.update({order.order_line[0].product_id: [order]})
         print("The products to be allocated are ", products_to_be_allocated)
         self._calculate_purchase_state(products_to_be_allocated)
+
+
