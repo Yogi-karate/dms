@@ -102,6 +102,16 @@ class DmsSaleOrder(models.Model):
             else:
                 order.state = False
 
+    @api.model
+    def _default_warehouse_id(self):
+        company = self.env.user.company_id.id
+        team_id = self.env.user.sale_team_id
+        if team_id:
+            warehouse_ids = [team_id.location_id.get_warehouse()]
+        else:
+            warehouse_ids = self.env['stock.warehouse'].search([('company_id', '=', company)], limit=1)
+        return warehouse_ids
+
     def write(self, values):
         self.ensure_one()
         location_name = self.warehouse_id.name.lower()
