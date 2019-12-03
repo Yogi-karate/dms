@@ -532,21 +532,18 @@
             <field name="name">Sales Order Mettuguda</field>
             <field name="code">sale.order.met</field>
             <field name="prefix"></field>
-        <field name="number_next">6274</field>
             <field name="company_id" eval="False"/>
         </record>
     <record id="tirumalgiri_sale_order" model="ir.sequence">
             <field name="name">Sales Order Tirumalgiri</field>
             <field name="code">sale.order.tir</field>
             <field name="prefix">T</field>
-                        <field name="number_next">2473</field>
             <field name="company_id" eval="False"/>
         </record>
     <record id="nacharam_sale_order" model="ir.sequence">
             <field name="name">Sales Order Nacharam</field>
             <field name="code">sale.order.nac</field>
             <field name="prefix">R</field>
-                <field name="number_next">3471</field>
             <field name="company_id" eval="False"/>
         </record>
 </odoo>
