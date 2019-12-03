@@ -79,7 +79,7 @@ class VehicleInventoryActions(models.TransientModel):
         move_lines = self.sudo().env['stock.move.line'].search(
             ['&', ('picking_id', '=', picking.id), ('product_id', '=', product.id), ('qty_done', '!=', 1)])
         for line in move_lines:
-            print("the line in picking------",line,line.state)
+            print("the line in picking------", line, line.state)
         if not move_lines:
             raise UserError(_(
                 "Invalid PO - There is a different Product in the Receipt. Product in Vehicle and Purchase order should be same. "))
@@ -87,6 +87,8 @@ class VehicleInventoryActions(models.TransientModel):
             move_lines[0].write({'qty_done': 1, 'vehicle_id': vehicle.id})
         else:
             move_lines.write({'qty_done': 1, 'vehicle_id': vehicle.id})
+        print("picking move lines", picking.move_line_ids_without_package.filtered(lambda l: l.qty_done != 1))
+        if not picking.move_line_ids_without_package.filtered(lambda l: l.qty_done != 1):
             picking.action_done()
         vehicle.purchase_id = self.purchase_id
         return
