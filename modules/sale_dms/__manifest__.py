@@ -13,6 +13,7 @@
         'wizard/sale_booking_views.xml',
         'wizard/update_booking_details.xml',
         'views/sale_views.xml',
+        'views/account_invoice_views.xml',
         'views/crm_team_views.xml',
         'views/pricelist_views.xml',
         'views/create_product_variant.xml',
