@@ -10,8 +10,8 @@ class Vehicle(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Vehicle'
     name = fields.Char(
-        'Engine Number', default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
-        required=True, help="Unique Vehicle Engine Number")
+        'Chassis Number', default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
+        required=True, help="Unique Vehicle Chassis Number")
     _sql_constraints = [
         ('name_ref_uniq', 'unique (name, product_id)', 'The combination of serial number and product must be unique !'),
     ]
@@ -25,6 +25,7 @@ class Vehicle(models.Model):
         ('cancel', 'Cancelled'),
     ], string='Status', readonly=True, copy=False, index=True,
         track_visibility='onchange', track_sequence=3, compute='_get_vehicle_state', store=True)
+    engine_no = fields.Char('Engine Number', help="Unique Engine number of the vehicle")
     chassis_no = fields.Char('Chassis Number', help="Unique Chasis number of the vehicle")
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
