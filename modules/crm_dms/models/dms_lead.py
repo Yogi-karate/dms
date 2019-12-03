@@ -11,12 +11,12 @@ class DmsLead(models.Model):
 
     date_deadline = fields.Date('Follow-Up Date', help="Estimate of the date on which the opportunity will be won.")
     days_open = fields.Float(compute='_compute_days_open', string='Days Open', store=True)
-    enquiry_id = fields.Many2one('dms.enquiry',string='Enquiry')
+    enquiry_id = fields.Many2one('dms.enquiry', string='Enquiry')
     opportunity_type = fields.Many2one('dms.opportunity.type', string='Opportunity Type')
-    color_value = fields.Char(compute='_compute_enquiry_values',string='Color',help ='true')
-    variant_value = fields.Char(compute='_compute_enquiry_values',string='Variant',help ='true')
-    vehicle_name = fields.Char(compute='_compute_enquiry_values',string='Vehicle',help ='true')
-    team_lead = fields.Char(compute='_compute_lead',string = 'Team Lead')
+    color_value = fields.Char(compute='_compute_enquiry_values', string='Color', help='true')
+    variant_value = fields.Char(compute='_compute_enquiry_values', string='Variant', help='true')
+    vehicle_name = fields.Char(compute='_compute_enquiry_values', string='Vehicle', help='true')
+    team_lead = fields.Char(compute='_compute_lead', string='Team Lead')
     member_values = fields.One2many('res.users', string='Team',
                                     compute='compute_member_values')
 
@@ -45,7 +45,6 @@ class DmsLead(models.Model):
         self.member_values = manager_values + member_values + team.user_id
         print(self.team_id.manager_user_ids)
 
-
     @api.depends('date_open')
     def _compute_days_open(self):
         """ Compute difference between create date and open date """
@@ -62,7 +61,7 @@ class DmsLead(models.Model):
             lead.color_value = enq.product_color.name
             lead.variant_value = enq.product_variant.name
             lead.vehicle_name = enq.product_id.name
-            print("#####################",enq.partner_name)
+            print("#####################", enq.partner_name)
             lead.partner_name = enq.partner_name
 
     @api.depends('team_id')
@@ -70,9 +69,24 @@ class DmsLead(models.Model):
         for lead in self.filtered(lambda l: l.team_id):
             lead.team_lead = lead.team_id.user_id.name
 
+    @api.depends('order_ids')
+    def _compute_sale_amount_total(self):
+        for lead in self:
+            total = 0.0
+            nbr = 0
+            company_currency = lead.company_currency or self.env.user.company_id.currency_id
+            for order in lead.order_ids:
+                if order.state in ('draft', 'sent', 'sale', 'booked'):
+                    nbr += 1
+                if order.state not in ('draft', 'sent', 'cancel'):
+                    total += order.currency_id._convert(
+                        order.amount_untaxed, company_currency, order.company_id,
+                        order.date_order or fields.Date.today())
+            lead.sale_amount_total = total
+            lead.sale_number = nbr
+
 
 class OpportunityType(models.Model):
-
     _name = "dms.opportunity.type"
     _description = "Opportunity Type"
 
@@ -80,9 +94,10 @@ class OpportunityType(models.Model):
     description = fields.Char('Description', required=True)
     active = fields.Boolean('Active', default=True)
     color = fields.Integer('Color')
-    company_id = fields.Many2one('res.company', string='Company', required=True, default=lambda self: self.env.user.company_id)
+    company_id = fields.Many2one('res.company', string='Company', required=True,
+                                 default=lambda self: self.env.user.company_id)
     team_id = fields.Many2one('crm.team', string='Default Sales Team', required=True)
-    categ_id = fields.Many2one('product.category',string="Default category", required=True)
+    categ_id = fields.Many2one('product.category', string="Default category", required=True)
     team_type = fields.Char('Team Type', compute='_get_team_type')
 
     @api.depends('team_id')
