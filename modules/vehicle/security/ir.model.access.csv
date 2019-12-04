@@ -1,6 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_vehicle_user,vehicle user,model_vehicle,group_vehicle_user,1,1,1,1
 access_vehicle_manager,vehicle manager,model_vehicle,group_vehicle_manager,1,1,1,1
+access_vehicle_manager_leads,vehicle manager_vehicle_lead,callcenter.model_dms_vehicle_lead,group_vehicle_manager,1,1,0,0
 access_vehicle_user_finance_history,vehicle user_finance,model_vehicle_finance,group_vehicle_user,1,1,1,0
 access_vehicle_user_insurance_history,vehicle user_insurance,model_vehicle_insurance,group_vehicle_user,1,1,1,0
 
