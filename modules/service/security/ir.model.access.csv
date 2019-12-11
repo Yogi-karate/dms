@@ -2,5 +2,7 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_service_booking_cord,dms service_booking_cord,callcenter.model_service_booking,group_dms_service_coordinator,1,1,0,0
 access_dms_vehicle_lead_cord,dms dms_vehicle_lead_cord,callcenter.model_dms_vehicle_lead,group_dms_service_coordinator,1,1,0,0
 access_dms_vehicle_cord,dms dms_vehicle_cord,vehicle.model_vehicle,group_dms_service_coordinator,1,1,0,0
+access_service_type_user,service_type,model_service_type,base.group_erp_manager,1,1,1,1
+access_service_schedule_user,service_schedule,model_service_schedule,base.group_erp_manager,1,1,1,1
 
 

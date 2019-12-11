@@ -11,5 +11,12 @@
     <menuitem name="Configuration" id="menu_dms_configurations_root" sequence="70"
               parent="menu_dms_root"
               />
+    <menuitem id="menu_service_root"
+              name="Service"
+              web_icon="dms,static/description/icon.png"
+              sequence="1"/>
 
+    <menuitem name="Configuration" id="menu_service_configurations_root" sequence="70"
+              parent="menu_service_root"
+              />
 </odoo>

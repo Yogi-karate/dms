@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <record id="view_service_schedule_tree" model="ir.ui.view">
+            <field name="name">service.schedule.tree</field>
+            <field name="model">service.schedule</field>
+            <field name="priority">4</field>
+            <field name="arch" type="xml">
+                <tree string="Service Schedule">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="product_id"/>
+                    <field name="parent_id"/>
+                    <field name="min_distance"/>
+                    <field name="max_distance"/>
+                    <field name="min_days"/>
+                    <field name="max_days"/>
+                    <field name="company"/>
+                    <field name="active"/>
+                    <field name="delta"/>
+                </tree>
+            </field>
+        </record>
+<record id="action_service_schedule" model="ir.actions.act_window">
+        <field name="name">Service Schedules</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">service.schedule</field>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('view_service_schedule_tree')})]"/>
+        <field name="context"></field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a Service Schedule Object
+            </p>
+            <p>
+                create Service Schedule Object
+            </p>
+        </field>
+    </record>
+<menuitem id="service_schedule_menu"
+            name="Service Schedule"
+            parent="base_dms.menu_service_root"
+              action="action_service_schedule"
+            sequence="1"/>
+</odoo>
