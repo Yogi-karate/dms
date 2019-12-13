@@ -35,11 +35,6 @@ class ServiceLeads(models.TransientModel):
                 leads.append(service_lead_dict3)
             else:
                 pass
-            service_lead_dict4 = self._create_service_paid_leads(vehicle, service_type, today)
-            if service_lead_dict4 and not self._check_duplicate(service_lead_dict4):
-                leads.append(service_lead_dict4)
-            else:
-                pass
             service_lead_dict5 = self._create_service_periodic_leads(vehicle, service_type, today)
             if service_lead_dict5 and not self._check_duplicate(service_lead_dict5):
                 leads.append(service_lead_dict5)
@@ -242,25 +237,16 @@ class ServiceLeads(models.TransientModel):
             dict = self._prepare_leads(vehicle, type, today, service_type, 7)
         return dict
 
-    def _create_service_paid_leads(self, vehicle, type, today):
-        sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
-        dict = None
-        if today + timedelta(7) == sale_date + timedelta(365) and vehicle.fuel_type == 'diesel':
-            service_type = 'paid'
-            dict = self._prepare_leads(vehicle, type, today, service_type, 7)
-        if today + timedelta(7) == sale_date + timedelta(445) and vehicle.fuel_type == 'petrol':
-            service_type = 'paid'
-            dict = self._prepare_leads(vehicle, type, today, service_type, 7)
-        return dict
+
 
     def _create_service_periodic_leads(self, vehicle, type, today):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
-        if (today + timedelta(7) - sale_date).days > 365 and (
+        if (today + timedelta(7) - sale_date).days >= 365 and (
                 today + timedelta(7) - sale_date).days % 120 == 0 and vehicle.fuel_type == 'diesel':
             service_type = 'paid'
             dict = self._prepare_leads(vehicle, type, today, service_type, 7)
-        if (today + timedelta(7) - sale_date).days > 445 and (
+        if (today + timedelta(7) - sale_date).days >= 365 and (
                 today + timedelta(7) - sale_date).days % 180 == 0 and vehicle.fuel_type == 'petrol':
             service_type = 'paid'
             dict = self._prepare_leads(vehicle, type, today, service_type, 7)
