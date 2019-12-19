@@ -180,17 +180,18 @@ class VehicleInventoryActions(models.TransientModel):
         else:
             res = self._prepare_picking()
             picking = StockPicking.create(res)
-
-        move_vals = self._prepare_stock_moves(picking)
-        for move_val in move_vals:
-            self.env['stock.move'] \
-                .create(move_val) \
-                ._action_confirm() \
-                ._action_assign()
-
-        for move_line in picking.move_line_ids:
-            move_line.write({'vehicle_id': self.vehicle_id.id, 'qty_done': 1})
-        return picking
+            move_vals = self._prepare_stock_moves(picking)
+            for move_val in move_vals:
+                move  = self.env['stock.move'] \
+                    .create(move_val) \
+                    ._action_confirm() \
+                    ._action_assign()
+            if not picking.move_line_ids:
+                raise UserError(_(
+                    "Could not transfer vehicle. Please check with Administrator"))
+            for move_line in picking.move_line_ids:
+                move_line.write({'vehicle_id': self.vehicle_id.id, 'qty_done': 1})
+            return picking
 
     @api.multi
     def _prepare_stock_moves(self, picking):
@@ -199,8 +200,6 @@ class VehicleInventoryActions(models.TransientModel):
         """
         self.ensure_one()
         res = []
-        if self.vehicle_id.product_id.type not in ['product', 'consu']:
-            return res
         template = {
             'name': self.vehicle_id.name or '',
             'product_id': self.vehicle_id.product_id.id,

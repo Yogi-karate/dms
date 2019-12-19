@@ -10,8 +10,8 @@ class Vehicle(models.Model):
     _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Vehicle'
     name = fields.Char(
-        'Chassis Number', default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
-        required=True, help="Unique Vehicle Chassis Number")
+        'Name',
+        help="Unique Vehicle Number")
     _sql_constraints = [
         ('name_ref_uniq', 'unique (name, product_id)', 'The combination of serial number and product must be unique !'),
     ]
@@ -26,7 +26,9 @@ class Vehicle(models.Model):
     ], string='Status', readonly=True, copy=False, index=True,
         track_visibility='onchange', track_sequence=3, compute='_get_vehicle_state', store=True)
     engine_no = fields.Char('Engine Number', help="Unique Engine number of the vehicle")
-    chassis_no = fields.Char('Chassis Number', help="Unique Chasis number of the vehicle")
+    chassis_no = fields.Char('Chassis Number',
+                             default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
+                             help="Unique Chasis number of the vehicle", required=True)
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
                              change_default=True, ondelete='cascade')
@@ -135,20 +137,34 @@ class Vehicle(models.Model):
         for vehicle in self:
             vehicle.change_vehicle_state()
 
+    @api.multi
+    def write(self, vals):
+        if 'chassis_no' in vals:
+            vals.update({'name': vals['chassis_no']})
+            self._update_vehicle_lot(vals)
+        return super(Vehicle, self).write(vals)
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
+            if 'chassis_no' in vals:
+                vals['name'] = vals['chassis_no']
             if 'no_lot' not in vals:
-                self._create_vehicle_lot(vals)
+                self._update_vehicle_lot(vals)
         return super(Vehicle, self).create(vals_list)
 
-    def _create_vehicle_lot(self, vals):
-        new_lot = self.env['stock.production.lot'].create({
-            'name': vals['name'],
-            'product_id': vals['product_id'],
-        })
-        vals['lot_id'] = new_lot.id
-        print("The new Lot created is " + new_lot.name)
+    @api.model
+    def _update_vehicle_lot(self, vals):
+        if not self.lot_id:
+            new_lot = self.env['stock.production.lot'].create({
+                'name': vals['name'],
+                'product_id': vals['product_id'],
+            })
+            vals['lot_id'] = new_lot.id
+            print("The new Lot created is " + new_lot.name)
+        else:
+            # update the lot with the new chassis number
+            self.lot_id.write({'name': vals['chassis_no']})
 
     @api.depends('order_id')
     @api.multi
@@ -191,6 +207,7 @@ class Vehicle(models.Model):
                 vehicle.age = 0
             else:
                 vehicle.age = (today - vehicle.invoice_date).days
+
     @api.multi
     def action_view_sale_order(self):
         action = self.env.ref('sale.action_orders').read()[0]
