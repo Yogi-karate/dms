@@ -14,10 +14,6 @@
               parent="base_dms.menu_dms_reports_root" groups="stock.group_stock_user"
               sequence="1"/>
 
-    <menuitem action="vehicle.action_vehicle_stock" id="menu_action_vehicle_stock"
-              parent="base_dms.menu_dms_reports_root" groups="stock.group_stock_user"
-              sequence="1"/>
-
     <menuitem name="Vehicle Import" id="menu_dms_vehicle_import_root" sequence="30" action="vehicle.action_import_vehicle"
              parent="base_dms.menu_dms_configurations_root"/>
 

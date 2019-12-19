@@ -29,6 +29,7 @@ class ODVehicle(models.Model):
     ignore_reason = fields.Char('Reason for Cancel')
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('dms.enquiry'))
+
     @api.model
     def create_vehicles(self):
         _logger.info("!!!!!!!!!!!!!!Starting Creation of Vehicle from Import Data!!!!!!!!!!!!!!!!")
@@ -113,7 +114,7 @@ class ODVehicle(models.Model):
 
     @api.model
     def update_vehicle_from_ref(self):
-        vehicles = self.env['vehicle'].search([('ref', '!=', False)])
+        vehicles = self.env['vehicle'].search([('ref', '!=', False), ('order_id', '=', False), ('state', '=', 'sold')])
         for vehicle in vehicles:
             order_id = self.env['sale.order'].search([('name', '=', vehicle.ref)])
             if order_id:
