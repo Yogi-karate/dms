@@ -571,4 +571,11 @@
             <field name="prefix">R</field>
             <field name="company_id" eval="False"/>
         </record>
+
+
+
+     <menuitem id="sale.menu_sale_invoicing"
+            name="To Invoice"
+            parent="sale.sale_menu_root"
+            sequence="3" groups="base.group_system"/>
 </odoo>

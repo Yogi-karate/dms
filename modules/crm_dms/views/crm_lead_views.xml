@@ -273,7 +273,11 @@
                groups="base.user_admin"
             sequence="5"/>
 
-
+<menuitem id="crm.crm_menu_report"
+            name="Reporting"
+            parent="crm.crm_menu_root"
+            sequence="20"
+             groups="base.user_admin"/>
 
 
 </odoo>
