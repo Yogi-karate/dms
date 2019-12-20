@@ -14,7 +14,6 @@ class UpdateBookingDetails(models.TransientModel):
     finance_type = fields.Selection([
         ('in', 'in-house'),
         ('out', 'out-house'),
-        ('cash','Cash'),
     ], string='Finance Type', store=True, default='in')
     financier_name = fields.Many2one('res.bank', string='Financier', help="Bank for finance")
     finance_pmt = fields.Float('Finance Amount')
