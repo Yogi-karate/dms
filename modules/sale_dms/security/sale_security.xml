@@ -1,6 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+        <record id="groups_general_manager" model="res.groups">
+            <field name="name">Sales General Manager</field>
+            <field name="comment">manager with admin credentials</field>
+            <field name="category_id" ref="base.module_category_sales_management"/>
+            <field name="implied_ids" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
+        </record>
+  <record id="groups_general_manager_teams_rule" model="ir.rule">
+        <field name="name">All Salesteam General Manager</field>
+        <field ref="sales_team.model_crm_team" name="model_id"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('groups_general_manager'))]"/>
+    </record>
 
+    <record id="sale_orders_general_manager_rule" model="ir.rule">
+        <field name="name">All Sale orders General Manager</field>
+        <field ref="sale.model_sale_order" name="model_id"/>
+        <field name="domain_force">[(1,'=',1)]</field>
+        <field name="groups" eval="[(4, ref('groups_general_manager'))]"/>
+    </record>
     <record id="sale.sale_order_see_all" model="ir.rule">
         <field name="name">All Orders</field>
         <field ref="sale.model_sale_order" name="model_id"/>
@@ -25,7 +43,6 @@
         <field name="domain_force">[('team_type','in', ['sales', 'website','insurance','finance','business-center','business-center-insurance-renewal','business-center-insurance-rollover'])]</field>
         <field name="groups" eval="[(4, ref('sales_team.group_sale_manager'))]"/>
     </record>
-
     <record id="sale_order_accounting_all" model="ir.rule">
         <field name="name">All Booking Orders</field>
         <field ref="sale.model_sale_order" name="model_id"/>
@@ -51,6 +68,8 @@
         <field name="groups" eval="[(4, ref('account.group_account_invoice'))]"/>
     </record>
 
+
+
     <record id="sale.action_quotations_with_onboarding" model="ir.actions.act_window">
             <field name="name">Quotations</field>
             <field name="type">ir.actions.act_window</field>
@@ -74,6 +93,7 @@
             action="sale.action_orders"
             parent="sale.sale_order_menu"
             sequence="2" groups="sales_team.group_sale_salesman,account.group_account_invoice"/>
+
 
 
 
