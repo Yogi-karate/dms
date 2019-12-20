@@ -252,6 +252,7 @@
             <field name="age"/>
         </tree>
     </field>
+</record>
 
     <record model="ir.ui.view" id="search_vehicle_stock">
         <field name="name">Production Lots Filter stock</field>
