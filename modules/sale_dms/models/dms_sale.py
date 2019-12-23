@@ -89,6 +89,13 @@ class DmsSaleOrder(models.Model):
     product_color = fields.Char('Color', compute='_calculate_product')
     balance_amount = fields.Float('Balance Amount', compute='_calculate_residual_amount')
     booking_amt = fields.Float(' Booking Amount')
+    product_id = fields.Many2one('product.product', string='product', compute='_calculate_product')
+
+    @api.multi
+    def _calculate_product(self):
+        for order in self:
+            if order.order_line:
+                order.product_id = order.order_line[0].product_id
 
     @api.depends('name')
     def _compute_consultant(self):

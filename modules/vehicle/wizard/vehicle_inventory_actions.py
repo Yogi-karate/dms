@@ -28,6 +28,7 @@ class VehicleInventoryActions(models.TransientModel):
     allocation_age = fields.Char("Days Allocated")
     partner_id = fields.Many2one('res.partner', string="Customer")
     transfer_date = fields.Date("Transfer Date")
+    product_id = fields.Many2one('product.product', string="product")
 
     @api.model
     def default_get(self, fields):

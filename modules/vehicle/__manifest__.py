@@ -10,6 +10,7 @@
     'description': "Vehicle Business Domain",
     'depends': ['base_dms','stock'],
     'data': [
+        'data/ir_sequence_data.xml',
         'security/vehicle_security.xml',
         'security/ir.model.access.csv',
         'wizard/vehicle_inventory_views.xml',

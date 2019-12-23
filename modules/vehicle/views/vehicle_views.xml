@@ -236,24 +236,24 @@
         </field>
     </record>
 
-<record id="view_vehicle_stock" model="ir.ui.view">
-    <field name="name">vehicle.stock.tree</field>
-    <field name="model">vehicle</field>
-    <field name="arch" type="xml">
-        <tree string="vehicles">
-            <field name="chassis_no"/>
-            <field name="model"/>
-            <field name="color"/>
-            <field name="variant"/>
-            <field name="engine_no"/>
-            <field name="partner_id"/>
-            <field name="location_id"/>
-            <field name="state"/>
-            <field name="allocation_state"/>
-            <field name="age"/>
-        </tree>
-    </field>
-</record>
+    <record id="view_vehicle_stock" model="ir.ui.view">
+        <field name="name">vehicle.stock.tree</field>
+        <field name="model">vehicle</field>
+        <field name="arch" type="xml">
+            <tree string="vehicles">
+                <field name="chassis_no"/>
+                <field name="model"/>
+                <field name="color"/>
+                <field name="variant"/>
+                <field name="engine_no"/>
+                <field name="partner_id"/>
+                <field name="location_id"/>
+                <field name="state"/>
+                <field name="allocation_state"/>
+                <field name="age"/>
+            </tree>
+        </field>
+    </record>
 
     <record model="ir.ui.view" id="search_vehicle_stock">
         <field name="name">Production Lots Filter stock</field>
