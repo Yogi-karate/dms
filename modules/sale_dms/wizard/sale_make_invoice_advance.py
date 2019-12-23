@@ -18,7 +18,7 @@ class SaleAdvancePaymentInv(models.TransientModel):
     amount = fields.Float('Down Payment Amount', help="The amount to be invoiced in advance, taxes excluded.")
     journal_id = fields.Many2one('account.journal', string='Payment Journal', required=True, domain=[('type', 'in', ('bank', 'cash'))])
     currency_id = fields.Many2one('res.currency', string='Currency', required=True, default=lambda self: self.env.user.company_id.currency_id)
-    communication = fields.Char(string='Memo')
+    communication = fields.Char(string='Remarks')
 
 
     @api.multi

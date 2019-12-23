@@ -411,7 +411,7 @@
             <field name="model">sale.order</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <tree string="Booking List" class="o_sale_order" decoration-bf="message_needaction==True" decoration-muted="state=='cancel'">
+                <tree string="Booking List" class="o_sale_order" decoration-bf="message_needaction==True" decoration-muted="state=='cancel'" create="false">
                     <field name="message_needaction" invisible="1"/>
                     <field name="name" string="Order Number"/>
                     <field name="date_order" string="Quotation Date" invisible="1"/>
@@ -578,4 +578,8 @@
             name="To Invoice"
             parent="sale.sale_menu_root"
             sequence="3" groups="base.group_system"/>
+
+            <menuitem id="sale.product_menu_catalog" name="Products" action="sale.product_template_action" parent="sale.sale_menu_root" sequence="4" groups="base.group_system"/>
+
+
 </odoo>
