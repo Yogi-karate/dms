@@ -76,6 +76,7 @@ class Vehicle(models.Model):
     purchase_count = fields.Integer(string='Purchase Count', compute='_get_purchase_order_count', readonly=True)
     delivery_count = fields.Integer(string='Delivery Count', compute='_get_sale_order_count', readonly=True)
     receipt_count = fields.Integer(string='Receipt Count', compute='_get_purchase_order_count', readonly=True)
+    active = fields.Boolean('Active',default=True)
 
     @api.multi
     def _get_sale_order_count(self):
@@ -141,7 +142,8 @@ class Vehicle(models.Model):
     def write(self, vals):
         if 'chassis_no' in vals:
             vals.update({'name': vals['chassis_no']})
-            self._update_vehicle_lot(vals)
+            if self.state != 'sold':
+                self._update_vehicle_lot(vals)
         return super(Vehicle, self).write(vals)
 
     @api.model_create_multi

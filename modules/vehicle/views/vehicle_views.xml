@@ -69,6 +69,7 @@
                             <field name="fuel_type"/>
                             <field name="source"/>
                             <field name="age"/>
+                            <field name="active"/>
                         </group>
                         <group string="Product Details">
                             <field name="product_id"

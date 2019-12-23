@@ -3,24 +3,24 @@
 
 
     <menuitem name="Vehicles" id="menu_dms_master_data_root" sequence="40"
-              parent="base_dms.menu_dms_root"
+              parent="base_dms.menu_dms_root" groups="vehicle.group_sold_vehicle_manager"
               web_icon="vehicle,static/description/icon.png"/>
 
     <!-- Vehicle Menus -->
     <menuitem action="vehicle.action_vehicle_form" id="menu_action_vehicle_form"
-              parent="menu_dms_master_data_root" groups="stock.group_stock_user"
+              parent="menu_dms_master_data_root" groups="vehicle.group_sold_vehicle_manager"
               sequence="1"/>
      <menuitem action="vehicle.action_vehicle_customer_form" id="menu_action_vehicle_customer_form"
-              parent="base_dms.menu_dms_reports_root" groups="stock.group_stock_user"
+              parent="base_dms.menu_dms_reports_root" groups="vehicle.group_sold_vehicle_manager"
               sequence="1"/>
 
     <menuitem name="Vehicle Import" id="menu_dms_vehicle_import_root" sequence="30" action="vehicle.action_import_vehicle"
-             parent="base_dms.menu_dms_configurations_root"/>
+             parent="base_dms.menu_dms_configurations_root" groups="vehicle.group_sold_vehicle_manager"/>
 
 <menuitem id="base_dms.menu_dms_root"
               name="Dms"
               web_icon="dms,static/description/icon.png"
-              sequence="1" groups="callcenter.group_dms_telecaller_insurance,callcenter.group_dms_telecaller"/>
+              sequence="1" groups="callcenter.group_dms_telecaller_insurance,callcenter.group_dms_telecaller,vehicle.group_sold_vehicle_manager"/>
     <menuitem name="Sale Order Cleanup" id="menu_dms_order_cleanup" sequence="30" action="sale_dms.action_clean_sale_orders"
              parent="base_dms.menu_dms_configurations_root" groups="stock.group_stock_manager"/>
 
