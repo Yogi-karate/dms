@@ -22,7 +22,7 @@
         <field name="model">vehicle.inventory.action</field>
         <field name="arch" type="xml">
             <form string="Allocate Vehicle">
-
+                <field name="product_id" invisible="1"/>
                 <group name="left" string="Select Order to Allocate">
                     <field name="allocation_order_id" domain="[('state','=','booked'),('product_id','=',product_id)]"
                     options="{'no_create_edit': True}"/>
