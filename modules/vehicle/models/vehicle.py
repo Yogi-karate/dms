@@ -27,7 +27,7 @@ class Vehicle(models.Model):
         track_visibility='onchange', track_sequence=3, compute='_get_vehicle_state', store=True)
     engine_no = fields.Char('Engine Number', help="Unique Engine number of the vehicle")
     chassis_no = fields.Char('Chassis Number',
-                             default=lambda self: self.env['ir.sequence'].next_by_code('stock.lot.serial'),
+                             default=lambda self: self.env['ir.sequence'].next_by_code('vehicle.chassis.number'),
                              help="Unique Chasis number of the vehicle", required=True)
     registration_no = fields.Char('Registration Number', help="Unique Registration number of the vehicle")
     lot_id = fields.Many2one('stock.production.lot', string='Vehicle Serial Number',
