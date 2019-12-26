@@ -186,7 +186,7 @@
             <field name="domain_force">['|',('team_id.manager_user_ids','in',user.id),('user_id','=',False)]</field>
             <field name="groups" eval="[(4, ref('group_dms_callcenter_manager')),(4, ref('group_dms_callcenter_manager_insurance'))]"/>
         </record>
-<record id="dms_rule_manager_done_Activity_lead" model="ir.rule">
+<record id="dms_rule_general_manager_done_Activity_lead" model="ir.rule">
             <field name="name">General Manager Done Activities Leads</field>
             <field ref="model_crm_activity_done_report" name="model_id"/>
             <field name="domain_force">[(1,'=',1)]</field>
