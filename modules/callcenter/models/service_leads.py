@@ -11,7 +11,7 @@ class ServiceLeads(models.TransientModel):
 
     @api.model
     def _process_service_leads(self, company):
-        vehicles = self.sudo().env['vehicle'].search([('company_id', '=', company.id),('state', '=', 'sold')])
+        vehicles = self.sudo().env['vehicle'].search([('company_id', '=', company.id), ('state', '=', 'sold')])
         service_type = self.sudo().env['dms.opportunity.type'].search(
             [('name', '=', 'Service'), ('company_id', '=', company.id)])
         today = fields.Datetime.now()
@@ -75,7 +75,7 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def _check_duplicate(self, lead_dict):
         dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', lead_dict['name']),
-                                                          ('partner_name', '=',lead_dict['partner_name']),
+                                                          ('partner_name', '=', lead_dict['partner_name']),
                                                           ('mobile', '=', lead_dict['mobile']),
                                                           ('date_deadline', '=',
                                                            lead_dict['date_deadline'])])
@@ -237,8 +237,6 @@ class ServiceLeads(models.TransientModel):
             dict = self._prepare_leads(vehicle, type, today, service_type, 7)
         return dict
 
-
-
     def _create_service_periodic_leads(self, vehicle, type, today):
         sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
         dict = None
@@ -348,4 +346,13 @@ class ServiceLeads(models.TransientModel):
     def _clean_service_leads(self):
         today = datetime.strptime(datetime.strftime(fields.Datetime.now(), '%Y%m%d'), '%Y%m%d')
         lead_ids = self.env['dms.vehicle.lead'].search([('create_date', '=', today)]).unlink()
+        pass
+
+    @api.model
+    def create_service_leads_new(self, autocommit=True):
+        _logger.info("!!!!!!!!!!!!!!Starting Creation of Service Leads NEW....!!!!!!!!!!!!!!!!")
+        schedules = self.env['service.schedule'].search([])
+        print("the schedules in the system are ", schedules)
+        schedules.generate_leads()
+        _logger.info("****************Finished creating Service Leads NEW ....****************")
         pass

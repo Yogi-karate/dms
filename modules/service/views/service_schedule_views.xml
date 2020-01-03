@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
                 <tree string="Service Schedule">
                     <field name="name"/>
-                    <field name="type"/>
+                    <field name="service_type"/>
                     <field name="product_id"/>
                     <field name="parent_id"/>
                     <field name="min_distance"/>
