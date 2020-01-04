@@ -85,7 +85,7 @@ class ServiceLeads(models.TransientModel):
             return False
 
     @api.model
-    def _process_insurance_leads_oct(self):
+    def _process_insurance_leads_oct(self,company):
         vehicles = self.sudo().env['vehicle'].search([('company_id', '=', company.id), ('state', '=', 'sold')])
         insurance_type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Insurance')])
         today = fields.Datetime.now()
@@ -138,16 +138,17 @@ class ServiceLeads(models.TransientModel):
     def _allocate_insurance_user(self, leads, company):
         self_team = self.sudo().env['crm.team'].search(
             [('team_type', '=', 'business-center-insurance-renewal'), ('user_id', '!=', False),
-             ('company_id', '=', company.id)], limit=1)
+             ('company_id', '=', company.id)])
         other_teams = self.sudo().env['crm.team'].search(
             [('team_type', '=', 'business-center-insurance-rollover'), ('member_ids', '!=', False),
              ('user_id', '!=', False), ('company_id', '=', company.id)])
         self_leads = [lead for lead in leads if lead['source'] == 'saboo']
         other_leads = [lead for lead in leads if lead['source'] != 'saboo']
-        for lead in self_leads:
-            lead.update({
-                'user_id': self_team.user_id.id,
-                'team_id': self_team.id})
+        # for lead in self_leads:
+        #     lead.update({
+        #         'user_id': self_team.user_id.id,
+        #         'team_id': self_team.id})
+        self._allocate_user(self_leads, self_team)
         self._allocate_user(other_leads, other_teams)
 
     @api.model
@@ -300,13 +301,14 @@ class ServiceLeads(models.TransientModel):
     @api.model
     def create_all_company_insurance_leads(self, autocommit=True):
         # self._clean_service_leads()
-        _logger.info("!!!!!!!!!!!!!!Starting Creation of All Company Service Leads!!!!!!!!!!!!!!!!")
+        _logger.info("!!!!!!!!!!!!!!Starting Creation of All Company Insurance Leads!!!!!!!!!!!!!!!!")
         # get All Child Companies
         companies = self.sudo().env['res.company'].search([('parent_id', '!=', False)])
         if companies:
             for company in companies:
+                print(company.name)
                 self._process_insurance_leads(company)
-        _logger.info("****************Finished creating All Company Service Leads****************")
+        _logger.info("****************Finished creating All Company Insurance Leads****************")
         pass
 
     @api.model

@@ -114,7 +114,7 @@ class ODVehicle(models.Model):
 
     @api.model
     def update_vehicle_from_ref(self):
-        vehicles = self.env['vehicle'].search([('ref', '!=', False), ('order_id', '=', False), ('state', '=', 'sold')])
+        vehicles = self.env['vehicle'].search([('ref', '!=', False),('state', '=', 'sold')])
         for vehicle in vehicles:
             order_id = self.env['sale.order'].search([('name', '=', vehicle.ref)])
             if order_id:
