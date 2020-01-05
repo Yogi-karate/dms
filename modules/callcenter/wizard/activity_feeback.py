@@ -27,7 +27,7 @@ class ActivityFeedback(models.TransientModel):
         return result
 
     feedback = fields.Char('Call Feedback')
-    disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
+    disposition = fields.Many2one('dms.lead.disposition', string="Disposition", required=True)
     lead_id = fields.Many2one('dms.vehicle.lead')
     activity_id = fields.Many2one('mail.activity', string="Activity")
     summary = fields.Char('Summary')
@@ -36,11 +36,7 @@ class ActivityFeedback(models.TransientModel):
 
     @api.multi
     def action_apply(self):
-        print("Applying Action")
-        #message =
-        self.activity_id.action_apply_disposition(self.feedback,self.disposition.id)
-        print(self.activity_id.res_id,"EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-            # self.lead_id.write({'disposition': self.disposition.id})
+        self.activity_id.action_apply_disposition(self.feedback, self.disposition.id)
         return
 
     @api.multi
@@ -48,5 +44,3 @@ class ActivityFeedback(models.TransientModel):
         print("Applying Rescedule")
         self.activity_id.action_feedback(self.feedback)
         return
-
-

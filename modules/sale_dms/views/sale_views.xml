@@ -20,7 +20,7 @@
                     <button name="action_confirm" id="action_confirm"
                         string="Confirm" class="btn-primary" type="object"
                         attrs="{'invisible': [('state', 'not in', ['sent'])]}"/>
-                    <button name="%(sale_dms.action_view_sale_booking_payment_inv)d" string="Book"
+                    <button name="%(sale_dms.action_view_sale_booking_payment_invs)d" string="Book"
                     type="action"
                     attrs="{'invisible': [('state', '!=', 'sale')]}" groups="account.group_account_invoice"/>
                     <button name="%(sale_dms.update_booking_details)d"

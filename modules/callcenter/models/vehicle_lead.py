@@ -165,17 +165,19 @@ class LostReason(models.Model):
 class ServiceBooking(models.Model):
     _name = "service.booking"
     _description = "Service Booking"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
     lead_id = fields.Many2one('dms.vehicle.lead', required=True)
     vehicle_id = fields.Many2one('vehicle', compute='_get_lead_values', store=True)
-    location_id = fields.Many2one('stock.location', string='Preferred location of service')
+    location_id = fields.Many2one('stock.location', string='Preferred location of service', track_visibility='onchange')
     remarks = fields.Char('Remarks')
-    dop = fields.Datetime('Date and Time of Pick-Up')
+    dop = fields.Datetime('Date and Time of Pick-Up', track_visibility='onchange')
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('service.booking'))
     booking_type = fields.Selection([
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
-    ], string='Booking Type', store=True, default='pickup')
+    ], string='Booking Type', store=True, default='pickup', track_visibility='onchange')
 
     pick_up_address = fields.Char('Pick-up Address')
     due_date = fields.Datetime(string='Service Due Date')
@@ -183,12 +185,12 @@ class ServiceBooking(models.Model):
     mobile = fields.Char('Customer number', compute='_get_lead_values', store=True)
     mail = fields.Char('Customer Mail ID', compute='_get_lead_values', store=True)
     vehicle_model = fields.Char('Model', compute='_get_lead_values', store=True)
-    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
+    user_id = fields.Many2one('res.users', string='Salesperson',
                               default=lambda self: self.env.user)
     team_id = fields.Many2one('crm.team', string='Sales Team',
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid),
-                              index=True, track_visibility='onchange')
+                              index=True)
     service_type = fields.Char('Service Type', compute='_get_lead_values')
     active = fields.Boolean(default=True)
     reg_no = fields.Char('Registration Number', compute='_get_lead_values')
@@ -196,7 +198,7 @@ class ServiceBooking(models.Model):
         ('new', 'Pending'),
         ('won', 'Reported'),
         ('lost', 'Not Reported'),
-    ], string='Status', store=True, default='new')
+    ], string='Status', store=True, default='new', track_visibility='onchange')
 
     @api.depends('lead_id')
     def _get_lead_values(self):
@@ -252,6 +254,8 @@ class ServiceBooking(models.Model):
 class InsuranceBooking(models.Model):
     _name = "insurance.booking"
     _description = "Insurance Booking"
+    _inherit = ['mail.thread', 'mail.activity.mixin']
+
     lead_id = fields.Many2one('dms.vehicle.lead', required=True)
     vehicle_id = fields.Many2one('vehicle', compute='_get_lead_values', store=True)
     service_type = fields.Char('Service Type')
@@ -266,12 +270,12 @@ class InsuranceBooking(models.Model):
     sale_date = fields.Char('Sale Date', compute='_update_booking_values', store=True)
     policy_no = fields.Char(string='Policy No')
     previous_insurance_company = fields.Many2one('res.insurance.company', string='Previous Insurance Company')
-    user_id = fields.Many2one('res.users', string='Salesperson', track_visibility='onchange',
+    user_id = fields.Many2one('res.users', string='Salesperson',
                               default=lambda self: self.env.user)
     team_id = fields.Many2one('crm.team', string='Sales Team',
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid),
-                              index=True, track_visibility='onchange')
+                              index=True)
     rollover_company = fields.Many2one('res.insurance.company', string='Current Insurance Company')
     previous_idv = fields.Char('Previous IDV')
     idv = fields.Char('IDV')
@@ -279,10 +283,10 @@ class InsuranceBooking(models.Model):
     cur_final_premium = fields.Char('Cur Final Premium')
     cur_ncb = fields.Char('Cur NCB')
     prev_ncb = fields.Char('Prev NCB')
-    cur_due_date = fields.Datetime(string='Cur Insurance Due Date')
+    cur_due_date = fields.Datetime(string='Cur Insurance Due Date', track_visibility='onchange')
     prev_due_date = fields.Datetime(string='Prev Insurance Due Date')
     discount = fields.Char('Discount')
-    dop = fields.Datetime('Date and Time of Pick-Up')
+    dop = fields.Datetime('Date and Time of Pick-Up', track_visibility='onchange')
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('insurance.booking'))
     cur_dip_or_comp = fields.Selection([
@@ -297,14 +301,14 @@ class InsuranceBooking(models.Model):
         ('pickup', 'Pick-Up'),
         ('walk', 'Walk-In'),
         ('online_payment', 'Online Payment'),
-    ], string='Cur Booking Type', store=True, default='pickup')
+    ], string='Cur Booking Type', store=True, default='pickup' , track_visibility='onchange')
 
     pick_up_address = fields.Char('Pick-up Address')
     status = fields.Selection([
         ('lost', 'Lost'),
         ('new', 'New'),
         ('won', 'Won'),
-    ], string='Status', store=True, default='new')
+    ], string='Status', store=True, default='new' , track_visibility='onchange')
 
     @api.depends('lead_id')
     def _update_booking_values(self):
