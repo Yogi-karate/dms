@@ -30,6 +30,13 @@ class ServiceSchedule(models.Model):
     user_id = fields.Many2one('res.users', string='Salesperson', index=True, track_visibility='onchange')
     company_id = fields.Many2one('res.company', string='Company',
                                  default=lambda self: self.env['res.company']._company_default_get('service.schedule'))
+    team_type = fields.Selection(
+        [('sales', 'Sales'), ('insurance', 'Insurance'), ('finance', 'Finance'), ('service', 'Service'),
+         ('business-center-insurance-rollover', 'Insurance Rollover'),
+         ('business-center-insurance-renewal', 'Insurance Renewal'),
+         ('business-center', 'Business-Center'), ('website', 'Website')], string='Team Type', default='sales',
+        required=True,
+        help="The type of this channel, it will define the resources this channel uses.")
     schedule_type = fields.Selection([
         ('period', 'Fixed Frequency'),
         ('normal', 'Time Frame'),
@@ -49,15 +56,33 @@ class ServiceSchedule(models.Model):
     max_distance = fields.Integer('Kilometers Run(Max)')
     min_days = fields.Integer('Minimum Days', required=True)
     max_days = fields.Integer('Maximum Days')
+    days = fields.Integer('Frequency')
     delta = fields.Integer('Days for followup')
     company = fields.Many2one('res.company')
     active = fields.Boolean('active', default=True)
+    product_radio = fields.Selection([
+        ('Template', 'Product Template'),
+        ('Product', 'Individual Product'),
+        ('Category','Product Category'),
+    ], string='Apply on', store=True, default='Product')
     product_type = fields.Selection([
         ('na', 'Not Applicable'),
         ('petrol', 'petrol'),
         ('diesel', 'diesel'),
         ('lpg', 'lpg'),
     ], string='Vehicle Type', store=True, default='na')
+
+    @api.onchange('product_radio')
+    def _clear(self):
+        self.product_temp_id = False
+        self.product_id = False
+        self.product_category_id = False
+
+    @api.onchange('schedule_type')
+    def _clear(self):
+        self.min_days = False
+        self.max_days = False
+        self.days = False
 
     @api.model
     def _prepare_leads(self, vehicle, type, date_follow_up, service_type, delta):
@@ -70,7 +95,7 @@ class ServiceSchedule(models.Model):
             'date_deadline': date_follow_up + timedelta(delta),
             'vehicle_id': vehicle.id,
             'type': 'lead',
-            'service_type': service_type,
+            'service_type': service_type.id,
             'vin_no': vehicle.chassis_no,
             'registration_no': vehicle.registration_no,
             'dos': vehicle.date_order,
@@ -86,7 +111,7 @@ class ServiceSchedule(models.Model):
                 "Follow up  on  <a href='#' data-oe-model='%s' data-oe-id='%d'>%s</a> for customer %s") % (
                      lead._name, lead.id, lead.name,
                      lead.partner_name),
-            date_deadline=today + timedelta(2))
+            date_deadline=today + timedelta(self.delta))
 
     @api.model
     def _allocate_user(self, leads, teams):
@@ -121,34 +146,151 @@ class ServiceSchedule(models.Model):
     @api.model
     def _generate_leads(self):
         if self.product_category_id:
-            products = self.sudo().env['product.template'].search([('categ_id', '=', self.product_category_id.id)])
-            vehicles = self.sudo().env['vehicle'].search(
-                [('product_id', 'in', products.mapped('product_variant_ids').ids), ('state', '=', 'sold'),
+            products = self.sudo().env['product.template'].with_context(active_test=False).search([('categ_id', '=', self.product_category_id.id)])
+            prods = self.sudo().env['product.product']
+            if self.product_type == 'na':
+                prods = prods.with_context(active_test=False).search([('id', 'in', products.mapped('product_variant_ids').ids)])
+            else:
+                prods = prods.with_context(active_test=False).search([('id', 'in', products.mapped('product_variant_ids').ids),('fule_type','=',self.product_type)])
+            vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
+                [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
                  ('date_order', '!=', False)])
-            print("%%%%% the vehicles", vehicles)
+            print("%%%%% the vehicles", len(vehicles))
+        elif self.product_temp_id:
+                products = self.sudo().env['product.template'].with_context(active_test=False).search([('id','=',self.product_temp_id.id)])
+                prods = self.sudo().env['product.product']
+                if self.product_type == 'na':
+                    prods = prods.with_context(active_test=False).search(
+                        [('id', 'in', products.mapped('product_variant_ids').ids)])
+                else:
+                    prods = prods.with_context(active_test=False).search(
+                        [('id', 'in', products.mapped('product_variant_ids').ids),
+                         ('fule_type', '=', self.product_type)])
+
+                vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
+                    [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
+                     ('date_order', '!=', False)])
         else:
             vehicles = self.sudo().env['vehicle'].search([('product_id', '=', self.product_id.id)])
         leads = []
         for vehicle in vehicles:
-            today = fields.Datetime.now()
+            today = fields.Datetime.now().date()
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
             diff = (today - sale_date).days
-            if not self.max_days:
-                if diff > self.min_days:
-                    dict = self._prepare_leads(vehicle, self.type.name, today, self.type.name, self.delta)
-                    leads.append(dict)
+            type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Service')])
+            if not self.days:
+                if not self.max_days:
+                    if diff > self.min_days:
+                        dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
+                        leads.append(dict)
+                else:
+                    if diff > self.min_days and diff < self.max_days:
+                        dict = self._prepare_leads(vehicle,type, today, self.service_type, self.delta)
+                        leads.append(dict)
             else:
-                if diff > self.min_days and diff < self.max_days:
-                    dict = self._prepare_leads(vehicle, self.type.name, today, self.type.name, self.delta)
+                if diff % self.days == 0:
+                    dict = self._prepare_leads(vehicle, type, today, self.service_type,self.delta)
                     leads.append(dict)
-            teams = self.sudo().env['crm.team'].search(
-                [('team_type', '=', 'business-center'), ('member_ids', '!=', False),
-                 ('company_id', '=', self.company.id)])
-            for lead in leads:
-                lead.update({'company_id': self.company.id})
-            self._allocate_user(leads, teams)
-            created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
-            for lead in created_leads:
-                self._schedule_follow_up(lead, today)
-            _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
+            if self.allocation_type == 'Round-Robin':
+                teams = self.sudo().env['crm.team'].search(
+                    [('team_type', '=', self.team_type), ('member_ids', '!=', False),
+                     ('company_id', '=', self.company.id)])
+                self._allocate_user(leads, teams)
+            elif self.allocation_type == 'Lead':
+                for lead in leads:
+                    lead.update({'user_id': self.team_id.user_id.id})
+            elif self.allocation_type == 'user':
+                for lead in leads:
+                    lead.update({'user_id': self.user_id.id})
+
+        for lead in leads:
+            lead.update({'company_id': self.company.id})
+
+        created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
+        for lead in created_leads:
+            self._schedule_follow_up(lead, today)
+        _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
+
+class ServiceSchedule(models.Model):
+    _name = 'insurance.schedule'
+    _inherit = 'service.schedule'
+    source = fields.Selection([
+        ('od', 'Other Dealer'),
+        ('saboo', 'Saboo'),
+    ], string='Source', store=True, default='saboo')
+
+    @api.model
+    def _generate_leads(self):
+        if self.product_category_id:
+            products = self.sudo().env['product.template'].with_context(active_test=False).search(
+                [('categ_id', '=', self.product_category_id.id)])
+            prods = self.sudo().env['product.product']
+            if self.product_type == 'na':
+                prods = prods.with_context(active_test=False).search(
+                    [('id', 'in', products.mapped('product_variant_ids').ids)])
+            else:
+                prods = prods.with_context(active_test=False).search(
+                    [('id', 'in', products.mapped('product_variant_ids').ids), ('fule_type', '=', self.product_type)])
+            vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
+                [('product_id', 'in', prods.ids), ('state', '=', 'sold'),('source', '=', self.source),
+                 ('date_order', '!=', False)])
+            print("%%%%% the vehicles", len(vehicles))
+        elif self.product_temp_id:
+            products = self.sudo().env['product.template'].with_context(active_test=False).search(
+                [('id', '=', self.product_temp_id.id)])
+            prods = self.sudo().env['product.product']
+            if self.product_type == 'na':
+                prods = prods.with_context(active_test=False).search(
+                    [('id', 'in', products.mapped('product_variant_ids').ids)])
+            else:
+                prods = prods.with_context(active_test=False).search(
+                    [('id', 'in', products.mapped('product_variant_ids').ids),
+                     ('fule_type', '=', self.product_type)])
+
+            vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
+                [('product_id', 'in', prods.ids), ('state', '=', 'sold'),('source', '=', self.source),
+                 ('date_order', '!=', False)])
+        else:
+            vehicles = self.sudo().env['vehicle'].search([('product_id', '=', self.product_id.id)('source', '=', self.source),])
+        leads = []
+        for vehicle in vehicles:
+            today = fields.Datetime.now().date()
+            today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
+            sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
+            diff = (today - sale_date).days
+            type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Insurance')])
+            if not self.days:
+                if not self.max_days:
+                    if diff > self.min_days:
+                        dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
+                        leads.append(dict)
+                else:
+                    if diff > self.min_days and diff < self.max_days:
+                        dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
+                        leads.append(dict)
+            else:
+                if diff % self.days == 0:
+                    dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
+                    leads.append(dict)
+            if self.allocation_type == 'Round-Robin':
+                teams = self.sudo().env['crm.team'].search(
+                    [('team_type', '=', self.team_type), ('member_ids', '!=', False),
+                     ('company_id', '=', self.company.id)])
+                self._allocate_user(leads, teams)
+            elif self.allocation_type == 'Lead':
+                for lead in leads:
+                    lead.update({'user_id': self.team_id.user_id.id})
+            elif self.allocation_type == 'user':
+                for lead in leads:
+                    lead.update({'user_id': self.user_id.id})
+
+        for lead in leads:
+            lead.update({'company_id': self.company.id})
+
+        created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
+        for lead in created_leads:
+            self._schedule_follow_up(lead, today)
+        _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
+
+

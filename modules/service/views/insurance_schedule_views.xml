@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-     <record id="view_service_schedule_form" model="ir.ui.view">
-            <field name="name">service.schedule.form</field>
-            <field name="model">service.schedule</field>
+     <record id="view_insurance_schedule_form" model="ir.ui.view">
+            <field name="name">insurance.schedule.form</field>
+            <field name="model">insurance.schedule</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <form string="Service Schedule">
+                <form string="Insurance Schedule">
                     <sheet>
                         <group>
                             <field name="name"/>
                             <field name="service_type"/>
                             <field name="schedule_type"/>
                             <field name="allocation_type"/>
+                            <field name="source"/>
                             <field name="user_id" attrs="{'invisible': [('allocation_type', '!=', 'user')]}"/>
                             <field name="team_id" attrs="{'invisible': [('allocation_type', '!=', 'Lead')]}"/>
                             <field name="team_type" attrs="{'invisible': [('allocation_type', '!=', 'Round-Robin')]}"/>
@@ -38,12 +39,12 @@
                 </form>
             </field>
         </record>
-     <record id="view_service_schedule_tree" model="ir.ui.view">
-            <field name="name">service.schedule.tree</field>
-            <field name="model">service.schedule</field>
+     <record id="view_insurance_schedule_tree" model="ir.ui.view">
+            <field name="name">insurance.schedule.tree</field>
+            <field name="model">insurance.schedule</field>
             <field name="priority">4</field>
             <field name="arch" type="xml">
-                <tree string="Service Schedule">
+                <tree string="insurance Schedule">
                     <field name="name"/>
                     <field name="service_type"/>
                     <field name="product_id"/>
@@ -58,28 +59,28 @@
                 </tree>
             </field>
         </record>
-<record id="action_service_schedule" model="ir.actions.act_window">
-        <field name="name">Service Schedules</field>
+<record id="action_insurance_schedule" model="ir.actions.act_window">
+        <field name="name">insurance Schedules</field>
         <field name="type">ir.actions.act_window</field>
-        <field name="res_model">service.schedule</field>
+        <field name="res_model">insurance.schedule</field>
         <field name="view_ids"
                eval="[(5, 0, 0),
-                           (0, 0, {'view_mode': 'tree', 'view_id': ref('view_service_schedule_tree')}),
-                           (0, 0, {'view_mode': 'form', 'view_id': ref('view_service_schedule_form')})]"/>
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('view_insurance_schedule_tree')}),
+                           (0, 0, {'view_mode': 'form', 'view_id': ref('view_insurance_schedule_form')})]"/>
         <field name="context"></field>
         <field name="domain"></field>
         <field name="help" type="html">
             <p class="o_view_nocontent_smiling_face">
-                Add a Service Schedule Object
+                Add a insurance Schedule Object
             </p>
             <p>
-                create Service Schedule Object
+                create insurance Schedule Object
             </p>
         </field>
     </record>
-<menuitem id="service_schedule_menu"
-            name="Service Schedule"
+<menuitem id="insurance_schedule_menu"
+            name="Insurance Schedule"
             parent="base_dms.menu_service_root"
-              action="action_service_schedule"
+              action="action_insurance_schedule"
             sequence="1"/>
 </odoo>

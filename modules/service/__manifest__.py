@@ -14,6 +14,7 @@
         'security/ir.model.access.csv',
         'views/service_type_views.xml',
         'views/service_schedule_views.xml',
+'views/insurance_schedule_views.xml',
     ],
 'installable': True,
     'auto_install': False,

@@ -356,3 +356,12 @@ class ServiceLeads(models.TransientModel):
         schedules.generate_leads()
         _logger.info("****************Finished creating Service Leads NEW ....****************")
         pass
+
+    @api.model
+    def create_insurance_leads_new(self, autocommit=True):
+        _logger.info("!!!!!!!!!!!!!!Starting Creation of Service Leads NEW....!!!!!!!!!!!!!!!!")
+        schedules = self.env['insurance.schedule'].search([])
+        print("the schedules in the system are ", schedules)
+        schedules.generate_leads()
+        _logger.info("****************Finished creating Service Leads NEW ....****************")
+        pass

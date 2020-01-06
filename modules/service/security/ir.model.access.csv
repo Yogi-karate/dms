@@ -3,6 +3,8 @@ access_service_booking_cord,dms service_booking_cord,callcenter.model_service_bo
 access_dms_vehicle_lead_cord,dms dms_vehicle_lead_cord,callcenter.model_dms_vehicle_lead,group_dms_service_coordinator,1,1,0,0
 access_dms_vehicle_cord,dms dms_vehicle_cord,vehicle.model_vehicle,group_dms_service_coordinator,1,1,0,0
 access_service_type_user,service_type,model_service_type,base.group_erp_manager,1,1,1,1
-access_service_schedule_user,service_schedule,model_service_schedule,base.group_erp_manager,1,1,1,1
+access_service_schedule_user,service_schedule,model_service_schedule,callcenter.group_dms_callcenter_manager,1,1,1,1
+access_insurance_schedule_user,insurance_schedule,model_insurance_schedule,callcenter.group_dms_callcenter_manager_insurance,1,1,1,1
+
 
 
