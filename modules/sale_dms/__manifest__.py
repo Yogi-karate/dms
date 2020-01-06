@@ -24,6 +24,7 @@
         'security/sale_security.xml',
         'security/ir.model.access.csv',
         'data/booking_allotment_cron.xml',
+        'views/product_attribute_views.xml',
     ],
     'installable': True,
     'auto_install': True,
