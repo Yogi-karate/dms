@@ -7,7 +7,7 @@
     'category': 'Sale',
     'sequence': 60,
     'summary': 'Insurance Module',
-    'depends': ['vehicle'],
+    'depends': ['vehicle','Schedule'],
     'description': "Insurance Module",
     'data': [
         'security/ir.model.access.csv',

@@ -53,7 +53,7 @@ class ServiceSchedule(models.Model):
                     [('id', 'in', products.mapped('product_variant_ids').ids)])
             else:
                 prods = prods.with_context(active_test=False).search(
-                    [('id', 'in', products.mapped('product_variant_ids').ids), ('fule_type', '=', self.product_type)])
+                    [('id', 'in', products.mapped('product_variant_ids').ids), ('fuel_type', '=', self.product_type)])
             vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
                 [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
                  ('date_order', '!=', False)])
@@ -81,19 +81,18 @@ class ServiceSchedule(models.Model):
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
             diff = (today - sale_date).days
-            type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Service')])
             if not self.days:
                 if not self.max_days:
                     if diff > self.min_days:
-                        dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
+                        dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
                         leads.append(dict)
                 else:
                     if diff > self.min_days and diff < self.max_days:
-                        dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
+                        dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
                         leads.append(dict)
             else:
                 if diff % self.days == 0:
-                    dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
+                    dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
                     leads.append(dict)
             if self.allocation_type == 'Round-Robin':
                 teams = self.sudo().env['crm.team'].search(

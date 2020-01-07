@@ -16,6 +16,10 @@ class InsuranceSchedule(models.Model):
         ('saboo', 'Saboo'),
     ], string='Source', store=True, default='saboo')
 
+    @api.onchange('schedule_type')
+    def _clear(self):
+        self.days = False
+
     @api.model
     def _generate_leads(self):
         if self.product_category_id:
@@ -56,20 +60,9 @@ class InsuranceSchedule(models.Model):
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
             diff = (today - sale_date).days
-            type = self.env['dms.opportunity.type'].search([('name', '=ilike', 'Insurance')])
-            if not self.days:
-                if not self.max_days:
-                    if diff > self.min_days:
-                        dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
-                        leads.append(dict)
-                else:
-                    if diff > self.min_days and diff < self.max_days:
-                        dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
-                        leads.append(dict)
-            else:
-                if diff % self.days == 0:
-                    dict = self._prepare_leads(vehicle, type, today, self.service_type, self.delta)
-                    leads.append(dict)
+            if diff % self.days == 0:
+                dict = self._prepare_leads(vehicle,today, self.service_type, self.delta)
+                leads.append(dict)
             if self.allocation_type == 'Round-Robin':
                 teams = self.sudo().env['crm.team'].search(
                     [('team_type', '=', self.team_type), ('member_ids', '!=', False),

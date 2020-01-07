@@ -7,7 +7,7 @@
     'category': 'Sale',
     'sequence': 60,
     'summary': 'Service Module',
-    'depends': ['vehicle'],
+    'depends': ['Schedule','vehicle'],
     'description': "Service Module",
     'data': [
         'security/service_security.xml',

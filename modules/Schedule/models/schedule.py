@@ -37,7 +37,7 @@ class Schedule(models.Model):
     product_temp_id = fields.Many2one('product.template')
     product_id = fields.Many2one('product.product')
     product_category_id = fields.Many2one('product.category')
-    parent_id = fields.Many2one('service.schedule')
+    parent_id = fields.Many2one('vehicle.schedule')
     days = fields.Integer('Frequency')
     delta = fields.Integer('Days for followup')
     active = fields.Boolean('active', default=True)
