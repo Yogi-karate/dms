@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+
+access_insurance_schedule_user,insurance_schedule,model_insurance_schedule,callcenter.group_dms_callcenter_manager_insurance,1,1,1,1
+
+
+

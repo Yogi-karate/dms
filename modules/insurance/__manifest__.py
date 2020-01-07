@@ -2,18 +2,16 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 {
-    'name': ' Service_DMS',
+    'name': ' Insurance_DMS',
     'version': '1.0',
     'category': 'Sale',
     'sequence': 60,
-    'summary': 'Service Module',
+    'summary': 'Insurance Module',
     'depends': ['vehicle'],
-    'description': "Service Module",
+    'description': "Insurance Module",
     'data': [
-        'security/service_security.xml',
         'security/ir.model.access.csv',
-        'views/service_type_views.xml',
-        'views/service_schedule_views.xml',
+        'views/insurance_schedule_views.xml',
     ],
     'installable': True,
     'auto_install': False,
