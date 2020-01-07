@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="product.attribute_tree_view" model="ir.ui.view">
+        <field name="name">product.attribute.tree</field>
+        <field name="model">product.attribute</field>
+        <field name="arch" type="xml">
+            <tree string="Variant Values">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="create_variant"/>
+                <field name="company_id"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="product.product_attribute_view_form" model="ir.ui.view">
+        <field name="name">product.attribute.form</field>
+        <field name="model">product.attribute</field>
+        <field name="arch" type="xml">
+            <form string="Product Attribute">
+                <group>
+                    <group name="main_fields">
+                        <label for="name" string="Attribute Name"/>
+                        <field name="name" nolabel="1"/>
+                        <field name="create_variant" widget="radio"/>
+                        <field name="company_id"/>
+                        <field name="active"/>
+                    </group>
+                </group>
+                <group name="values_ids">
+                    <label for="value_ids" string="Attribute Values"/>
+                    <field name="value_ids" widget="one2many_list" nolabel="1">
+                        <tree string="Values" editable="bottom">
+                            <field name="sequence" widget="handle"/>
+                            <field name="name"/>
+                        </tree>
+                    </field>
+                </group>
+            </form>
+        </field>
+    </record>
+
+    <record id="product.variants_tree_view" model="ir.ui.view">
+        <field name="name">product.attribute.value.tree</field>
+        <field name="model">product.attribute.value</field>
+        <field name="arch" type="xml">
+            <tree string="Variant Values" editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="attribute_id"/>
+                <field name="name"/>
+                <field name="company_id"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+</odoo>

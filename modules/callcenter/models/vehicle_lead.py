@@ -15,15 +15,16 @@ class VehicleLead(models.Model):
     vin_no = fields.Char('Chassis No.', compute='_compute_vehicle_values', store=True)
     dos = fields.Datetime(string='Date of Sale', compute='_compute_vehicle_values', store=True)
     source = fields.Char('Dealer', compute='_compute_vehicle_values', store=True)
-    service_type = fields.Selection([
-        ('first', 'First Free Service'),
-        ('second', 'Second Free Service'),
-        ('third', 'Third Free Service'),
-        ('paid', 'Paid Service'),
-        ('ar', 'Accidental Repair'),
-        ('rr', 'Running Repair'),
-        ('Insurance', 'Insurance'),
-    ], string='Service Type', store=True, default='first')
+    # service_type = fields.Selection([
+    #     ('first', 'First Free Service'),
+    #     ('second', 'Second Free Service'),
+    #     ('third', 'Third Free Service'),
+    #     ('paid', 'Paid Service'),
+    #     ('ar', 'Accidental Repair'),
+    #     ('rr', 'Running Repair'),
+    #     ('Insurance', 'Insurance'),
+    # ], string='Service Type', store=True, default='first')
+    service_type = fields.Many2one('service.type')
     lost_remarks = fields.Char('Remarks')
     call_type = fields.Char('Call Type', compute='_compute_lead_type')
     call_state = fields.Selection([
