@@ -6,7 +6,7 @@
     'version': '1.0',
     'category': 'Sale',
     'sequence': 60,
-    'summary': 'Schedule module',
+    'summary': 'DMS Schedule module',
     'description': "Vehicle Schedule Domain",
     'depends': ['vehicle','crm_dms'],
     'data': [
@@ -14,6 +14,6 @@
     ],
     'installable': True,
     'auto_install': False,
-'application': True,
+    'application': True,
 
 }

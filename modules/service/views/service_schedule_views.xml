@@ -15,7 +15,7 @@
                         <field name="user_id" attrs="{'invisible': [('allocation_type', '!=', 'user')]}"/>
                         <field name="team_id" attrs="{'invisible': [('allocation_type', '!=', 'Lead')]}"/>
                         <field name="team_type" attrs="{'invisible': [('allocation_type', '!=', 'Round-Robin')]}"/>
-                        <field name="company"/>
+                        <field name="company_id"/>
                         <field name="active"/>
                         <field name="parent_id"/>
                     </group>
@@ -52,7 +52,7 @@
                 <field name="max_distance"/>
                 <field name="min_days"/>
                 <field name="max_days"/>
-                <field name="company"/>
+                <field name="company_id"/>
                 <field name="active"/>
                 <field name="delta"/>
             </tree>
