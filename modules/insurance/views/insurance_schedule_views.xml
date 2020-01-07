@@ -25,7 +25,7 @@
                         <field name="product_id" attrs="{'invisible': [('product_radio', '!=', 'Product')]}"/>
                         <field name="product_category_id" attrs="{'invisible': [('product_radio', '!=', 'Category')]}"/>
                         <field name="product_type"/>
-                        <field name="days" attrs="{'invisible': [('schedule_type', '=', 'normal')]}"/>
+                        <field name="days"/>
                         <field name="delta"/>
                     </group>
 

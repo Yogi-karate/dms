@@ -134,8 +134,7 @@ class VehicleLead(models.Model):
         ser_type = self.sudo().env['dms.opportunity.type'].search([('id', '=', vals['opportunity_type'])])
 
         if ser_type.name == 'Insurance':
-            vals['service_type'] = 'Insurance'
-
+            vals['service_type'] = None
         result = super(VehicleLead, self).create(vals)
         return result
 

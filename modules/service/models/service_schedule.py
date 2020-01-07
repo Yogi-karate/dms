@@ -31,6 +31,12 @@ class ServiceSchedule(models.Model):
     min_days = fields.Integer('Minimum Days', required=True)
     max_days = fields.Integer('Maximum Days')
 
+    @api.onchange('product_radio')
+    def _clear(self):
+        self.product_temp_id = False
+        self.product_id = False
+        self.product_category_id = False
+
     @api.onchange('schedule_type')
     def _clear(self):
         self.min_days = False
@@ -60,7 +66,7 @@ class ServiceSchedule(models.Model):
             print("%%%%% the vehicles", len(vehicles))
         elif self.product_temp_id:
             products = self.sudo().env['product.template'].with_context(active_test=False).search(
-                [('id', '=', self.product_temp_id.id)])
+                [('name', '=', self.product_temp_id.name)])
             prods = self.sudo().env['product.product']
             if self.product_type == 'na':
                 prods = prods.with_context(active_test=False).search(
@@ -68,7 +74,7 @@ class ServiceSchedule(models.Model):
             else:
                 prods = prods.with_context(active_test=False).search(
                     [('id', 'in', products.mapped('product_variant_ids').ids),
-                     ('fule_type', '=', self.product_type)])
+                     ('fuel_type', '=', self.product_type)])
 
             vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
                 [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
@@ -97,7 +103,7 @@ class ServiceSchedule(models.Model):
             if self.allocation_type == 'Round-Robin':
                 teams = self.sudo().env['crm.team'].search(
                     [('team_type', '=', self.team_type), ('member_ids', '!=', False),
-                     ('company_id', '=', self.company.id)])
+                     ('company_id', '=', self.company_id.id)])
                 self._allocate_user(leads, teams)
             elif self.allocation_type == 'Lead':
                 for lead in leads:
@@ -107,7 +113,7 @@ class ServiceSchedule(models.Model):
                     lead.update({'user_id': self.user_id.id})
 
         for lead in leads:
-            lead.update({'company_id': self.company.id})
+            lead.update({'company_id': self.company_id.id})
 
         created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
         for lead in created_leads:
