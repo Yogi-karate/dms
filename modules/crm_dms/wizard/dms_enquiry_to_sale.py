@@ -182,7 +182,6 @@ class Lead2OpportunityPartner(models.TransientModel):
         return {
             'name': component_name,
             'type': 'service',
-            'company_id': False,
             'taxes_id': []
         }
 
