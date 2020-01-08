@@ -32,13 +32,14 @@ class ServiceSchedule(models.Model):
     max_days = fields.Integer('Maximum Days')
 
     @api.onchange('product_radio')
-    def _clear(self):
+    def _clear_product(self):
+        print("__________________________________=================================")
         self.product_temp_id = False
         self.product_id = False
         self.product_category_id = False
 
     @api.onchange('schedule_type')
-    def _clear(self):
+    def _clear_type(self):
         self.min_days = False
         self.max_days = False
         self.days = False

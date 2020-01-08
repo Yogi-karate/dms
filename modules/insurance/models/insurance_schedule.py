@@ -17,11 +17,11 @@ class InsuranceSchedule(models.Model):
     ], string='Source', store=True, default='saboo')
 
     @api.onchange('schedule_type')
-    def _clear(self):
+    def _clear_type(self):
         self.days = False
 
     @api.onchange('product_radio')
-    def _clear(self):
+    def _clear_product(self):
         self.product_temp_id = False
         self.product_id = False
         self.product_category_id = False
