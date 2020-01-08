@@ -29,13 +29,13 @@ class InsuranceSchedule(models.Model):
     def _generate_leads(self):
 
         leads = []
-        for vehicle in self._get_vehicles_for_schedule():
+        for vehicle in self._get_vehicles_for_schedule([],[('source','=',self.source)]):
             today = fields.Datetime.now().date()
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
-            diff = (today - sale_date).days
+            diff = (today + timedelta(self.offset_days) - sale_date).days
             if diff % self.days == 0:
-                dict = self._prepare_leads(vehicle, today, self.delta)
+                dict = self.prepare_leads(vehicle, today, self.delta)
                 leads.append(dict)
 
         created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(

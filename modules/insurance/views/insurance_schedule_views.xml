@@ -26,6 +26,7 @@
                         <field name="product_category_id" attrs="{'invisible': [('product_radio', '!=', 'Category')]}"/>
                         <field name="product_type"/>
                         <field name="days"/>
+                        <field name="offset_days"/>
                         <field name="delta"/>
                     </group>
 

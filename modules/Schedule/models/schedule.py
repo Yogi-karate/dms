@@ -53,6 +53,7 @@ class Schedule(models.Model):
         ('lpg', 'lpg'),
     ], string='Vehicle Type', store=True, default='na')
     opportunity_type = fields.Many2one('dms.opportunity.type')
+    offset_days = fields.Integer('Offset Days')
 
     @api.model
     def default_get(self, fields):
@@ -78,7 +79,7 @@ class Schedule(models.Model):
             'registration_no': vehicle.registration_no,
             'dos': vehicle.date_order,
             'source': vehicle.source,
-            'company_id': self.company_id
+            'company_id': self.company_id.id
         }
 
     @api.model
@@ -168,9 +169,10 @@ class Schedule(models.Model):
         prods = self.calculate_products_for_schedule(product_filters)
         filters = [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
                    ('date_order', '!=', False)]
+
         if vehicle_filters:
             filters += vehicle_filters
-        vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(vehicle_filters)
+        vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(filters)
         print("%%%%% the vehicles", len(vehicles))
         return vehicles
 
