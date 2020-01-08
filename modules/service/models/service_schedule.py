@@ -33,7 +33,6 @@ class ServiceSchedule(models.Model):
 
     @api.onchange('product_radio')
     def _clear_product(self):
-        print("__________________________________=================================")
         self.product_temp_id = False
         self.product_id = False
         self.product_category_id = False
@@ -50,40 +49,14 @@ class ServiceSchedule(models.Model):
             schedule._generate_leads()
 
     @api.model
-    def _generate_leads(self):
-        if self.product_category_id:
-            products = self.sudo().env['product.template'].with_context(active_test=False).search(
-                [('categ_id', '=', self.product_category_id.id)])
-            prods = self.sudo().env['product.product']
-            if self.product_type == 'na':
-                prods = prods.with_context(active_test=False).search(
-                    [('id', 'in', products.mapped('product_variant_ids').ids)])
-            else:
-                prods = prods.with_context(active_test=False).search(
-                    [('id', 'in', products.mapped('product_variant_ids').ids), ('fuel_type', '=', self.product_type)])
-            vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
-                [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
-                 ('date_order', '!=', False)])
-            print("%%%%% the vehicles", len(vehicles))
-        elif self.product_temp_id:
-            products = self.sudo().env['product.template'].with_context(active_test=False).search(
-                [('name', '=', self.product_temp_id.name)])
-            prods = self.sudo().env['product.product']
-            if self.product_type == 'na':
-                prods = prods.with_context(active_test=False).search(
-                    [('id', 'in', products.mapped('product_variant_ids').ids)])
-            else:
-                prods = prods.with_context(active_test=False).search(
-                    [('id', 'in', products.mapped('product_variant_ids').ids),
-                     ('fuel_type', '=', self.product_type)])
+    def _prepare_leads(self, vehicle, date_follow_up, service_type, delta):
+        lead = super(ServiceSchedule, self).prepare_leads(vehicle, date_follow_up, delta)
+        lead.update({'service_type': service_type})
 
-            vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
-                [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
-                 ('date_order', '!=', False)])
-        else:
-            vehicles = self.sudo().env['vehicle'].search([('product_id', '=', self.product_id.id)])
+    @api.model
+    def _generate_leads(self):
         leads = []
-        for vehicle in vehicles:
+        for vehicle in self._get_vehicles_for_schedule():
             today = fields.Datetime.now().date()
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
@@ -101,25 +74,8 @@ class ServiceSchedule(models.Model):
                 if diff % self.days == 0:
                     dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
                     leads.append(dict)
-            if self.allocation_type == 'Round-Robin':
-                teams = self.sudo().env['crm.team'].search(
-                    [('team_type', '=', self.team_type), ('member_ids', '!=', False),
-                     ('company_id', '=', self.company_id.id)])
-                self._allocate_user(leads, teams)
-            elif self.allocation_type == 'Lead':
-                for lead in leads:
-                    lead.update({'user_id': self.team_id.user_id.id})
-            elif self.allocation_type == 'user':
-                for lead in leads:
-                    lead.update({'user_id': self.user_id.id})
 
-        for lead in leads:
-            lead.update({'company_id': self.company_id.id})
-
-        created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
+        created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(self.allocate_users_for_schedule(leads))
         for lead in created_leads:
             self._schedule_follow_up(lead, today)
         _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
-
-
-

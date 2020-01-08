@@ -63,14 +63,8 @@ class Schedule(models.Model):
             rec['opportunity_type'] = opportunity.id
         return rec
 
-    @api.onchange('product_radio')
-    def _clear(self):
-        self.product_temp_id = False
-        self.product_id = False
-        self.product_category_id = False
-
     @api.model
-    def _prepare_leads(self, vehicle, date_follow_up, service_type, delta):
+    def prepare_leads(self, vehicle, date_follow_up, delta):
         return {
             'name': vehicle.partner_name + '-' + vehicle.product_id.name,
             'partner_name': vehicle.partner_name,
@@ -80,11 +74,11 @@ class Schedule(models.Model):
             'date_deadline': date_follow_up + timedelta(delta),
             'vehicle_id': vehicle.id,
             'type': 'lead',
-            'service_type': service_type.id,
             'vin_no': vehicle.chassis_no,
             'registration_no': vehicle.registration_no,
             'dos': vehicle.date_order,
-            'source': vehicle.source
+            'source': vehicle.source,
+            'company_id': self.company_id
         }
 
     @api.model
@@ -129,73 +123,58 @@ class Schedule(models.Model):
             schedule._generate_leads()
 
     @api.model
-    def _generate_leads(self):
+    def allocate_users_for_schedule(self, leads):
+        if self.allocation_type == 'Round-Robin':
+            teams = self.sudo().env['crm.team'].search(
+                [('team_type', '=', self.team_type), ('member_ids', '!=', False),
+                 ('company_id', '=', self.company_id.id)])
+            self._allocate_user(leads, teams)
+        elif self.allocation_type == 'Lead':
+            for lead in leads:
+                lead.update({'user_id': self.team_id.user_id.id})
+        elif self.allocation_type == 'user':
+            for lead in leads:
+                lead.update({'user_id': self.user_id.id})
+        return leads
+
+    @api.model
+    def calculate_products_for_schedule(self, additional_filters):
+        product_product = self.sudo().env['product.product']
         if self.product_category_id:
-            products = self.sudo().env['product.template'].with_context(active_test=False).search(
+            product_template = self.sudo().env['product.template'].with_context(active_test=False).search(
                 [('categ_id', '=', self.product_category_id.id)])
-            prods = self.sudo().env['product.product']
             if self.product_type == 'na':
-                prods = prods.with_context(active_test=False).search(
-                    [('id', 'in', products.mapped('product_variant_ids').ids)])
+                prods = product_product.with_context(active_test=False).search(
+                    [('id', 'in', product_template.mapped('product_variant_ids').ids)])
             else:
-                prods = prods.with_context(active_test=False).search(
-                    [('id', 'in', products.mapped('product_variant_ids').ids), ('fule_type', '=', self.product_type)])
-            vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
-                [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
-                 ('date_order', '!=', False)])
-            print("%%%%% the vehicles", len(vehicles))
+                prods = product_product.with_context(active_test=False).search(
+                    [('id', 'in', product_template.mapped('product_variant_ids').ids), ('fuel_type', '=', self.product_type)])
         elif self.product_temp_id:
             products = self.sudo().env['product.template'].with_context(active_test=False).search(
                 [('id', '=', self.product_temp_id.id)])
-            prods = self.sudo().env['product.product']
             if self.product_type == 'na':
-                prods = prods.with_context(active_test=False).search(
+                prods = product_product.with_context(active_test=False).search(
                     [('id', 'in', products.mapped('product_variant_ids').ids)])
             else:
-                prods = prods.with_context(active_test=False).search(
+                prods = product_product.with_context(active_test=False).search(
                     [('id', 'in', products.mapped('product_variant_ids').ids),
-                     ('fule_type', '=', self.product_type)])
-
-            vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(
-                [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
-                 ('date_order', '!=', False)])
+                     ('fuel_type', '=', self.product_type)])
         else:
-            vehicles = self.sudo().env['vehicle'].search([('product_id', '=', self.product_id.id)])
-        leads = []
-        for vehicle in vehicles:
-            today = fields.Datetime.now().date()
-            today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
-            sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
-            diff = (today - sale_date).days
-            if not self.days:
-                if not self.max_days:
-                    if diff > self.min_days:
-                        dict = self._prepare_leads(vehicle,today, self.service_type, self.delta)
-                        leads.append(dict)
-                else:
-                    if diff > self.min_days and diff < self.max_days:
-                        dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
-                        leads.append(dict)
-            else:
-                if diff % self.days == 0:
-                    dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
-                    leads.append(dict)
-            if self.allocation_type == 'Round-Robin':
-                teams = self.sudo().env['crm.team'].search(
-                    [('team_type', '=', self.team_type), ('member_ids', '!=', False),
-                     ('company_id', '=', self.company.id)])
-                self._allocate_user(leads, teams)
-            elif self.allocation_type == 'Lead':
-                for lead in leads:
-                    lead.update({'user_id': self.team_id.user_id.id})
-            elif self.allocation_type == 'user':
-                for lead in leads:
-                    lead.update({'user_id': self.user_id.id})
+            prods = self.product_id
+        return prods
 
-        for lead in leads:
-            lead.update({'company_id': self.company.id})
+    @api.model
+    def _get_vehicles_for_schedule(self, product_filters, vehicle_filters):
+        prods = self.calculate_products_for_schedule(product_filters)
+        filters = [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
+                   ('date_order', '!=', False)]
+        if vehicle_filters:
+            filters += vehicle_filters
+        vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(vehicle_filters)
+        print("%%%%% the vehicles", len(vehicles))
+        return vehicles
 
-        created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(leads)
-        for lead in created_leads:
-            self._schedule_follow_up(lead, today)
-        _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
+    @api.model
+    def _generate_leads(self):
+        # Need child class to implement this.
+        pass
