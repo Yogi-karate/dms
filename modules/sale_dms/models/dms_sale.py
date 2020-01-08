@@ -91,6 +91,9 @@ class DmsSaleOrder(models.Model):
     booking_amt = fields.Float(' Booking Amount')
     product_id = fields.Many2one('product.product', string='product', compute='_calculate_product')
 
+    def _get_forbidden_state_confirm(self):
+        return {'done', 'cancel','booked'}
+
     @api.multi
     def _calculate_product(self):
         for order in self:
