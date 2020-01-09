@@ -55,6 +55,18 @@ class ServiceSchedule(models.Model):
         return lead
 
     @api.model
+    def _check_duplicate(self, lead_dict):
+        dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', lead_dict['name']),
+                                                          ('partner_name', '=', lead_dict['partner_name']),
+                                                          ('mobile', '=', lead_dict['mobile']),
+                                                          ('date_deadline', '=',
+                                                           lead_dict['date_deadline'])])
+        if dup:
+            return True
+        else:
+            return False
+
+    @api.model
     def _generate_leads(self):
         leads = []
         today = fields.Datetime.now().date()
@@ -66,15 +78,18 @@ class ServiceSchedule(models.Model):
                 if not self.max_days:
                     if diff == self.min_days:
                         dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
-                        leads.append(dict)
+                        if not self._check_duplicate(dict):
+                            leads.append(dict)
                 else:
                     if diff > self.min_days and diff < self.max_days:
                         dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
-                        leads.append(dict)
+                        if not self._check_duplicate(dict):
+                            leads.append(dict)
             else:
                 if diff % self.days == 0:
                     dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
-                    leads.append(dict)
+                    if not self._check_duplicate(dict):
+                        leads.append(dict)
         print("The leads generated are &&&&&&&&&&&&&&&&&", leads)
         if leads:
             created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(

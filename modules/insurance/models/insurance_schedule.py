@@ -26,6 +26,18 @@ class InsuranceSchedule(models.Model):
         self.product_category_id = False
 
     @api.model
+    def _check_duplicate(self, lead_dict):
+        dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', lead_dict['name']),
+                                                          ('partner_name', '=', lead_dict['partner_name']),
+                                                          ('mobile', '=', lead_dict['mobile']),
+                                                          ('date_deadline', '=',
+                                                           lead_dict['date_deadline'])])
+        if dup:
+            return True
+        else:
+            return False
+
+    @api.model
     def _generate_leads(self):
 
         leads = []
@@ -36,7 +48,8 @@ class InsuranceSchedule(models.Model):
             diff = (today + timedelta(self.offset_days) - sale_date).days
             if diff % self.days == 0:
                 dict = self.prepare_leads(vehicle, today, self.delta)
-                leads.append(dict)
+                if not self._check_duplicate(dict):
+                        leads.append(dict)
 
         created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(
             self.allocate_users_for_schedule(leads))
