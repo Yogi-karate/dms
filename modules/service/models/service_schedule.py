@@ -57,8 +57,8 @@ class ServiceSchedule(models.Model):
     @api.model
     def _generate_leads(self):
         leads = []
+        today = fields.Datetime.now().date()
         for vehicle in self._get_vehicles_for_schedule(None, None):
-            today = fields.Datetime.now().date()
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
             diff = (today - sale_date).days
