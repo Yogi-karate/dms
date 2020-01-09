@@ -100,6 +100,13 @@ class DmsSaleOrder(models.Model):
             if order.order_line:
                 order.product_id = order.order_line[0].product_id
 
+    @api.multi
+    def action_cancel(self):
+        if self.state == 'booked' and self.balance_amount > 0:
+            raise UserError(
+                _('You cannot cancel a booking unless credit note is created'))
+        return self.write({'state': 'cancel'})
+
     @api.depends('name')
     def _compute_consultant(self):
         """ Compute difference between create date and open date """
