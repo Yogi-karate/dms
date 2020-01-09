@@ -51,19 +51,20 @@ class ServiceSchedule(models.Model):
     @api.model
     def _prepare_leads(self, vehicle, date_follow_up, service_type, delta):
         lead = super(ServiceSchedule, self).prepare_leads(vehicle, date_follow_up, delta)
-        lead.update({'service_type': service_type})
+        lead.update({'service_type': service_type.id})
+        return lead
 
     @api.model
     def _generate_leads(self):
         leads = []
-        for vehicle in self._get_vehicles_for_schedule():
+        for vehicle in self._get_vehicles_for_schedule(None, None):
             today = fields.Datetime.now().date()
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
             diff = (today - sale_date).days
             if not self.days:
                 if not self.max_days:
-                    if diff > self.min_days:
+                    if diff == self.min_days:
                         dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
                         leads.append(dict)
                 else:
@@ -74,8 +75,12 @@ class ServiceSchedule(models.Model):
                 if diff % self.days == 0:
                     dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
                     leads.append(dict)
-
-        created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(self.allocate_users_for_schedule(leads))
-        for lead in created_leads:
-            self._schedule_follow_up(lead, today)
-        _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
+        print("The leads generated are &&&&&&&&&&&&&&&&&", leads)
+        if leads:
+            created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(
+                self.allocate_users_for_schedule(leads))
+            for lead in created_leads:
+                self._schedule_follow_up(lead, today)
+            _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
+        else:
+            _logger.info("No Service Leads for %s", str(today))

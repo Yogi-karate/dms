@@ -17,7 +17,6 @@
                         <field name="team_type" attrs="{'invisible': [('allocation_type', '!=', 'Round-Robin')]}"/>
                         <field name="company_id"/>
                         <field name="active"/>
-                        <field name="parent_id"/>
                     </group>
                     <group>
                         <field name="product_radio" widget="radio"/>
@@ -81,7 +80,7 @@
         </field>
     </record>
     <menuitem id="service_schedule_menu"
-              name="Service Schedule"
+              name="Schedule"
               parent="base_dms.menu_service_root"
               action="action_service_schedule"
               sequence="1"/>

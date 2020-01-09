@@ -8,7 +8,7 @@
     'sequence': 60,
     'summary': 'DMS Schedule module',
     'description': "Vehicle Schedule Domain",
-    'depends': ['vehicle','crm_dms'],
+    'depends': ['base_dms','vehicle','crm_dms'],
     'data': [
 
     ],

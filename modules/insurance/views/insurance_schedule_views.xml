@@ -17,7 +17,6 @@
                         <field name="team_type" attrs="{'invisible': [('allocation_type', '!=', 'Round-Robin')]}"/>
                         <field name="company_id"/>
                         <field name="active"/>
-                        <field name="parent_id"/>
                     </group>
                     <group>
                         <field name="product_radio" widget="radio"/>
@@ -51,7 +50,7 @@
         </field>
     </record>
     <record id="action_insurance_schedule" model="ir.actions.act_window">
-        <field name="name">insurance Schedules</field>
+        <field name="name">Insurance Schedules</field>
         <field name="type">ir.actions.act_window</field>
         <field name="res_model">insurance.schedule</field>
         <field name="view_ids"
