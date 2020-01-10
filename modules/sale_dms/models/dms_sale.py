@@ -104,7 +104,7 @@ class DmsSaleOrder(models.Model):
     def action_cancel(self):
         if self.state == 'booked' and self.balance_amount > 0:
             raise UserError(
-                _('You cannot cancel a booking unless credit note is created'))
+                _('You cannot cancel a booking with payments pending'))
         return self.write({'state': 'cancel'})
 
     @api.depends('name')
