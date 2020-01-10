@@ -26,21 +26,24 @@ class Lead2ServiceBooking(models.TransientModel):
                 result['name'] = lead.partner_name
             if lead.mobile:
                 result['mobile'] = lead.mobile
+            if lead.service_type:
+                result['service_type'] = lead.service_type
             if lead.team_id:
                 result['team_id'] = lead.team_id.id
 
         return result
 
     name = fields.Char('Customer Name')
-    service_type = fields.Selection([
-        ('first', 'First Free Service'),
-        ('second', 'Second Free Service'),
-        ('third', 'Third Free Service'),
-        ('paid', 'Paid Service'),
-        ('ar', 'Accidental Repair'),
-        ('rr', 'Running Repair'),
-        ('Insurance', 'Insurance'),
-    ], string='Service Type', store=True, default='first')
+    service_type = fields.Many2one('service.type')
+    # service_type = fields.Selection([
+    #     ('first', 'First Free Service'),
+    #     ('second', 'Second Free Service'),
+    #     ('third', 'Third Free Service'),
+    #     ('paid', 'Paid Service'),
+    #     ('ar', 'Accidental Repair'),
+    #     ('rr', 'Running Repair'),
+    #     ('Insurance', 'Insurance'),
+    # ], string='Service Type', store=True, default='first')
     date_follow_up = fields.Date('Follow-Up Date', help="Estimate of the date on which the opportunity will be won.")
     mobile = fields.Char('Mobile')
     user_id = fields.Many2one('res.users', 'Salesperson', index=True)
@@ -78,7 +81,7 @@ class Lead2ServiceBooking(models.TransientModel):
                 'dop': self.dop,
                 'booking_type': self.booking_type,
                 'pick_up_address': self.pick_up_address,
-                'service_type': self.service_type,
+                'service_type': self.service_type.id,
                 'due_date': self.due_date,
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
@@ -114,15 +117,6 @@ class Lead2InsuranceBooking(models.TransientModel):
         return result
 
     name = fields.Char('Customer Name')
-    service_type = fields.Selection([
-        ('first', 'First Free Service'),
-        ('second', 'Second Free Service'),
-        ('third', 'Third Free Service'),
-        ('paid', 'Paid Service'),
-        ('ar', 'Accidental Repair'),
-        ('rr', 'Running Repair'),
-        ('Insurance', 'Insurance'),
-    ], string='Service Type', store=True, default='first')
     date_follow_up = fields.Date('Follow-Up Date', help="Estimate of the date on which the opportunity will be won.")
     mobile = fields.Char('Mobile')
     user_id = fields.Many2one('res.users', 'Salesperson', index=True)
@@ -176,7 +170,6 @@ class Lead2InsuranceBooking(models.TransientModel):
             'cur_dip_or_comp': self.cur_booking_type_insurance,
             'booking_type': self.booking_type,
             'alternate_no': self.alternate_no,
-            'service_type': self.service_type,
             'pick_up_address': self.pick_up_address,
             'pre_due_date': self.prev_due_date,
             'cur_due_date': self.cur_due_date,

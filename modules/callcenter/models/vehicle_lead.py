@@ -65,7 +65,8 @@ class VehicleLead(models.Model):
             rec['opportunity_type'] = opportunity.id
             rec['call_type'] = opportunity.name
             if opportunity.name == 'Insurance':
-                rec['service_type'] = 'Insurance'
+                pass
+                # rec['service_type'] = 'Insurance'
         return rec
 
     @api.depends('activity_ids.date_deadline')
@@ -191,7 +192,7 @@ class ServiceBooking(models.Model):
                               default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
                                   user_id=self.env.uid),
                               index=True)
-    service_type = fields.Char('Service Type', compute='_get_lead_values')
+    service_type = fields.Many2one('service.type', compute='_get_lead_values')
     active = fields.Boolean(default=True)
     reg_no = fields.Char('Registration Number', compute='_get_lead_values')
     status = fields.Selection([
@@ -215,7 +216,7 @@ class ServiceBooking(models.Model):
             booking.mail = booking.lead_id.email_from
             booking.vehicle_model = booking.lead_id.vehicle_id.product_id.name
             if not booking.service_type:
-                booking.service_type = booking.lead_id.service_type
+                booking.service_type = booking.lead_id.service_type.id
 
     @api.model
     def create(self, vals):
@@ -224,7 +225,7 @@ class ServiceBooking(models.Model):
             result = super(ServiceBooking, self).create(vals)
             print("---------------the lead in booking is ------------", result.lead_id)
             values = {
-                'service_type': result.service_type,
+                'service_type': vals['service_type'],
                 'type': 'opportunity',
                 'date_conversion': fields.Datetime.today(),
                 'probability': 100
@@ -258,7 +259,7 @@ class InsuranceBooking(models.Model):
 
     lead_id = fields.Many2one('dms.vehicle.lead', required=True)
     vehicle_id = fields.Many2one('vehicle', compute='_get_lead_values', store=True)
-    service_type = fields.Char('Service Type')
+    service_type = fields.Many2one('Service Type')
     active = fields.Boolean(default=True)
     partner_name = fields.Char('Customer name', compute='_update_booking_values', store=True)
     mobile = fields.Char('Customer number', compute='_update_booking_values', store=True)
@@ -326,7 +327,7 @@ class InsuranceBooking(models.Model):
             booking.reg_no = booking.vehicle_id.registration_no
             booking.sale_date = booking.lead_id.dos
             if not booking.service_type:
-                booking.service_type = booking.lead_id.service_type
+                print("service type doesn't exist")
 
     @api.model
     def create(self, vals):
@@ -334,7 +335,6 @@ class InsuranceBooking(models.Model):
         if not duplicate_booking:
             result = super(InsuranceBooking, self).create(vals)
             values = {
-                'service_type': result.service_type,
                 'type': 'opportunity',
                 'date_conversion': fields.Datetime.today(),
                 'probability': 100
