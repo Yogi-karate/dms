@@ -90,6 +90,7 @@ class DmsSaleOrder(models.Model):
     balance_amount = fields.Float('Balance Amount', compute='_calculate_residual_amount')
     booking_amt = fields.Float(' Booking Amount')
     product_id = fields.Many2one('product.product', string='product', compute='_calculate_product')
+    recovered = fields.Boolean('Recovery flag',default=False)
 
     def _get_forbidden_state_confirm(self):
         return {'done', 'cancel','booked'}
@@ -106,6 +107,19 @@ class DmsSaleOrder(models.Model):
             raise UserError(
                 _('You cannot cancel a booking with payments pending'))
         return self.write({'state': 'cancel'})
+
+    @api.multi
+    def action_draft(self):
+        orders = self.filtered(lambda s: s.state in ['cancel', 'sent'])
+        for order in self:
+            for line in order.order_line:
+                line.write({'qty_invoiced':0.0})
+        return orders.write({
+            'state': 'draft',
+            'signature': False,
+            'signed_by': False,
+            'recovered': True
+        })
 
     @api.depends('name')
     def _compute_consultant(self):
@@ -169,7 +183,7 @@ class DmsSaleOrder(models.Model):
     def write(self, values):
         self.ensure_one()
         location_name = self.warehouse_id.name.lower()
-        if location_name and 'state' in values and values['state'] == 'booked':
+        if location_name and 'state' in values and values['state'] == 'booked' and not self.recovered:
             if 'tirumalgiri' in location_name:
                 values['name'] = self.env['ir.sequence'].next_by_code('sale.order.tir') or _('New')
             if 'mettuguda' in location_name:
@@ -224,9 +238,9 @@ class DmsSaleOrder(models.Model):
                 refund_ids = self.env['account.invoice'].browse()
 
             line_invoice_status = [d[1] for d in line_invoice_status_all if d[0] == order.id]
-            print(line_invoice_status)
-            if order.state == 'cancel' and len(line_invoice_status) > 0 and line_invoice_status[0] == 'invoiced':
-                invoice_status = 'invoiced'
+            print(line_invoice_status,order.state)
+            if order.state == 'sale' and len(line_invoice_status) > 0 and line_invoice_status[0] == 'invoiced':
+                invoice_status = 'to invoice'
             elif order.state not in ('sale', 'done','booked'):
                 invoice_status = 'no'
             elif any(invoice_status == 'to invoice' for invoice_status in line_invoice_status):
@@ -237,6 +251,8 @@ class DmsSaleOrder(models.Model):
                 invoice_status = 'upselling'
             else:
                 invoice_status = 'no'
+            print(line_invoice_status)
+
             order.update({
                 'invoice_count': len(set(invoice_ids.ids + refund_ids.ids)),
                 'invoice_ids': invoice_ids.ids + refund_ids.ids,
@@ -279,8 +295,8 @@ class DmsSaleOrderLine(models.Model):
         precision = self.env['decimal.precision'].precision_get('Product Unit of Measure')
         for line in self:
             if line.state == 'cancel' and line.qty_invoiced == 1:
-                line.invoice_status = 'invoiced'
-            elif line.state not in ('sale', 'done' ,'booked'):
+                line.invoice_status = 'to invoice'
+            elif line.state not in ('sale', 'done','booked'):
                 line.invoice_status = 'no'
             elif not float_is_zero(line.qty_to_invoice, precision_digits=precision):
                 line.invoice_status = 'to invoice'
