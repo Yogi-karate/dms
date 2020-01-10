@@ -55,41 +55,26 @@ class ServiceSchedule(models.Model):
         return lead
 
     @api.model
-    def _check_duplicate(self, lead_dict):
-        dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', lead_dict['name']),
-                                                          ('partner_name', '=', lead_dict['partner_name']),
-                                                          ('mobile', '=', lead_dict['mobile']),
-                                                          ('date_deadline', '=',
-                                                           lead_dict['date_deadline'])])
-        if dup:
-            return True
-        else:
-            return False
-
-    @api.model
     def _generate_leads(self):
         leads = []
         today = fields.Datetime.now().date()
         for vehicle in self._get_vehicles_for_schedule(None, None):
+            lead = {}
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
             diff = (today - sale_date).days
             if not self.days:
                 if not self.max_days:
                     if diff == self.min_days:
-                        dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
-                        if not self._check_duplicate(dict):
-                            leads.append(dict)
+                        lead = self._prepare_leads(vehicle, today, self.service_type, self.delta)
                 else:
                     if diff > self.min_days and diff < self.max_days:
-                        dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
-                        if not self._check_duplicate(dict):
-                            leads.append(dict)
+                        lead = self._prepare_leads(vehicle, today, self.service_type, self.delta)
             else:
                 if diff % self.days == 0:
-                    dict = self._prepare_leads(vehicle, today, self.service_type, self.delta)
-                    if not self._check_duplicate(dict):
-                        leads.append(dict)
+                    lead = self._prepare_leads(vehicle, today, self.service_type, self.delta)
+            if lead and not self.check_duplicate(lead):
+                leads.append(lead)
         print("The leads generated are &&&&&&&&&&&&&&&&&", leads)
         if leads:
             created_leads = self.sudo().env['dms.vehicle.lead'].with_context(mail_create_nosubscribe=True).create(

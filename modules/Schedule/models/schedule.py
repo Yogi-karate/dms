@@ -177,6 +177,16 @@ class Schedule(models.Model):
         return vehicles
 
     @api.model
+    def check_duplicate(self, lead):
+        dup = self.sudo().env['dms.vehicle.lead'].search([('name', '=', lead['name']),
+                                                          ('partner_name', '=', lead['partner_name']),
+                                                          ('mobile', '=', lead['mobile']),
+                                                          ('date_deadline', '=',
+                                                           lead['date_deadline'])])
+        if dup:
+            return True
+
+    @api.model
     def _generate_leads(self):
         # Need child class to implement this.
         pass
