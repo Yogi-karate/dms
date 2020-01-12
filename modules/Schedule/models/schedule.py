@@ -167,12 +167,12 @@ class Schedule(models.Model):
     @api.model
     def _get_vehicles_for_schedule(self, product_filters, vehicle_filters):
         prods = self.calculate_products_for_schedule(product_filters)
-        filters = [('product_id', 'in', prods.ids), ('state', '=', 'sold'),
+        filters = [('product_id', 'in', prods.ids), ('state', '=', 'sold'),('company_id','=',self.company_id.id),
                    ('date_order', '!=', False)]
 
         if vehicle_filters:
             filters += vehicle_filters
-        vehicles = self.sudo().env['vehicle'].with_context(active_test=False).search(filters)
+        vehicles = self.sudo().env['vehicle'].search(filters)
         print("%%%%% the vehicles", len(vehicles))
         return vehicles
 
