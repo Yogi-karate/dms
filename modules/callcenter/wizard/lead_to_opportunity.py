@@ -27,7 +27,7 @@ class Lead2ServiceBooking(models.TransientModel):
             if lead.mobile:
                 result['mobile'] = lead.mobile
             if lead.service_type:
-                result['service_type'] = lead.service_type
+                result['service_type'] = lead.service_type.id
             if lead.team_id:
                 result['team_id'] = lead.team_id.id
 
