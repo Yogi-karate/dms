@@ -12,7 +12,8 @@ class VehicleLead(models.Model):
                                  required=True,
                                  index=True)
     registration_no = fields.Char('Registration No.', compute='_compute_vehicle_values', store=True)
-    vin_no = fields.Char('Engine No.', compute='_compute_vehicle_values', store=True)
+    vin_no = fields.Char('Chassis No.', compute='_compute_vehicle_values', store=True)
+    engine_no = fields.Char('Engine No', compute='_compute_vehicle_values')
     dos = fields.Datetime(string='Date of Sale', compute='_compute_vehicle_values', store=True)
     source = fields.Char('Dealer', compute='_compute_vehicle_values', store=True)
     # service_type = fields.Selection([
@@ -84,7 +85,7 @@ class VehicleLead(models.Model):
             if len(lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back')) > 0:
                 lead.call_state = 'call-back'
 
-    @api.depends('vehicle_id.registration_no', 'vehicle_id.source', 'vehicle_id.date_order', 'vehicle_id.engine_no',
+    @api.depends('vehicle_id.registration_no', 'vehicle_id.source', 'vehicle_id.date_order', 'vehicle_id.chassis_no',
                  'vehicle_id.product_id')
     @api.multi
     def _compute_vehicle_values(self):
@@ -93,8 +94,9 @@ class VehicleLead(models.Model):
             lead.model = lead.vehicle_id.product_id.name
             lead.dos = lead.vehicle_id.date_order
             sale_date = lead.vehicle_id.date_order
-            lead.vin_no = lead.vehicle_id.engine_no
+            lead.vin_no = lead.vehicle_id.chassis_no
             lead.source = lead.vehicle_id.source
+            lead.engine_no = lead.vehicle_id.engine_no
             if sale_date:
                 today = fields.Datetime.now()
                 if sale_date.date().day == 29 and sale_date.date().month == 2:
