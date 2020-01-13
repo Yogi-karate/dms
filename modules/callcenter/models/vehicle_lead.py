@@ -141,12 +141,12 @@ class VehicleLead(models.Model):
         result = super(VehicleLead, self).create(vals)
         return result
 
-    def write(self, vals):
-        if 'vehicle_id' in vals:
-            raise UserError(
-                _("Vehicle related fields can't be changed for an existing Lead. Please create a New Lead."))
-
-        return super(VehicleLead, self).write(vals)
+    # def write(self, vals):
+    #     if 'vehicle_id' in vals:
+    #         raise UserError(
+    #             _("Vehicle related fields can't be changed for an existing Lead. Please create a New Lead."))
+    #
+    #     return super(VehicleLead, self).write(vals)
 
     @api.multi
     def reassign_users(self, user_id, team_id):
