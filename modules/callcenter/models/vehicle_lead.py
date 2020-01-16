@@ -150,12 +150,27 @@ class VehicleLead(models.Model):
 
     @api.multi
     def reassign_users(self, user_id, team_id):
+        today = fields.Datetime.now().date()
         for lead in self:
+            for activity in lead.activity_ids:
+                activity.action_feedback('Reassigned ')
+            self._schedule_follow_up_reasssign(lead,today)
             vals = {
                 'user_id': user_id,
                 'team_id': team_id
             }
             lead.write(vals)
+
+    @api.model
+    def _schedule_follow_up_reasssign(self, lead, today):
+        lead.activity_schedule(
+            'mail.mail_activity_data_call',
+            user_id=lead.user_id.id,
+            note=_(
+                "Follow up  on  <a href='#' data-oe-model='%s' data-oe-id='%d'>%s</a> for customer %s") % (
+                     lead._name, lead.id, lead.name,
+                     lead.partner_name),
+            date_deadline=today + timedelta(2))
 
 
 class LostReason(models.Model):
