@@ -12,7 +12,8 @@ class VehicleLead(models.Model):
                                  required=True,
                                  index=True)
     registration_no = fields.Char('Registration No.', compute='_compute_vehicle_values', store=True)
-    vin_no = fields.Char('Engine No.', compute='_compute_vehicle_values', store=True)
+    vin_no = fields.Char('Chassis No.', compute='_compute_vehicle_values', store=True)
+    engine_no = fields.Char('Engine No', compute='_compute_vehicle_values')
     dos = fields.Datetime(string='Date of Sale', compute='_compute_vehicle_values', store=True)
     source = fields.Char('Dealer', compute='_compute_vehicle_values', store=True)
     # service_type = fields.Selection([
@@ -84,7 +85,7 @@ class VehicleLead(models.Model):
             if len(lead.activity_ids.filtered(lambda rec: rec.activity_type_id.name == 'call-back')) > 0:
                 lead.call_state = 'call-back'
 
-    @api.depends('vehicle_id.registration_no', 'vehicle_id.source', 'vehicle_id.date_order', 'vehicle_id.engine_no',
+    @api.depends('vehicle_id.registration_no', 'vehicle_id.source', 'vehicle_id.date_order', 'vehicle_id.chassis_no',
                  'vehicle_id.product_id')
     @api.multi
     def _compute_vehicle_values(self):
@@ -93,8 +94,9 @@ class VehicleLead(models.Model):
             lead.model = lead.vehicle_id.product_id.name
             lead.dos = lead.vehicle_id.date_order
             sale_date = lead.vehicle_id.date_order
-            lead.vin_no = lead.vehicle_id.engine_no
+            lead.vin_no = lead.vehicle_id.chassis_no
             lead.source = lead.vehicle_id.source
+            lead.engine_no = lead.vehicle_id.engine_no
             if sale_date:
                 today = fields.Datetime.now()
                 if sale_date.date().day == 29 and sale_date.date().month == 2:
@@ -139,21 +141,36 @@ class VehicleLead(models.Model):
         result = super(VehicleLead, self).create(vals)
         return result
 
-    def write(self, vals):
-        if 'vehicle_id' in vals:
-            raise UserError(
-                _("Vehicle related fields can't be changed for an existing Lead. Please create a New Lead."))
-
-        return super(VehicleLead, self).write(vals)
+    # def write(self, vals):
+    #     if 'vehicle_id' in vals:
+    #         raise UserError(
+    #             _("Vehicle related fields can't be changed for an existing Lead. Please create a New Lead."))
+    #
+    #     return super(VehicleLead, self).write(vals)
 
     @api.multi
     def reassign_users(self, user_id, team_id):
+        today = fields.Datetime.now().date()
         for lead in self:
+            for activity in lead.activity_ids:
+                activity.action_feedback('Reassigned ')
+            self._schedule_follow_up_reasssign(lead,today)
             vals = {
                 'user_id': user_id,
                 'team_id': team_id
             }
             lead.write(vals)
+
+    @api.model
+    def _schedule_follow_up_reasssign(self, lead, today):
+        lead.activity_schedule(
+            'mail.mail_activity_data_call',
+            user_id=lead.user_id.id,
+            note=_(
+                "Follow up  on  <a href='#' data-oe-model='%s' data-oe-id='%d'>%s</a> for customer %s") % (
+                     lead._name, lead.id, lead.name,
+                     lead.partner_name),
+            date_deadline=today + timedelta(2))
 
 
 class LostReason(models.Model):

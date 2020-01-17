@@ -97,7 +97,8 @@
                                 <field name="vehicle_id"/>
                             <field name="model"/>
                                 <field name="registration_no" />
-                                <field name="vin_no" />
+                                <field name="vin_no" invisible="1"/>
+                            <field name="engine_no"/>
                                 <field name="dos" />
                                 <field name="source" />
                             <div class="o_row o_row_readonly">
