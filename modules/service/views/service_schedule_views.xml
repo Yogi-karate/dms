@@ -20,7 +20,7 @@
                     </group>
                     <group>
                         <field name="product_radio" widget="radio"/>
-                        <field name="product_temp_id" attrs="{'invisible': [('product_radio', '!=', 'Template')]}"/>
+                        <field name="product_temp_id" attrs="{'invisible': [('product_radio', '!=', 'Template')]}" context="{'active_test':False}"/>
                         <field name="product_id" attrs="{'invisible': [('product_radio', '!=', 'Product')]}"/>
                         <field name="product_category_id" attrs="{'invisible': [('product_radio', '!=', 'Category')]}"/>
                         <field name="product_type"/>
