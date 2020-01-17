@@ -55,23 +55,3 @@ class ReassignVehicleLead(models.TransientModel):
         self.ensure_one()
         print("Hello from reassign")
         reassign_enquiries = self.enquiry_ids.reassign_users(self.user_id.id, self.team_id.id)
-        # merge_opportunity = self.opportunity_ids.merge_opportunity(self.user_id.id, self.team_id.id)
-        #
-        # # The newly created lead might be a lead or an opp: redirect toward the right view
-        # if merge_opportunity.type == 'opportunity':
-        #     return merge_opportunity.redirect_opportunity_view()
-        # else:
-        #     return merge_opportunity.redirect_lead_view()
-
-    # @api.onchange('user_id')
-    # def _onchange_user(self):
-    #     """ When changing the user, also set a team_id or restrict team id
-    #         to the ones user_id is member of. """
-    #     team_id = False
-    #     if self.user_id:
-    #         user_in_team = False
-    #         if self.team_id:
-    #             user_in_team = self.env['crm.team'].search_count([('id', '=', self.team_id.id), '|', ('user_id', '=', self.user_id.id), ('member_ids', '=', self.user_id.id)])
-    #         if not user_in_team:
-    #             team_id = self.env['crm.team'].search(['|', ('user_id', '=', self.user_id.id), ('member_ids', '=', self.user_id.id)], limit=1)
-    #     self.team_id = team_id

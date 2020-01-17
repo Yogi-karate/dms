@@ -106,21 +106,22 @@ class VehicleInventoryActions(models.TransientModel):
 
         if picking.location_id == self.location_id or self.location_id in picking.location_id.child_ids:
             # no move lines as availability is not there try confirming stock move
-            move = picking.move_ids_without_package[0]
-            if move:
-                print("the move is&&&&&", move)
-                move._action_confirm() \
-                    ._action_assign()
-
-            move_line = picking.move_line_ids[0]
-            if not move_line or len(move_line) > 1:
-                raise UserError(_(
-                    "Could not confirm this delivery order ...please check location and availability:"))
+            if picking.move_line_ids and not picking.move_line_ids[0].vehicle_id == self.vehicle_id:
+                picking.do_unreserve()
+                self.env['stock.move.line'].create(self._prepare_move_line_vals(picking))
+            # picking.action_done()
+            print(" the state of the picking before is *********", picking.state)
+            for move_line in picking.move_line_ids:
+                move_line.write({'location_id': self.location_id.id, 'vehicle_id': self.vehicle_id.id, 'qty_done': 1})
+            picking.action_done()
+            print(" the state of the picking after is >>>>>>>>>>", picking.state)
+            if picking.state in ['done']:
+                vehicle.write({'state': 'sold',
+                               'date_order': order_id.date_order
+                               })
             else:
-                print("The location of move line is ", move_line[0].location_id)
-                move_line[0].write({'vehicle_id': vehicle.id, 'qty_done': 1})
-                picking.action_done()
-                vehicle.write({'state': 'sold'})
+                raise UserError(_(
+                    "Could not Complete delivery ,Please contact the administrator"))
         else:
             raise UserError(_(
                 "The Location of vehicle is not as per sale order.Check vehicle is in location or do a transfer"))
@@ -130,14 +131,12 @@ class VehicleInventoryActions(models.TransientModel):
         vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
         product_id = vehicle.product_id
         order_product_id = self.allocation_order_id.order_line[0].product_id
-        if product_id.id == order_product_id.id:
-            vehicle.write({'order_id': self.allocation_order_id.id, 'allocation_state': 'allocated',
-                           'allocation_date': fields.Date.today()})
-        else:
-            raise UserError(_(
-                "There is a different Product in the Sale Order. Product in Vehicle and Sale order should be same. "))
 
         if product_id.id == order_product_id.id:
+            picking = self.allocation_order_id.picking_ids[0]
+            if picking and picking.move_line_ids_without_package:
+                picking.do_unreserve()
+            self.env['stock.move.line'].create(self._prepare_move_line_vals(picking))
             vehicle.write({'order_id': self.allocation_order_id.id, 'allocation_state': 'allocated',
                            'allocation_date': fields.Date.today()})
         else:
@@ -147,6 +146,9 @@ class VehicleInventoryActions(models.TransientModel):
 
     def action_apply_deallocate(self):
         vehicle = self.env['vehicle'].browse(self._context.get('active_ids', []))
+        picking = vehicle.order_id.picking_ids[0]
+        if picking:
+            picking.do_unreserve()
         vehicle.write({'allocation_state': 'free', 'allocation_date': False, 'order_id': False})
         return
 
@@ -183,7 +185,7 @@ class VehicleInventoryActions(models.TransientModel):
             picking = StockPicking.create(res)
             move_vals = self._prepare_stock_moves(picking)
             for move_val in move_vals:
-                move  = self.env['stock.move'] \
+                move = self.env['stock.move'] \
                     .create(move_val) \
                     ._action_confirm() \
                     ._action_assign()
@@ -222,3 +224,26 @@ class VehicleInventoryActions(models.TransientModel):
         }
         res.append(template)
         return res
+
+    def _prepare_move_line_vals(self, picking_id, location_id=None, quantity=None, reserved_quant=None):
+        self.ensure_one()
+        # apply putaway
+        vals = {}
+        if picking_id.move_ids_without_package:
+            move = picking_id.move_ids_without_package[0]
+            location_dest_id = move.location_dest_id.get_putaway_strategy(
+                move.product_id).id or move.location_dest_id.id
+            vals = {
+                'move_id': move.id,
+                'product_id': move.product_id.id,
+                'product_uom_id': move.product_uom.id,
+                'location_id': picking_id.location_id.id,
+                'location_dest_id': location_dest_id,
+                'picking_id': picking_id.id,
+                'vehicle_id': self.vehicle_id.id,
+            }
+            if quantity:
+                vals.update({'qty_done': 1})
+            if location_id:
+                vals.update({'location_id': location_id.id})
+        return vals
