@@ -106,9 +106,9 @@ class VehicleInventoryActions(models.TransientModel):
 
         if picking.location_id == self.location_id or self.location_id in picking.location_id.child_ids:
             # no move lines as availability is not there try confirming stock move
-            if picking.move_line_ids and not picking.move_line_ids[0].vehicle_id == self.vehicle_id:
-                picking.do_unreserve()
+            if not picking.move_line_ids:
                 self.env['stock.move.line'].create(self._prepare_move_line_vals(picking))
+            #if picking.move_line_ids and not picking.move_line_ids[0].vehicle_id == self.vehicle_id:
             # picking.action_done()
             print(" the state of the picking before is *********", picking.state)
             for move_line in picking.move_line_ids:
