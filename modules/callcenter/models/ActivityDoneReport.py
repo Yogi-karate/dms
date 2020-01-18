@@ -51,7 +51,7 @@ class ActivityDoneReport(models.Model):
                 l.id as lead_id,
                 l.partner_name as partner_name,
                 l.mobile as mobile,
-                m.author_id as user_id,
+                l.user_id,
                 l.team_id,
                 l.country_id,
                 l.company_id,
