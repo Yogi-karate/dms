@@ -119,6 +119,8 @@ class VehicleInventoryActions(models.TransientModel):
                 vehicle.write({'state': 'sold',
                                'date_order': order_id.date_order
                                })
+                sale_order = self.sudo().env['sale.order'].search([('id', '=', order_id.id)])
+                sale_order.write({'state':'done'})
             else:
                 raise UserError(_(
                     "Could not Complete delivery ,Please contact the administrator"))

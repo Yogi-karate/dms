@@ -497,6 +497,25 @@
             </p>
         </field>
     </record>
+
+    <record id="action_product_delivered" model="ir.actions.act_window">
+        <field name="name">Delivered Orders</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">sale.order</field>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('view_booking_list_tree')})]"/>
+        <field name="context"></field>
+        <field name="domain">[('state','=','done')]</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a Booking
+            </p>
+            <p>
+                create booking
+            </p>
+        </field>
+    </record>
     <record id="sale.action_orders" model="ir.actions.act_window">
             <field name="name">Sales Orders</field>
             <field name="type">ir.actions.act_window</field>
@@ -543,7 +562,12 @@
               groups="account.group_account_invoice,sales_team.group_sale_salesman"
               action="action_product_booking"
             sequence="2"/>
-
+<menuitem id="sale_delivered_orders"
+            name="Delivered Orders"
+            parent="sale.sale_order_menu"
+              groups="account.group_account_invoice,sales_team.group_sale_salesman"
+              action="action_product_delivered"
+            sequence="2"/>
         <menuitem id="sale_booking_cancelled_menu"
             name="Cancelled Bookings"
             parent="sale.sale_order_menu"
