@@ -12,6 +12,7 @@
     'data': [
         'wizard/sale_booking_views.xml',
         'wizard/update_booking_details.xml',
+        'wizard/product_update_sale_order.xml',
         'views/sale_views.xml',
         'views/account_invoice_views.xml',
         'views/crm_team_views.xml',
