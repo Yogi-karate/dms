@@ -24,7 +24,8 @@ class ProductUpdateForSaleOrder(models.TransientModel):
             if order.pricelist_id:
                 result['pricelist'] = order.pricelist_id.id
         return result
-    order_id = fields.Many2one('sale.order',string='Sale Order')
+
+    order_id = fields.Many2one('sale.order', string='Sale Order')
     product_id = fields.Many2one('product.template', string='Product', required=True
                                  )
     product_color = fields.Many2one('product.attribute.value', required=True, string='Color')
@@ -36,8 +37,6 @@ class ProductUpdateForSaleOrder(models.TransientModel):
                                              compute='compute_color_attribute_values')
     pricelist = fields.Many2one('product.pricelist', string='Pricelist', required=True, ondelete="cascade")
     show_color = fields.Boolean('Color Visible', default=False)
-
-
 
     @api.onchange('product_id')
     def compute_variant_attribute_values(self):
@@ -64,35 +63,25 @@ class ProductUpdateForSaleOrder(models.TransientModel):
 
     @api.multi
     def action_apply(self):
-        """ Update product_id in sale order
-
-
-update sale_order_line set product_id = 4269 where id = 15844
-update account_invoice_line set product_id = 4269 where id = 1442
-update stock_move set product_id = 4269 where id = 606
-        """
         product = self.sudo().env['product.product'].search([('product_tmpl_id', '=', self.product_id.id),
-                                                      ('color_value', '=', self.product_color.name),
-                                                      ('variant_value', '=', self.product_variant.name)], limit=1)
+                                                             ('color_value', '=', self.product_color.name),
+                                                             ('variant_value', '=', self.product_variant.name)],
+                                                            limit=1)
         if not product:
             raise UserError(_("This combiination does not exist!"))
 
-        sale_order_line = self.sudo().env['sale.order.line'].search([('id','=',self.order_id.order_line[0].id)])
-        pricelist_item = self.sudo().env['product.pricelist.item'].search([('product_id','=',product.id),('pricelist_id','=',self.pricelist.id)])
-        sale_order_line.write({'product_id':product.id,'price_unit':pricelist_item.fixed_price,'name':self.product_id.name})
-        for invoice_line in sale_order_line.invoice_lines:
-            print(invoice_line,"==================1111")
-        # account_invoice = self.sudo().env['account.invoice'].search([('sale')])
-        account_invoice_line = self.sudo().env['account.invoice.line'].search([('id','=',sale_order_line.invoice_lines.id)])
-        account_invoice_line.write({'product_id':product.id,'price_unit':pricelist_item.fixed_price,'name':self.product_id.name,'discount_price':sale_order_line.discount_price})
-        stock_move = self.sudo().env['stock.move'].search([('sale_line_id','=',sale_order_line.id)])
-        stock_move.write({'product_id':product.id,'name':product.name})
+        sale_order_line = self.sudo().env['sale.order.line'].search([('id', '=', self.order_id.order_line[0].id)])
+        pricelist_item = self.sudo().env['product.pricelist.item'].search(
+            [('product_id', '=', product.id), ('pricelist_id', '=', self.pricelist.id)])
+        sale_order_line.write(
+            {'product_id': product.id, 'price_unit': pricelist_item.fixed_price, 'name': self.product_id.name})
+        account_invoice_line = self.sudo().env['account.invoice.line'].search(
+            [('id', '=', sale_order_line.invoice_lines.id)])
+        account_invoice_line.write(
+            {'product_id': product.id, 'price_unit': pricelist_item.fixed_price, 'name': self.product_id.name,
+             'discount_price': sale_order_line.discount_price})
+        stock_move = self.sudo().env['stock.move'].search([('sale_line_id', '=', sale_order_line.id)])
+        stock_move.write({'product_id': product.id, 'name': product.name})
         picking = self.order_id.picking_ids[0]
         if picking:
             picking.do_unreserve()
-
-
-
-
-
-

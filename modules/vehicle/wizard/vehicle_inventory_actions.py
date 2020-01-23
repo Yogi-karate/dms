@@ -105,11 +105,8 @@ class VehicleInventoryActions(models.TransientModel):
         picking = order_id.picking_ids[0]
 
         if picking.location_id == self.location_id or self.location_id in picking.location_id.child_ids:
-            # no move lines as availability is not there try confirming stock move
             if not picking.move_line_ids:
                 self.env['stock.move.line'].create(self._prepare_move_line_vals(picking))
-            #if picking.move_line_ids and not picking.move_line_ids[0].vehicle_id == self.vehicle_id:
-            # picking.action_done()
             print(" the state of the picking before is *********", picking.state)
             for move_line in picking.move_line_ids:
                 move_line.write({'location_id': self.location_id.id, 'vehicle_id': self.vehicle_id.id, 'qty_done': 1})
@@ -117,10 +114,10 @@ class VehicleInventoryActions(models.TransientModel):
             print(" the state of the picking after is >>>>>>>>>>", picking.state)
             if picking.state in ['done']:
                 vehicle.write({'state': 'sold',
-                               'date_order': order_id.date_order
+                               'date_order': order_id.date_order,
+                               'delivery_date': fields.Date.today()
                                })
-                sale_order = self.sudo().env['sale.order'].search([('id', '=', order_id.id)])
-                sale_order.write({'state':'done'})
+                vehicle.order_id.write({'state': 'done'})
             else:
                 raise UserError(_(
                     "Could not Complete delivery ,Please contact the administrator"))
