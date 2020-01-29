@@ -12,6 +12,9 @@
                             type="object" class="oe_highlight" attrs="{'invisible': [('active', '=', False)]}" groups="service.group_dms_service_coordinator"/>
                     <button name="mark_won" string="Reported" type="object"
                             class="oe_highlight" attrs="{'invisible': [('status', '=', 'won')]}" groups="service.group_dms_service_coordinator"/>
+                    <button name="%(action_dms_booking2assessment)d" string="Create Assessment Sheet"
+                            type="action"
+                            help="Create Assessment Sheet" class="oe_highlight"/>
                     <field name="status" widget="statusbar" statusbar_visible="new,won,lost"/>
 
                 </header>
@@ -25,7 +28,7 @@
                     <group string="Service Bookings">
                         <field name="active" invisible="1"/>
                         <field name="lead_id" domain="[('opportunity_type','=','Service')]"/>
-                        <field name="vehicle_id" invisible="1"/>
+                        <field name="vehicle_id"/>
                         <field name="reg_no"/>
                         <field name="dop" string="Appointment Date"/>
                         <field name="partner_name"/>

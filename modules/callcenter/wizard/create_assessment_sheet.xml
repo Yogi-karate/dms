@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_dms_booking2assessment" model="ir.ui.view">
+        <field name="name">dms.booking2assessment.form</field>
+        <field name="model">dms.booking2assessment</field>
+        <field name="arch" type="xml">
+            <form string="Create Assessment Sheet">
+                <group>
+                    <field name="booking_id"/>
+                    <field name="pick_or_drop"/>
+                    <field name="vehicle_id"/>
+                    <field name="date"/>
+                    <field name="bt_no"/>
+                    <field name="partner_name"/>
+                    <field name="partner_mobile"/>
+                    <field name="address"/>
+                </group>
+
+                <footer>
+                    <button name="action_apply" string="Confirm Booking" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_dms_booking2assessment" model="ir.actions.act_window">
+        <field name="name">Assessment Sheet</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.booking2assessment</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_dms_booking2assessment"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

@@ -182,8 +182,7 @@ class LostReason(models.Model):
 
 class ServiceBooking(models.Model):
     _name = "service.booking"
-    _description = "Service Booking"
-    _inherit = ['mail.thread', 'mail.activity.mixin']
+    _inherit = "service.booking"
 
     lead_id = fields.Many2one('dms.vehicle.lead', required=True)
     vehicle_id = fields.Many2one('vehicle', compute='_get_lead_values', store=True)

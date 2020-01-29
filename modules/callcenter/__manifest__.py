@@ -17,6 +17,7 @@
         'wizard/dms_vehicle_lead_assign.xml',
         'wizard/lead_to_opportunity.xml',
         'wizard/activity_feedback.xml',
+        'wizard/create_assessment_sheet.xml',
         'views/booking_insurance.xml',
         'views/booking_service.xml',
         'views/activity_done_views.xml',

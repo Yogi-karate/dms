@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_assessment_sheet_form" model="ir.ui.view">
+        <field name="name">assessment.sheet.form</field>
+        <field name="model">assessment.sheet</field>
+        <field name="priority">4</field>
+        <field name="arch" type="xml">
+            <form string="Assessment Sheet">
+                <sheet>
+                    <group>
+                        <group string="Booking details">
+                            <field name="booking_id"/>
+                            <field name="bt_no"/>
+                            <field name="date"/>
+                            <field name="active"/>
+                        </group>
+                        <group string="Customer Information">
+                             <field name="partner_name"/>
+                        <field name="partner_mobile"/>
+                        <field name="secondary_mobile"/>
+                        <field name="mail"/>
+                        <field name="address"/>
+                        </group>
+                       <group string="Vehicle Information">
+                        <field name="vehicle_id"/>
+                           <field name="brand"/>
+                           <field name="model"/>
+                           <field name="variant"/>
+                       </group>
+                        <group string="Damages">
+
+                        <field name="damages" widget="many2many_tags"/>
+                        </group>
+                        <group>
+                            <field name="internal_parts" widget="many2many_tags"/>
+                            <field name="needle_position"/>
+                            <field name="pick_or_drop"/>
+                        </group>
+                        <group string="Other Details">
+                            <field name="remarks"/>
+                            <field name="dealer_rep_name"/>
+
+                        </group>
+                    <group>
+
+                    </group>
+                    </group>
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+    <record id="view_assessment_sheet_tree" model="ir.ui.view">
+        <field name="name">assessment.sheet.tree</field>
+        <field name="model">assessment.sheet</field>
+        <field name="priority">4</field>
+        <field name="arch" type="xml">
+            <tree string="Assessment Sheet">
+                <field name="partner_name"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_assessment_sheet" model="ir.actions.act_window">
+        <field name="name">Assessment Sheets</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">assessment.sheet</field>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('view_assessment_sheet_tree')}),
+                           (0, 0, {'view_mode': 'form', 'view_id': ref('view_assessment_sheet_form')})]"/>
+        <field name="context"></field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add an Assessment Sheet
+            </p>
+            <p>
+                create an Assessment Sheet
+            </p>
+        </field>
+    </record>
+    <menuitem id="assessment_sheet_main_menu"
+              name="Repair Orders"
+              parent="base_dms.menu_service_root"
+              sequence="1"/>
+
+    <menuitem id="assessment_sheet_menu"
+              name="Assessment Sheets"
+              parent="assessment_sheet_main_menu"
+              action="action_assessment_sheet"
+              sequence="1"/>
+</odoo>
