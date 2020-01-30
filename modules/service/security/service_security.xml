@@ -7,8 +7,8 @@
             <field name="description">Helps you handle your Service Booking Operations.</field>
             <field name="sequence">3</field>
         </record>
-    <record id="group_dms_service_Advisor" model="res.groups">
-            <field name="name">Service Advisor</field>
+    <record id="group_dms_service_coordinator" model="res.groups">
+            <field name="name">Service Advisor.</field>
             <field name="category_id" ref="module_category_service"/>
             <field name="implied_ids" eval="[(4, ref('base.group_user'))]"/>
             <field name="comment">the user will have access the service bookings and modify its state.</field>
