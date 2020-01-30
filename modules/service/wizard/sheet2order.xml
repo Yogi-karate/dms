@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="view_dms_sheet2order" model="ir.ui.view">
+        <field name="name">dms.sheet2order.form</field>
+        <field name="model">dms.sheet2order</field>
+        <field name="arch" type="xml">
+            <form string="Create Repair Order">
+                <group>
+                    <field name="assessment_id"/>
+                    <field name="partner_mobile"/>
+
+                </group>
+
+                <footer>
+                    <button name="action_apply" string="Confirm Booking" type="object" class="btn-primary"/>
+                    <button string="Cancel" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="action_dms_sheet2order" model="ir.actions.act_window">
+        <field name="name">Repair Order</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">dms.sheet2order</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="view_dms_sheet2order"/>
+        <field name="target">new</field>
+    </record>
+</odoo>

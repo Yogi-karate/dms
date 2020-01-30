@@ -4,10 +4,12 @@ access_dms_vehicle_lead_cord,dms dms_vehicle_lead_cord,callcenter.model_dms_vehi
 access_dms_vehicle_cord,dms dms_vehicle_cord,vehicle.model_vehicle,group_dms_service_coordinator,1,1,0,0
 access_service_type_user,service_type,model_service_type,base.group_erp_manager,1,1,1,1
 access_service_schedule_user,service_schedule,model_service_schedule,callcenter.group_dms_callcenter_manager,1,1,1,1
-access_vehicle_part_user,vehicle_part_user,model_vehicle_internal_part,callcenter.group_dms_callcenter_manager,1,1,1,1
+access_vehicle_asset_user,vehicle_asset_user,model_vehicle_asset,callcenter.group_dms_callcenter_manager,1,1,1,1
 access_vehicle_damage_user,vehicle_damage_user,model_vehicle_damage,callcenter.group_dms_callcenter_manager,1,1,1,1
 access_assessment_sheet_user,assessment_sheet_user,model_assessment_sheet,callcenter.group_dms_callcenter_manager,1,1,1,1
 access_repair_order_user,repair_order_user,model_repair_order,callcenter.group_dms_callcenter_manager,1,1,1,1
+access_repair_order_line_user,repair_order_line_user,model_repair_order_line,callcenter.group_dms_callcenter_manager,1,1,1,1
+
 
 
 

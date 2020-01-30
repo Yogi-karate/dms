@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="product_services" model="product.category">
+            <field name="name">Services</field>
+            <field name="parent_id" ref="product.product_category_all"/>
+        </record>
+        <record id="product_spare_parts" model="product.category">
+            <field name="name">Spare Parts</field>
+            <field name="parent_id" ref="product_services"/>
+        </record>
+
+        <record id="product_labour" model="product.template">
+            <field name="name">Labour</field>
+            <field name="categ_id" ref="product_services"/>
+            <field name="type">consu</field>
+        </record>
+
+    </data>
+</odoo>

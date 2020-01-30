@@ -184,8 +184,7 @@ class ServiceBooking(models.Model):
     _name = "service.booking"
     _inherit = "service.booking"
 
-    lead_id = fields.Many2one('dms.vehicle.lead', required=True)
-    vehicle_id = fields.Many2one('vehicle', compute='_get_lead_values', store=True)
+    lead_id = fields.Many2one('dms.vehicle.lead')
     location_id = fields.Many2one('stock.location', string='Preferred location of service', track_visibility='onchange')
     remarks = fields.Char('Remarks')
     dop = fields.Datetime('Date and Time of Pick-Up', track_visibility='onchange')

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_vehicle_asset_tree" model="ir.ui.view">
+        <field name="name">vehicle.asset.tree</field>
+        <field name="model">vehicle.asset</field>
+        <field name="priority">4</field>
+        <field name="arch" type="xml">
+            <tree string="Vehicle Asset" editable="bottom">
+                <field name="name"/>
+            </tree>
+        </field>
+    </record>
+    <record id="action_vehicle_asset" model="ir.actions.act_window">
+        <field name="name">Vehicle Assets</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">vehicle.asset</field>
+        <field name="view_ids"
+               eval="[(5, 0, 0),
+                           (0, 0, {'view_mode': 'tree', 'view_id': ref('view_vehicle_asset_tree')})]"/>
+        <field name="context"></field>
+        <field name="domain"></field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Add a Vehicle Asset
+            </p>
+            <p>
+                create a Vehicle Asset
+            </p>
+        </field>
+    </record>
+
+    <menuitem id="vehicle_assets_menu"
+              name="Vehicle Assets"
+              parent="base_dms.menu_service_configurations_root"
+              action="action_vehicle_asset"
+              sequence="1"/>
+</odoo>

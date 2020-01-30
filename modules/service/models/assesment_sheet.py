@@ -7,16 +7,17 @@ from odoo.exceptions import UserError
 
 class AssessmentSheet(models.Model):
     _name = 'assessment.sheet'
-    booking_id = fields.Many2one('service.booking')
+    booking_id = fields.Many2one('service.booking',required=True)
     active = fields.Boolean('Active',default=True)
     bt_no = fields.Char('BT No')
     date = fields.Datetime('Date')
-    partner_name = fields.Char('Customer')
-    partner_mobile = fields.Char('Mobile')
+    partner_name = fields.Char('Customer',required=True)
+    partner_mobile = fields.Char('Mobile',required=True
+                                 )
     secondary_mobile = fields.Char('Secondary Mobile')
     mail = fields.Char('Mail ID')
     address = fields.Text('Address')
-    internal_parts = fields.Many2many('vehicle.internal.part')
+    assets = fields.Many2many('vehicle.asset')
     damages = fields.Many2many('vehicle.damage')
     needle_position = fields.Selection([('F or H','F or H'),('F or H- 3/4','F or H- 3/4'),
                                         ('3/4','3/4'),('3/4-1/2','3/4-1/2'),('1/2','1/2'),
@@ -25,7 +26,7 @@ class AssessmentSheet(models.Model):
     pick_or_drop = fields.Selection([('pick','Pick'),('drop','Drop')])
     remarks = fields.Text('Remarks')
     dealer_rep_name = fields.Char('Dealer Rep.Name')
-    vehicle_id = fields.Many2one('vehicle')
+    vehicle_id = fields.Many2one('vehicle',compute='_get_vehicle_values',store=True)
     company_id = fields.Many2one('res.company')
     brand = fields.Char('Brand',compute='_get_vehicle_values')
     model = fields.Char('Model',compute='_get_vehicle_values')
@@ -37,34 +38,38 @@ class AssessmentSheet(models.Model):
                                   user_id=self.env.uid),
                               index=True)
 
-    @api.depends('vehicle_id')
+    @api.depends('booking_id.vehicle_id')
     def _get_vehicle_values(self):
         self._vehicle_values()
 
-    @api.onchange('vehicle_id')
+    @api.onchange('booking_id.vehicle_id')
     def _vehicle_values(self):
         for sheet in self:
-            sheet.brand = sheet.vehicle_id.company_id.name
-            sheet.model = sheet.vehicle_id.product_id.product_tmpl_id.name
-            sheet.variant = sheet.vehicle_id.product_id.variant_value
-            sheet.partner_name = sheet.vehicle_id.partner_id.name
-            sheet.partner_mobile = sheet.vehicle_id.partner_id.mobile
-            sheet.secondary_mobile = sheet.vehicle_id.partner_id.phone
-            sheet.mail = sheet.vehicle_id.partner_id.email
+            print(sheet.booking_id.vehicle_id)
+            sheet.vehicle_id = sheet.booking_id.vehicle_id.id
+            sheet.brand = sheet.booking_id.vehicle_id.company_id.name
+            sheet.model = sheet.booking_id.vehicle_id.product_id.product_tmpl_id.name
+            sheet.variant = sheet.booking_id.vehicle_id.product_id.variant_value
 
-            sheet.address = sheet.vehicle_id.partner_id.street
-        # for booking in self:
-        #     booking.partner_name = booking.lead_id.partner_name
-        #     booking.vehicle_id = booking.lead_id.vehicle_id
-        #     booking.reg_no = booking.lead_id.vehicle_id.registration_no
-        #
-        #     booking.mobile = booking.lead_id.mobile
-        #     booking.mail = booking.lead_id.email_from
-        #     booking.vehicle_model = booking.lead_id.vehicle_id.product_id.name
+    @api.depends('vehicle_id','vehicle_id.partner_id','booking_id','booking_id.vehicle_id','booking_id.vehicle_id.partner_id')
+    def _get_partner_values(self):
+        self._partner_values()
+
+    @api.onchange('vehicle_id','vehicle_id.partner_id','booking_id','booking_id.vehicle_id','booking_id.vehicle_id.partner_id')
+    def _partner_values(self):
+        for sheet in self:
+            vehicle = sheet.booking_id.vehicle_id
+            sheet.partner_name = vehicle.partner_id.name
+            sheet.partner_mobile = vehicle.partner_id.mobile
+            sheet.secondary_mobile = vehicle.partner_id.phone
+            sheet.mail = vehicle.partner_id.email
+            sheet.address = vehicle.partner_id.street
+
+
 
 
 class VehicleInternalParts(models.Model):
-    _name = 'vehicle.internal.part'
+    _name = 'vehicle.asset'
     name = fields.Char('Name')
 
 class VehicleDamages(models.Model):

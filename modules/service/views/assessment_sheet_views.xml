@@ -6,6 +6,11 @@
         <field name="priority">4</field>
         <field name="arch" type="xml">
             <form string="Assessment Sheet">
+                <header>
+                    <button name="%(action_dms_sheet2order)d" string="Create Repair Order"
+                            type="action"
+                            help="Create a Repair Order" class="oe_highlight"/>
+                </header>
                 <sheet>
                     <group>
                         <group string="Booking details">
@@ -32,7 +37,7 @@
                         <field name="damages" widget="many2many_tags"/>
                         </group>
                         <group>
-                            <field name="internal_parts" widget="many2many_tags"/>
+                            <field name="assets" widget="many2many_tags"/>
                             <field name="needle_position"/>
                             <field name="pick_or_drop"/>
                         </group>

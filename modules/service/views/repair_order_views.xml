@@ -7,11 +7,14 @@
         <field name="arch" type="xml">
             <form string="Repair Order">
                 <sheet>
+
+
                     <group>
                         <field name="name"/>
                         <field name="assessment_id"/>
                         <field name="state"/>
                         <field name="partner_id"/>
+                        <field name="partner_mobile"/>
                         <field name="pricelist_id" invisible="1"/>
                         <field name="invoice_count" invisible="1"/>
                         <field name="partner_invoice_id" invisible="1"/>
@@ -357,4 +360,11 @@
               parent="assessment_sheet_main_menu"
               action="action_repair_order"
               sequence="1"/>
+
+    <record id="repair_order" model="ir.sequence">
+            <field name="name">Repair Order</field>
+            <field name="code">repair.order</field>
+            <field name="prefix">RO-</field>
+            <field name="company_id" eval="False"/>
+        </record>
 </odoo>
