@@ -34,6 +34,12 @@
                         <field name="partner_name"/>
                         <field name="mobile"/>
                         <field name="vehicle_model"/>
+                        <field name="variant_attribute_values" invisible="1"/>
+                                    <field name="color_attribute_values" invisible="1"/>
+                        <field name="product_variant" no_label="1" options="{'no_create_edit': True}"
+                                           domain="[('attribute_id.name','=ilike','variant'),('id','in',variant_attribute_values)]"/>
+                        <field name="product_color" options="{'no_create_edit': True}"
+                                           domain="[('attribute_id.name','=ilike','color'),('id','in',color_attribute_values)]"/>
                         <field name="service_type"/>
                         <field name="booking_type" string="Pickup/Walkin"/>
                         <field name="pick_up_address" string="Address"/>

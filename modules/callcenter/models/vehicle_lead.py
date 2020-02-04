@@ -185,36 +185,6 @@ class ServiceBooking(models.Model):
     _inherit = "service.booking"
 
     lead_id = fields.Many2one('dms.vehicle.lead')
-    location_id = fields.Many2one('stock.location', string='Preferred location of service', track_visibility='onchange')
-    remarks = fields.Char('Remarks')
-    dop = fields.Datetime('Date and Time of Pick-Up', track_visibility='onchange')
-    company_id = fields.Many2one('res.company', string='Company',
-                                 default=lambda self: self.env['res.company']._company_default_get('service.booking'))
-    booking_type = fields.Selection([
-        ('pickup', 'Pick-Up'),
-        ('walk', 'Walk-In'),
-    ], string='Booking Type', store=True, default='pickup', track_visibility='onchange')
-
-    pick_up_address = fields.Char('Pick-up Address')
-    due_date = fields.Datetime(string='Service Due Date')
-    partner_name = fields.Char('Customer name', compute='_get_lead_values', store=True)
-    mobile = fields.Char('Customer number', compute='_get_lead_values', store=True)
-    mail = fields.Char('Customer Mail ID', compute='_get_lead_values', store=True)
-    vehicle_model = fields.Char('Model', compute='_get_lead_values', store=True)
-    user_id = fields.Many2one('res.users', string='Salesperson',
-                              default=lambda self: self.env.user)
-    team_id = fields.Many2one('crm.team', string='Sales Team',
-                              default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
-                                  user_id=self.env.uid),
-                              index=True)
-    service_type = fields.Many2one('service.type', compute='_get_lead_values')
-    active = fields.Boolean(default=True)
-    reg_no = fields.Char('Registration Number', compute='_get_lead_values')
-    status = fields.Selection([
-        ('new', 'Pending'),
-        ('won', 'Reported'),
-        ('lost', 'Not Reported'),
-    ], string='Status', store=True, default='new', track_visibility='onchange')
 
     @api.depends('lead_id')
     def _get_lead_values(self):
@@ -229,9 +199,30 @@ class ServiceBooking(models.Model):
 
             booking.mobile = booking.lead_id.mobile
             booking.mail = booking.lead_id.email_from
-            booking.vehicle_model = booking.lead_id.vehicle_id.product_id.name
+            booking.vehicle_model = booking.lead_id.vehicle_id.product_id.product_tmpl_id.id
+            if not booking.lead_id:
+                pass
+            else:
+                booking.product_color = booking.lead_id.vehicle_id.product_id.attribute_value_ids[0].id
+                booking.product_variant = booking.lead_id.vehicle_id.product_id.attribute_value_ids[1].id
+
             if not booking.service_type:
                 booking.service_type = booking.lead_id.service_type.id
+
+    @api.onchange('vehicle_id')
+    def _vehicle_values(self):
+        for booking in self:
+            booking.partner_name = booking.vehicle_id.partner_name
+            booking.reg_no = booking.vehicle_id.registration_no
+
+            booking.mobile = booking.vehicle_id.partner_mobile
+            booking.mail = booking.vehicle_id.partner_id.email
+            booking.vehicle_model = booking.vehicle_id.product_id.product_tmpl_id.id
+            if not booking.vehicle_id:
+                pass
+            else:
+                booking.product_color = booking.vehicle_id.product_id.attribute_value_ids[0].id
+                booking.product_variant = booking.vehicle_id.product_id.attribute_value_ids[1].id
 
     @api.model
     def create(self, vals):

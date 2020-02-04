@@ -10,6 +10,62 @@ class ServiceBooking(models.Model):
     _description = "Service Booking"
     _inherit = ['mail.thread', 'mail.activity.mixin']
     vehicle_id = fields.Many2one('vehicle')
+    location_id = fields.Many2one('stock.location', string='Preferred location of service', track_visibility='onchange')
+    remarks = fields.Char('Remarks')
+    dop = fields.Datetime('Date and Time of Pick-Up', track_visibility='onchange')
+    company_id = fields.Many2one('res.company', string='Company',
+                                 default=lambda self: self.env['res.company']._company_default_get('service.booking'))
+    booking_type = fields.Selection([
+        ('pickup', 'Pick-Up'),
+        ('walk', 'Walk-In'),
+    ], string='Booking Type', store=True, default='pickup', track_visibility='onchange')
+
+    pick_up_address = fields.Char('Pick-up Address')
+    due_date = fields.Datetime(string='Service Due Date')
+    partner_name = fields.Char('Customer name',required=True)
+    mobile = fields.Char('Customer number',required=True)
+    mail = fields.Char('Customer Mail ID')
+    vehicle_model = fields.Many2one('product.template')
+    product_color = fields.Many2one('product.attribute.value', string='Color')
+    product_variant = fields.Many2one('product.attribute.value', string='Variant')
+    variant_attribute_values = fields.One2many('product.attribute.value', string='attributes',
+                                               compute='compute_variant_attribute_values')
+    color_attribute_values = fields.One2many('product.attribute.value', string='attributes',
+                                             compute='compute_color_attribute_values')
+    user_id = fields.Many2one('res.users', string='Salesperson',
+                              default=lambda self: self.env.user)
+    team_id = fields.Many2one('crm.team', string='Sales Team',
+                              default=lambda self: self.env['crm.team'].sudo()._get_default_team_id(
+                                  user_id=self.env.uid),
+                              index=True)
+    service_type = fields.Many2one('service.type')
+    active = fields.Boolean(default=True)
+    reg_no = fields.Char('Registration Number')
+    status = fields.Selection([
+        ('new', 'Pending'),
+        ('won', 'Reported'),
+        ('lost', 'Not Reported'),
+    ], string='Status', store=True, default='new', track_visibility='onchange')
+
+    @api.onchange('vehicle_model')
+    def compute_variant_attribute_values(self):
+        if self.variant_attribute_values or self.color_attribute_values:
+            self.product_color = None
+            self.product_variant = None
+        self.variant_attribute_values = None
+        self.color_attribute_values = None
+        products = self.sudo().env['product.product'].search([('product_tmpl_id', '=', self.vehicle_model.id)])
+        self.variant_attribute_values = products.mapped('attribute_value_ids')
+
+        print(self.variant_attribute_values)
+
+    @api.onchange('product_variant')
+    def compute_color_attribute_values(self):
+        products = self.sudo().env['product.product'].search(
+            [('product_tmpl_id', '=', self.vehicle_model.id), ('variant_value', '=', self.product_variant.name)])
+        self.color_attribute_values = products.mapped('attribute_value_ids')
+        print(self.color_attribute_values)
+
 
 
 

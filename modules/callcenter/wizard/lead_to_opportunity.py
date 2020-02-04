@@ -59,6 +59,7 @@ class Lead2ServiceBooking(models.TransientModel):
     due_date = fields.Datetime(string='Service Due Date')
     lead_id = fields.Many2one('dms.vehicle.lead')
 
+
     @api.multi
     def action_apply(self):
         """ Convert lead to opportunity or merge lead and opportunity and open
@@ -72,8 +73,8 @@ class Lead2ServiceBooking(models.TransientModel):
             raise UserError("Please add pickup date and address")
         else:
             booking_values = {
-                'partner_name': self.lead_id.partner_name,
-                'mobile': self.lead_id.mobile,
+                'partner_name': self.name,
+                'mobile': self.mobile,
                 'lead_id': self.lead_id.id,
                 'vehicle_id': self.lead_id.vehicle_id.id,
                 'location_id': self.location_id.id,
@@ -86,7 +87,10 @@ class Lead2ServiceBooking(models.TransientModel):
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
                 'vin_no': self.lead_id.vin_no,
-                'vehicle_model': self.lead_id.vehicle_id.product_id.name
+                'reg_no':self.lead_id.vehicle_id.registration_no,
+                'vehicle_model': self.lead_id.vehicle_id.product_id.product_tmpl_id.id,
+                'product_color':self.lead_id.vehicle_id.product_id.attribute_value_ids[0].id,
+                'product_variant': self.lead_id.vehicle_id.product_id.attribute_value_ids[1].id
             }
         bo = self.env['service.booking'].create(booking_values)
         # return leads[0].redirect_opportunity_view()
