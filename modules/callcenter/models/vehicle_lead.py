@@ -235,19 +235,23 @@ class ServiceBooking(models.Model):
 
     @api.model
     def create(self, vals):
-        duplicate_booking = self.env['service.booking'].search([('lead_id', '=', vals['lead_id'])])
-        if not duplicate_booking:
-            result = super(ServiceBooking, self).create(vals)
-            values = {
-                'type': 'opportunity',
-                'date_conversion': fields.Datetime.today(),
-                'probability': 100
-            }
-            result.lead_id.write(values)
-            return result
+        if 'lead_id' in vals:
+            duplicate_booking = self.env['service.booking'].search([('lead_id', '=', vals['lead_id'])])
+            if not duplicate_booking:
+                result = super(ServiceBooking, self).create(vals)
+                print("---------------the lead in booking is ------------", result.lead_id)
+                values = {
+                    'type': 'opportunity',
+                    'date_conversion': fields.Datetime.today(),
+                    'probability': 100
+                }
+                result.lead_id.write(values)
+                return result
+            else:
+                raise UserError(
+                    _("Service booking already existed for this lead. Please go back to that Booking and restore."))
         else:
-            raise UserError(
-                _("Service booking already existed for this lead. Please go back to that Booking and restore."))
+            return super(ServiceBooking, self).create(vals)
 
     @api.multi
     def mark_won(self):
