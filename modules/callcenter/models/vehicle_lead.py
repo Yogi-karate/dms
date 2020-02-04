@@ -238,9 +238,7 @@ class ServiceBooking(models.Model):
         duplicate_booking = self.env['service.booking'].search([('lead_id', '=', vals['lead_id'])])
         if not duplicate_booking:
             result = super(ServiceBooking, self).create(vals)
-            print("---------------the lead in booking is ------------", result.lead_id)
             values = {
-                'service_type': vals['service_type'],
                 'type': 'opportunity',
                 'date_conversion': fields.Datetime.today(),
                 'probability': 100
