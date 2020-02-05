@@ -237,6 +237,15 @@ class ServiceBooking(models.Model):
                     'probability': 100
                 }
                 result.lead_id.write(values)
+                vehicle_model = result.lead_id.vehicle_id.product_id.product_tmpl_id.id,
+                product_color = result.lead_id.vehicle_id.product_id.attribute_value_ids[0].id,
+                product_varaint = result.lead_id.vehicle_id.product_id.attribute_value_ids[1].id
+                booking_values = {
+                    'vehicle_model': vehicle_model,
+                    'product_color': product_color,
+                    'product_variant': product_varaint
+                }
+                result.write(booking_values)
                 return result
             else:
                 raise UserError(

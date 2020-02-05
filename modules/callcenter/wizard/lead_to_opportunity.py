@@ -87,10 +87,7 @@ class Lead2ServiceBooking(models.TransientModel):
                 'user_id': self.user_id.id,
                 'team_id': self.team_id.id,
                 'vin_no': self.lead_id.vin_no,
-                'reg_no':self.lead_id.vehicle_id.registration_no,
-                'vehicle_model': self.lead_id.vehicle_id.product_id.product_tmpl_id.id,
-                'product_color':self.lead_id.vehicle_id.product_id.attribute_value_ids[0].id,
-                'product_variant': self.lead_id.vehicle_id.product_id.attribute_value_ids[1].id
+                'reg_no':self.lead_id.vehicle_id.registration_no
             }
         bo = self.env['service.booking'].create(booking_values)
         # return leads[0].redirect_opportunity_view()
