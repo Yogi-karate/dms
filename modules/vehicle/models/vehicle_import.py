@@ -114,13 +114,15 @@ class ODVehicle(models.Model):
 
     @api.model
     def update_vehicle_from_ref(self):
-        vehicles = self.env['vehicle'].search([('ref', '!=', False),('state', '=', 'sold')])
-        for vehicle in vehicles:
-            order_id = self.env['sale.order'].search([('name', '=', vehicle.ref)])
-            if order_id:
-                vehicle.order_id = order_id
-                vehicle.partner_id = order_id.partner_id
-                vehicle.date_order = order_id.date_order
+        companies = self.env['res.company'].search([])
+        for company in companies:
+            vehicles = self.env['vehicle'].search([('ref', '!=', False),('state', '=', 'sold'),('company_id','=',company.id)])
+            for vehicle in vehicles:
+                order_id = self.env['sale.order'].search([('name', '=', vehicle.ref),('company_id','=',company.id)])
+                if order_id:
+                    vehicle.order_id = order_id
+                    vehicle.partner_id = order_id.partner_id
+                    vehicle.date_order = order_id.date_order
 
     def create_partner(self, vehicle):
         return {
