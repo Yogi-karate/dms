@@ -45,6 +45,7 @@ class ProductUpdateForSaleOrder(models.TransientModel):
             self.product_color = False
         self.variant_attribute_values = None
         self.color_attribute_values = None
+
         products = self.sudo().env['product.product'].search([('product_tmpl_id', '=', self.product_id.id)])
         self.variant_attribute_values = products.mapped('attribute_value_ids').filtered(
             lambda attrib: attrib.attribute_id.name.lower() == 'variant')
@@ -82,6 +83,8 @@ class ProductUpdateForSaleOrder(models.TransientModel):
              'discount_price': sale_order_line.discount_price})
         stock_move = self.sudo().env['stock.move'].search([('sale_line_id', '=', sale_order_line.id)])
         stock_move.write({'product_id': product.id, 'name': product.name})
+        if len(self.order_id.picking_ids) < 1:
+            return
         picking = self.order_id.picking_ids[0]
         if picking:
             picking.do_unreserve()
