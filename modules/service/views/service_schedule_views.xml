@@ -30,6 +30,8 @@
                         <field name="max_days" attrs="{'invisible': [('schedule_type', '!=', 'normal')]}"/>
                         <field name="days" attrs="{'invisible': [('schedule_type', '=', 'normal')]}"/>
                         <field name="delta"/>
+                        <field name="particular_day"/>
+                        <button name="generate_service_leads" string="Run for Specific Day" type="object" class="btn-primary" attrs="{'invisible': [('particular_day', '=', False)]}"/>
                     </group>
 
                 </sheet>

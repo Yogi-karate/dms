@@ -24,14 +24,24 @@ class InsuranceSchedule(models.Model):
         self.product_temp_id = False
         self.product_id = False
         self.product_category_id = False
-
+    @api.model
+    def generate_leads(self,cr,uid,context=None):
+        self = self.env['insurance.schedule'].search([('id','=',cr[0])])
+        self._generate_leads()
+        print("======================================================================================",self)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
     @api.model
     def _generate_leads(self):
-
+        if not self.particular_day:
+            today = fields.Datetime.now().date()
+        else:
+            today = self.particular_day.date()
         leads = []
         for vehicle in self._get_vehicles_for_schedule([],[('source','=',self.source)]):
             lead = {}
-            today = fields.Datetime.now().date()
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
             sale_date = datetime.strptime(datetime.strftime(vehicle.date_order, '%Y%m%d'), '%Y%m%d')
             diff = (today + timedelta(self.offset_days) - sale_date).days
@@ -44,3 +54,4 @@ class InsuranceSchedule(models.Model):
         for lead in created_leads:
             self._schedule_follow_up(lead, today)
         _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
+        return

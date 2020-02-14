@@ -43,11 +43,15 @@ class ServiceSchedule(models.Model):
         self.max_days = False
         self.days = False
 
-    @api.multi
-    def generate_leads(self):
-        for schedule in self:
-            schedule._generate_leads()
-
+    @api.model
+    def generate_service_leads(self, cr, uid, context=None):
+        self = self.env['service.schedule'].search([('id', '=', cr[0])])
+        self._generate_leads()
+        print("======================================================================================", self)
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
     @api.model
     def _prepare_leads(self, vehicle, date_follow_up, service_type, delta):
         lead = super(ServiceSchedule, self).prepare_leads(vehicle, date_follow_up, delta)
@@ -56,8 +60,12 @@ class ServiceSchedule(models.Model):
 
     @api.model
     def _generate_leads(self):
+        print("=========================================--------------------------",self)
         leads = []
-        today = fields.Datetime.now().date()
+        if not self.particular_day:
+            today = fields.Datetime.now().date()
+        else:
+            today = self.particular_day.date()
         for vehicle in self._get_vehicles_for_schedule(None, None):
             lead = {}
             today = datetime.strptime(datetime.strftime(today, '%Y%m%d'), '%Y%m%d')
@@ -84,3 +92,4 @@ class ServiceSchedule(models.Model):
             _logger.info("Created %s Service Leads for %s", len(created_leads), str(today))
         else:
             _logger.info("No Service Leads for %s", str(today))
+        return 

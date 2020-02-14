@@ -54,6 +54,7 @@ class Schedule(models.Model):
     ], string='Vehicle Type', store=True, default='na')
     opportunity_type = fields.Many2one('dms.opportunity.type')
     offset_days = fields.Integer('Offset Days')
+    particular_day = fields.Datetime('Specific Day',default=False)
 
     @api.model
     def default_get(self, fields):

@@ -27,6 +27,10 @@
                         <field name="days"/>
                         <field name="offset_days"/>
                         <field name="delta"/>
+                        <field name="particular_day"/>
+                        <button name="generate_leads"
+                                string="Run for Specific Day" type="object" class="btn-primary" attrs="{'invisible': [('particular_day', '=', False)]}"/>
+
                     </group>
 
                 </sheet>
