@@ -9,6 +9,8 @@
                 <field name="summary" widget="html" string="Summary"/>
                 <field name="disposition" string="Disposition"/>
                 <field name="date" string="Completed Date"/>
+                <field name="vehicle_id"/>
+                <field name="registration_no"/>
                 <field name="user_id" string="Telecaller"/>
                 <field name="team_id" string="Team"/>
             </tree>
@@ -55,7 +57,11 @@
                 <field name="date" string="Completion Date"/>
                 <field name="mobile"/>
                 <field name="user_id" string="Telecaller name"/>
+                <field name="vehicle_id"/>
+                <field name="registration_no"/>
                 <group expand="1" string="Group By">
+                    <filter name="vehicle_id" string="VIN No" context="{'group_by':'vehicle_id'}"/>
+                    <filter name="registration_no" string="Registration no" context="{'group_by':'registration_no'}"/>
                     <filter string="Created By" name="group_by_salesperson" context="{'group_by':'author_id'}"/>
                     <filter string="Telecaller" name="group_by_telecaller" context="{'group_by':'user_id'}"/>
                     <filter string="Disposition" name="group_by_disposition" context="{'group_by':'disposition'}"/>

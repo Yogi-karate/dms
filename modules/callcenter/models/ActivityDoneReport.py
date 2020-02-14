@@ -37,7 +37,8 @@ class ActivityDoneReport(models.Model):
     call_type = fields.Char('Type')
     opportunity_type = fields.Many2one('dms.opportunity.type', 'Opportunity Type', readonly=True)
     disposition = fields.Many2one('dms.lead.disposition', string="Disposition")
-
+    registration_no = fields.Char('Registration')
+    vehicle_id = fields.Many2one('vehicle',string='VIN No')
     def _select(self):
         return """
             SELECT
@@ -62,7 +63,9 @@ class ActivityDoneReport(models.Model):
                 l.call_type,
                 l.probability,
                 l.opportunity_type,
-                l.disposition
+                l.disposition,
+                l.registration_no as registration_no,
+                l.vehicle_id as vehicle_id
         """
 
     def _from(self):
