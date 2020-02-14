@@ -42,6 +42,7 @@
             <search string="Search Leads">
                 <field name="name"
                        filter_domain="['|','|','|',('partner_name', 'ilike', self),('vin_no', 'ilike', self),('mobile', 'ilike', self), ('name', 'ilike', self)]"/>
+                <field name="vehicle_id"/>
                 <field name="user_id"/>
                 <field name="team_id"/>
                 <field name="create_date"/>

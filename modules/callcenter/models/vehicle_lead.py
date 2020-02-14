@@ -46,6 +46,7 @@ class VehicleLead(models.Model):
     partner_id = fields.Many2one('res.partner', compute='_computer_partner', store=True)
     partner_name = fields.Char('Customer', compute='_computer_partner_values', store=True)
     mobile = fields.Char('Mobile', compute='_computer_partner_values', store=True)
+    email_from = fields.Char('Email', compute='_computer_partner_values', store=True)
 
     @api.onchange('vehicle_id')
     def _process_insurance_data(self):
@@ -111,7 +112,7 @@ class VehicleLead(models.Model):
         for lead in self:
             lead.partner_id = lead.vehicle_id.partner_id
 
-    @api.depends('partner_id.name', 'partner_id.mobile')
+    @api.depends('partner_id.name', 'partner_id.mobile','partner_id.email')
     def _computer_partner_values(self):
         for lead in self:
             # if not lead.partner_id:
@@ -120,6 +121,7 @@ class VehicleLead(models.Model):
             # else:
             lead.partner_name = lead.partner_id.name
             lead.mobile = lead.partner_id.mobile
+            lead.email_from = lead.partner_id.email
 
     # @api.onchange('vehicle_id')
     # def get_values(self):
